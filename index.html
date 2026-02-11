@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Astro Logic | Strategic Timing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
+        .gold-gradient {
+            background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; }
+        .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; }
+        .btn-gold:hover { background: #f9e29d; transform: translateY(-2px); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="p-6 border-b border-gray-800 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-widest gold-gradient">VAULT LOGIC</h1>
+        <div class="space-x-6 text-sm uppercase tracking-tighter">
+            <a href="#" class="hover:text-white">Análisis</a>
+            <a href="#" class="hover:text-white">Pricing</a>
+            <a href="#" class="btn-gold px-4 py-2 rounded">Acceso VIP</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-4 text-center">
+        <h2 class="text-4xl md:text-6xl font-light mb-4">Los líderes no esperan a la suerte.<br> <span class="gold-gradient font-bold">Dominan el timing.</span></h2>
+        <p class="text-gray-400 max-w-2xl mb-8">Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.</p>
+
+        <div class="card p-8 w-full max-w-md">
+            <h3 class="text-lg mb-6 uppercase tracking-widest text-gray-300">Consulta de Poder</h3>
+            <div class="space-y-4">
+                <input type="text" placeholder="Nombre completo" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="date" class="p-3 bg-black border border-gray-700 rounded text-gray-400">
+                    <input type="time" class="p-3 bg-black border border-gray-700 rounded text-gray-400">
+                </div>
+                <button onclick="consultar()" class="w-full btn-gold py-4 rounded uppercase text-xs tracking-widest">Generar Briefing de Estrategia</button>
+            </div>
+            <div id="resultado" class="mt-6 text-sm text-yellow-100 italic"></div>
+        </div>
+    </main>
+
+    <footer class="p-10 border-t border-gray-900 text-center text-xs text-gray-600 uppercase tracking-widest">
+        &copy; 2026 VAULT LOGIC - Executive Intelligence Suite
+    </footer>
+
+    <script>
+        async function consultar() {
+            const resDiv = document.getElementById('resultado');
+            resDiv.innerText = "Calculando ciclos de mercado...";
+            
+            // Aquí conectarás con tu URL de Railway después
+            setTimeout(() => {
+                resDiv.innerText = "Análisis: Ventana de expansión detectada para las próximas 48 horas. Ejecución recomendada.";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
