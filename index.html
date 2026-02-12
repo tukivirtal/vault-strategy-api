@@ -51,15 +51,36 @@
     </footer>
 
     <script>
-        async function consultar() {
-            const resDiv = document.getElementById('resultado');
-            resDiv.innerText = "Calculando ciclos de mercado...";
-            
-            // Aquí conectarás con tu URL de Railway después
-            setTimeout(() => {
-                resDiv.innerText = "Análisis: Ventana de expansión detectada para las próximas 48 horas. Ejecución recomendada.";
-            }, 2000);
-        }
+      async function consultar() {
+    const resDiv = document.getElementById('resultado');
+    resDiv.innerText = "Accediendo a la bóveda estratégica...";
+    
+    // PEGA AQUÍ TU URL DE RAILWAY (asegúrate de que termine en /consultar)
+    const urlRailway = "vault-strategy-api-production.up.railway.app"; 
+
+    try {
+        const respuesta = await fetch(urlRailway, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                nombre: document.querySelector('input[placeholder="Nombre completo"]').value,
+                tipo: "ejecutivo"
+            })
+        });
+        
+        const data = await respuesta.json();
+        
+        // Esto mostrará la respuesta real que viene de Python
+        resDiv.innerHTML = `<div class="p-4 border border-yellow-600 bg-black mt-4">
+            <p class="gold-gradient font-bold uppercase text-xs mb-2">Briefing de Inteligencia:</p>
+            ${data.analisis_ejecutivo}
+        </div>`;
+        
+    } catch (error) {
+        resDiv.innerText = "Error: El servidor de alta prioridad no responde.";
+        console.error(error);
+    }
+}
     </script>
 </body>
 </html>
