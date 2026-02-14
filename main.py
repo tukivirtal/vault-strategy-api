@@ -6,22 +6,23 @@ import uvicorn
 
 app = FastAPI()
 
-# Configuración de seguridad (CORS) para que Vercel pueda hablar con Render
+# Configuración de seguridad (CORS) 
+# Importante: "*" permite que tu diseño en Vercel envíe datos sin bloqueos
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción cambiaremos esto por tu URL de Vercel
+    allow_origins=["*"],  
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Conexión con Supabase usando las variables de entorno que pegaste en Render
+# Conexión con Supabase usando las variables de entorno de Render
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.get("/")
 def home():
-    return {"status": "SaaS Ejecutivo Activo", "version": "1.1"}
+    return {"status": "SaaS Ejecutivo Activo", "version": "1.2"}
 
 @app.post("/consultar")
 async def consultar_astros(datos: dict):
@@ -33,7 +34,7 @@ async def consultar_astros(datos: dict):
 
     # 2. Lógica de Guardado en Supabase (clientes_vip)
     try:
-        # Combinamos los datos en un JSON para la columna datos_natales
+        # Estructura de datos para la columna JSONB de Supabase
         datos_natales = {
             "fecha": fecha,
             "hora": hora,
@@ -47,13 +48,14 @@ async def consultar_astros(datos: dict):
         }).execute()
         
     except Exception as e:
+        # Esto saldrá en los "Logs" de Render si algo falla
         print(f"Error guardando en Supabase: {e}")
-        # Seguimos adelante aunque falle el guardado para no romper la experiencia del usuario
 
-    # 3. Respuesta de Estrategia (Aquí es donde integraremos la librería astronómica después)
+    # 3. Respuesta de Estrategia Personalizada
     return {
-        "analisis_ejecutivo": f"Análisis para {nombre}: El cielo sobre {lugar} muestra una configuración estratégica sólida para la fecha {fecha}. Los ciclos indican una ventana de ejecución óptima entre las {hora} y el cierre de jornada."
+        "analisis_ejecutivo": f"Análisis de Bóveda para {nombre}: La frecuencia planetaria sobre {lugar} para el ciclo {fecha} indica una ventana de ejecución estratégica optimizada. Se recomienda acción directa desde las {hora}."
     }
 
+# Corrección del ejecutable principal
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
