@@ -31,23 +31,21 @@
 <main class="flex-grow flex flex-col items-center justify-center px-4 text-center py-12">
     <h2 class="text-4xl md:text-6xl font-light mb-4">Los líderes no esperan a la suerte.<br> <span class="gold-gradient font-bold">Dominan el timing.</span></h2>
     <p class="text-gray-400 max-w-2xl mb-8">Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.</p>
-
-    <div class="card p-8 w-full max-w-md">
-        <h3 class="text-lg mb-6 uppercase tracking-widest text-gray-300">Consulta de Poder</h3>
-        <div class="space-y-4">
-            <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
-            
-            <div class="grid grid-cols-2 gap-4">
-                <input type="date" id="fecha" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none focus:border-yellow-600">
-                <input type="time" id="hora" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none focus:border-yellow-600">
-            </div>
-
-            <input type="text" id="lugar" placeholder="Ciudad y País de nacimiento" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
-
-            <button onclick="consultar()" class="w-full btn-gold py-4 rounded uppercase text-xs tracking-widest">Generar Briefing de Estrategia</button>
+<div class="card p-8 w-full max-w-md">
+    <h3 class="text-lg mb-6 uppercase tracking-widest text-gray-300">Consulta de Poder</h3>
+    <div class="space-y-4">
+        <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
+        <div class="grid grid-cols-2 gap-4">
+            <input type="date" id="fecha" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none">
+            <input type="time" id="hora" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none">
         </div>
-        <div id="resultado" class="mt-6 text-sm text-yellow-100 italic"></div>
+        <input type="text" id="lugar" placeholder="Ciudad, País de nacimiento" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
+        
+        <button onclick="consultar()" class="w-full btn-gold py-4 rounded uppercase text-xs tracking-widest">Generar Briefing de Estrategia</button>
     </div>
+    <div id="resultado" class="mt-6 text-sm text-yellow-100 italic"></div>
+</div>
+  
 </main>
 
 <footer class="p-10 border-t border-gray-900 text-center text-xs text-gray-600 uppercase tracking-widest">
