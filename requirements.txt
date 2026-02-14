@@ -1,4 +1,5 @@
 fastapi
 uvicorn
-flatlib
+gunicorn
 supabase
+python-dotenv
