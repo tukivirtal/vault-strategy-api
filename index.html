@@ -55,49 +55,34 @@
 <script>
 async function consultar() {
     const resDiv = document.getElementById('resultado');
-    resDiv.innerHTML = `<span class="animate-pulse">Accediendo a la bóveda estratégica...</span>`;
+    resDiv.innerHTML = `<span class="animate-pulse">Sincronizando con la bóveda...</span>`;
 
-    // Datos capturados del formulario
-    const datosUsuario = {
+    const payload = {
         nombre: document.getElementById('nombre').value,
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
-        lugar: document.getElementById('lugar').value,
-        tipo: "ejecutivo"
+        lugar: document.getElementById('lugar').value
     };
 
-    // Validación simple
-    if (!datosUsuario.nombre || !datosUsuario.lugar) {
-        resDiv.innerText = "Error: Por favor completa los campos de identidad.";
-        return;
-    }
-
-    const urlBackend = "https://vault-strategy-api.onrender.com/consultar"; 
-
     try {
-        const respuesta = await fetch(urlBackend, {
+        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(datosUsuario)
+            body: JSON.stringify(payload)
         });
         
         const data = await respuesta.json();
         
-        // Renderizado del Briefing Real
+        // Esto borra todo y pone el briefing real
         resDiv.innerHTML = `
-            <div class="p-4 border border-yellow-600 bg-black mt-4 text-left shadow-2xl">
-                <p class="gold-gradient font-bold uppercase text-[10px] mb-2 tracking-[0.2em]">Briefing de Inteligencia Detectado:</p>
-                <div class="text-gray-200 leading-relaxed font-sans not-italic">
-                    ${data.analisis_ejecutivo}
-                </div>
+            <div class="p-4 border border-yellow-600 bg-black mt-4 text-left">
+                <p class="gold-gradient font-bold uppercase text-[10px] mb-2">Briefing de Inteligencia:</p>
+                <p class="not-italic text-gray-200">${data.analisis_ejecutivo}</p>
             </div>`;
-        
     } catch (error) {
-        resDiv.innerText = "Error: El servidor de alta prioridad no responde.";
-        console.error("Detalle técnico:", error);
+        resDiv.innerText = "Error de conexión con el núcleo estratégico.";
     }
 }
 </script>
-
 </body>
 </html>
