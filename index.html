@@ -6,7 +6,7 @@
     <title>Executive Astro Logic | Strategic Timing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         .gold-gradient {
             background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
             -webkit-background-clip: text;
@@ -17,70 +17,89 @@
         .btn-gold:hover { background: #f9e29d; transform: translateY(-2px); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-    <nav class="p-6 border-b border-gray-800 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-widest gold-gradient">VAULT LOGIC</h1>
-        <div class="space-x-6 text-sm uppercase tracking-tighter">
-            <a href="#" class="hover:text-white">Análisis</a>
-            <a href="#" class="hover:text-white">Pricing</a>
-            <a href="#" class="btn-gold px-4 py-2 rounded">Acceso VIP</a>
-        </div>
-    </nav>
+<nav class="p-6 border-b border-gray-800 flex justify-between items-center">
+    <h1 class="text-xl font-bold tracking-widest gold-gradient">VAULT LOGIC</h1>
+    <div class="space-x-6 text-sm uppercase tracking-tighter">
+        <a href="#" class="hover:text-white">Análisis</a>
+        <a href="#" class="hover:text-white">Pricing</a>
+        <a href="#" class="btn-gold px-4 py-2 rounded">Acceso VIP</a>
+    </div>
+</nav>
 
-    <main class="flex-grow flex flex-col items-center justify-center px-4 text-center">
-        <h2 class="text-4xl md:text-6xl font-light mb-4">Los líderes no esperan a la suerte.<br> <span class="gold-gradient font-bold">Dominan el timing.</span></h2>
-        <p class="text-gray-400 max-w-2xl mb-8">Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.</p>
+<main class="flex-grow flex flex-col items-center justify-center px-4 text-center py-12">
+    <h2 class="text-4xl md:text-6xl font-light mb-4">Los líderes no esperan a la suerte.<br> <span class="gold-gradient font-bold">Dominan el timing.</span></h2>
+    <p class="text-gray-400 max-w-2xl mb-8">Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.</p>
 
-        <div class="card p-8 w-full max-w-md">
-            <h3 class="text-lg mb-6 uppercase tracking-widest text-gray-300">Consulta de Poder</h3>
-            <div class="space-y-4">
-                <input type="text" placeholder="Nombre completo" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="date" class="p-3 bg-black border border-gray-700 rounded text-gray-400">
-                    <input type="time" class="p-3 bg-black border border-gray-700 rounded text-gray-400">
-                </div>
-                <button onclick="consultar()" class="w-full btn-gold py-4 rounded uppercase text-xs tracking-widest">Generar Briefing de Estrategia</button>
+    <div class="card p-8 w-full max-w-md">
+        <h3 class="text-lg mb-6 uppercase tracking-widest text-gray-300">Consulta de Poder</h3>
+        <div class="space-y-4">
+            <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <input type="date" id="fecha" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none focus:border-yellow-600">
+                <input type="time" id="hora" class="p-3 bg-black border border-gray-700 rounded text-gray-400 outline-none focus:border-yellow-600">
             </div>
-            <div id="resultado" class="mt-6 text-sm text-yellow-100 italic"></div>
+
+            <input type="text" id="lugar" placeholder="Ciudad y País de nacimiento" class="w-full p-3 bg-black border border-gray-700 rounded focus:border-yellow-600 outline-none text-white">
+
+            <button onclick="consultar()" class="w-full btn-gold py-4 rounded uppercase text-xs tracking-widest">Generar Briefing de Estrategia</button>
         </div>
-    </main>
+        <div id="resultado" class="mt-6 text-sm text-yellow-100 italic"></div>
+    </div>
+</main>
 
-    <footer class="p-10 border-t border-gray-900 text-center text-xs text-gray-600 uppercase tracking-widest">
-        &copy; 2026 VAULT LOGIC - Executive Intelligence Suite
-    </footer>
+<footer class="p-10 border-t border-gray-900 text-center text-xs text-gray-600 uppercase tracking-widest">
+    &copy; 2026 VAULT LOGIC - Executive Intelligence Suite
+</footer>
 
-    <script>
-      async function consultar() {
+<script>
+async function consultar() {
     const resDiv = document.getElementById('resultado');
-    resDiv.innerText = "Accediendo a la bóveda estratégica...";
-    
-    // PEGA AQUÍ TU URL DE RAILWAY (asegúrate de que termine en /consultar)
+    resDiv.innerHTML = `<span class="animate-pulse">Accediendo a la bóveda estratégica...</span>`;
+
+    // Datos capturados del formulario
+    const datosUsuario = {
+        nombre: document.getElementById('nombre').value,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        lugar: document.getElementById('lugar').value,
+        tipo: "ejecutivo"
+    };
+
+    // Validación simple
+    if (!datosUsuario.nombre || !datosUsuario.lugar) {
+        resDiv.innerText = "Error: Por favor completa los campos de identidad.";
+        return;
+    }
+
     const urlBackend = "https://vault-strategy-api.onrender.com/consultar"; 
 
     try {
         const respuesta = await fetch(urlBackend, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                nombre: document.querySelector('input[placeholder="Nombre completo"]').value,
-                tipo: "ejecutivo"
-            })
+            body: JSON.stringify(datosUsuario)
         });
         
         const data = await respuesta.json();
         
-        // Esto mostrará la respuesta real que viene de Python
-        resDiv.innerHTML = `<div class="p-4 border border-yellow-600 bg-black mt-4">
-            <p class="gold-gradient font-bold uppercase text-xs mb-2">Briefing de Inteligencia:</p>
-            ${data.analisis_ejecutivo}
-        </div>`;
+        // Renderizado del Briefing Real
+        resDiv.innerHTML = `
+            <div class="p-4 border border-yellow-600 bg-black mt-4 text-left shadow-2xl">
+                <p class="gold-gradient font-bold uppercase text-[10px] mb-2 tracking-[0.2em]">Briefing de Inteligencia Detectado:</p>
+                <div class="text-gray-200 leading-relaxed font-sans not-italic">
+                    ${data.analisis_ejecutivo}
+                </div>
+            </div>`;
         
     } catch (error) {
         resDiv.innerText = "Error: El servidor de alta prioridad no responde.";
-        console.error(error);
+        console.error("Detalle técnico:", error);
     }
 }
-    </script>
+</script>
+
 </body>
 </html>
