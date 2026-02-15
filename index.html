@@ -88,21 +88,30 @@ async function escribirEfecto(elemento, texto, velocidad = 30) {
         escribir();
     });
 }
-// Función para mayúsculas automáticas
+// Función para mayúsculas automáticas en todos los inputs
 document.querySelectorAll('input').forEach(input => {
     input.addEventListener('input', () => {
         input.value = input.value.toUpperCase();
     });
 });
 
-// Función para salto automático (Auto-Tab) en Fecha y Hora
-document.getElementById('fecha').addEventListener('change', () => {
-    document.getElementById('hora').focus();
+// Auto-Tab inteligente para la Fecha
+document.getElementById('fecha').addEventListener('input', (e) => {
+    const valor = e.target.value;
+    // Solo saltamos si el usuario terminó de escribir una fecha válida (YYYY-MM-DD)
+    // El formato del input date suele ser de 10 caracteres
+    if (valor.length === 10) {
+        document.getElementById('hora').focus();
+    }
 });
 
-document.getElementById('hora').addEventListener('change', () => {
-    document.getElementById('lugar').focus();
+// Auto-Tab para la Hora (salta al lugar al completarse)
+document.getElementById('hora').addEventListener('input', (e) => {
+    if (e.target.value.length === 5) { // Formato HH:MM
+        document.getElementById('lugar').focus();
+    }
 });
+
 async function consultar() {
     const resContainer = document.getElementById('resultado');
     const resTitulo = document.getElementById('res-titulo');
@@ -110,9 +119,8 @@ async function consultar() {
     const resGeo = document.getElementById('res-geo');
     
     resContainer.classList.remove('hidden');
-    resTitulo.innerHTML = "PROCESANDO...";
-    resCuerpo.innerHTML = "Sincronizando con efemérides NASA...";
-    resGeo.innerHTML = "";
+    resTitulo.innerHTML = "INICIANDO CÁLCULO...";
+    resCuerpo.innerHTML = "Sincronizando coordenadas con Bóveda Central...";
 
     const payload = {
         nombre: document.getElementById('nombre').value,
@@ -131,13 +139,13 @@ async function consultar() {
         
         const data = await respuesta.json();
         
-        // Efecto de carga finalizado, procedemos a escribir el briefing
-        await escribirEfecto(resTitulo, data.titulo || "BRIEFING ESTRATÉGICO");
+        // Efecto teletipo para el resultado final
+        await escribirEfecto(resTitulo, data.titulo);
         await escribirEfecto(resCuerpo, data.analisis_ejecutivo);
-        resGeo.innerHTML = `GEO-REF: ${data.coordinadas || 'LAT/LON ENCRYPTED'} | ${data.firma || 'VAULT LOGIC'}`;
+        resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "<span class='text-red-800'>ERROR: FALLO EN EL NÚCLEO ESTRATÉGICO.</span>";
+        resCuerpo.innerHTML = "ERROR DE SINCRONIZACIÓN: NÚCLEO NO DISPONIBLE.";
     }
 }
 </script>
