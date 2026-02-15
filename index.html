@@ -15,42 +15,43 @@
         }
         .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
-        .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+        .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); }
         .mono { font-family: 'JetBrains Mono', monospace; }
+        input:focus { border-color: #d4af37 !important; }
     </style>
 </head>
-<body class="p-4 md:p-10">
-    <header class="flex justify-between items-center mb-16 px-4">
+<body class="p-4 md:p-10 text-white">
+    <header class="flex justify-between items-center mb-16">
         <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
         <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-500">
-            <a href="#" class="hover:text-white transition">Análisis</a>
-            <a href="#" class="hover:text-white transition">Pricing</a>
-            <a href="#" class="hover:text-white transition font-bold text-yellow-600">Acceso VIP</a>
+            <span class="cursor-default">Análisis</span>
+            <span class="cursor-default">Pricing</span>
+            <span class="text-yellow-600 font-bold">Acceso VIP</span>
         </nav>
     </header>
 
 <main class="flex-grow flex flex-col items-center justify-center">
     <div class="text-center mb-10 px-4">
-        <h2 class="text-4xl md:text-5xl font-light mb-4 text-white">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
-        <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-tighter">
-            Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.
+        <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
+        <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-widest">
+            Inteligencia estratégica basada en ciclos planetarios de precisión.
         </p>
     </div>
 
     <div class="card p-8 w-full max-w-md">
-        <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4 font-bold">Acceso a la Bóveda</h3>
-        <div class="space-y-4">
-            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
-            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
+        <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Acceso a la Bóveda</h3>
+        <div class="space-y-4" id="form-boveda">
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
 
             <div class="grid grid-cols-2 gap-4">
-                <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
-                <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
+                <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
+                <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
             </div>
             
-            <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
+            <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
             
-            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-2">
+            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-4">
                 Iniciar Secuencia de Cálculo
             </button>
         </div>
@@ -70,6 +71,7 @@
 </footer>
 
 <script>
+// Efecto Teletipo
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -79,33 +81,24 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// Mayúsculas automáticas (Excepto Email)
-document.querySelectorAll('input:not([type="email"])').forEach(input => {
-    input.addEventListener('input', () => {
-        input.value = input.value.toUpperCase();
-    });
-});
-
-// NAVEGACIÓN MANUAL Y SEGURA
-// Para la fecha, mantenemos la lógica de longitud que te servía
-document.getElementById('fecha').addEventListener('input', (e) => {
-    if (e.target.value.length === 10) {
-        document.getElementById('hora').focus();
+// 1. FORZAR MAYÚSCULAS EN TIEMPO REAL (Excepto email)
+document.addEventListener('input', (e) => {
+    if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
+        e.target.value = e.target.value.toUpperCase();
     }
 });
 
-// Para la HORA y el LUGAR, mejor usamos la tecla ENTER para evitar saltos locos
+// 2. NAVEGACIÓN TOTAL CON ENTER (UX Premium sin errores)
+// El usuario presiona Enter para avanzar de forma segura
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        const current = document.activeElement;
-        if (current.id === 'hora') {
-            document.getElementById('lugar').focus();
-        } else if (current.id === 'lugar' || current.id === 'nombre' || current.id === 'email') {
-            const inputs = Array.from(document.querySelectorAll('input'));
-            const index = inputs.indexOf(current);
-            if (index > -1 && index < inputs.length - 1) {
-                inputs[index + 1].focus();
-            }
+        const inputs = Array.from(document.querySelectorAll('input'));
+        const index = inputs.indexOf(document.activeElement);
+        if (index > -1 && index < inputs.length - 1) {
+            e.preventDefault(); 
+            inputs[index + 1].focus();
+        } else if (index === inputs.length - 1) {
+            consultar(); 
         }
     }
 });
@@ -118,8 +111,7 @@ async function consultar() {
     
     resContainer.classList.remove('hidden');
     resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Analizando vectores de oportunidad...";
-    resGeo.innerHTML = "";
+    resCuerpo.innerHTML = "Extrayendo efemérides y geolocalización...";
 
     const payload = {
         nombre: document.getElementById('nombre').value,
@@ -143,7 +135,7 @@ async function consultar() {
         resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "<span class='text-red-700 text-xs'>CRITICAL ERROR: Enlace fallido con la Bóveda.</span>";
+        resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE DE DATOS.";
     }
 }
 </script>
