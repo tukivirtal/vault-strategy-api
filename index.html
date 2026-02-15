@@ -70,7 +70,6 @@
 </footer>
 
 <script>
-// Efecto Teletipo Profesional para la salida de datos
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -80,33 +79,33 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// 1. FORZAR MAYÚSCULAS (Excepto en el email por estándar técnico)
+// Mayúsculas automáticas (Excepto Email)
 document.querySelectorAll('input:not([type="email"])').forEach(input => {
-    input.addEventListener('input', (e) => {
-        e.target.value = e.target.value.toUpperCase();
+    input.addEventListener('input', () => {
+        input.value = input.value.toUpperCase();
     });
 });
 
-// 2. NAVEGACIÓN INTELIGENTE (Auto-Tab corregido)
-// Usamos 'change' para que el usuario termine de elegir antes de saltar
-document.getElementById('fecha').addEventListener('change', () => {
-    document.getElementById('hora').focus();
+// NAVEGACIÓN MANUAL Y SEGURA
+// Para la fecha, mantenemos la lógica de longitud que te servía
+document.getElementById('fecha').addEventListener('input', (e) => {
+    if (e.target.value.length === 10) {
+        document.getElementById('hora').focus();
+    }
 });
 
-document.getElementById('hora').addEventListener('change', () => {
-    document.getElementById('lugar').focus();
-});
-
-// 3. NAVEGACIÓN CON TECLA ENTER (Estilo Terminal Profesional)
+// Para la HORA y el LUGAR, mejor usamos la tecla ENTER para evitar saltos locos
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        const inputs = Array.from(document.querySelectorAll('input'));
-        const index = inputs.indexOf(document.activeElement);
-        if (index > -1 && index < inputs.length - 1) {
-            e.preventDefault(); 
-            inputs[index + 1].focus();
-        } else if (index === inputs.length - 1) {
-            consultar(); 
+        const current = document.activeElement;
+        if (current.id === 'hora') {
+            document.getElementById('lugar').focus();
+        } else if (current.id === 'lugar' || current.id === 'nombre' || current.id === 'email') {
+            const inputs = Array.from(document.querySelectorAll('input'));
+            const index = inputs.indexOf(current);
+            if (index > -1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
         }
     }
 });
@@ -119,7 +118,7 @@ async function consultar() {
     
     resContainer.classList.remove('hidden');
     resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Analizando vectores de oportunidad y coordenadas...";
+    resCuerpo.innerHTML = "Analizando vectores de oportunidad...";
     resGeo.innerHTML = "";
 
     const payload = {
@@ -139,13 +138,12 @@ async function consultar() {
         
         const data = await respuesta.json();
         
-        // Ejecución de respuesta con efecto visual de terminal
-        await escribirEfecto(resTitulo, data.titulo || "DIRECTIVA RECIBIDA");
+        await escribirEfecto(resTitulo, data.titulo);
         await escribirEfecto(resCuerpo, data.analisis_ejecutivo);
         resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "<span class='text-red-700'>CRITICAL ERROR: Enlace fallido con la Bóveda.</span>";
+        resCuerpo.innerHTML = "<span class='text-red-700 text-xs'>CRITICAL ERROR: Enlace fallido con la Bóveda.</span>";
     }
 }
 </script>
