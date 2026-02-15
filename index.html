@@ -63,8 +63,10 @@ async function consultar() {
     const resDiv = document.getElementById('resultado');
     resDiv.innerHTML = `<span class="animate-pulse">Sincronizando con la bóveda...</span>`;
 
+    // ASEGÚRATE DE QUE LOS ID COINCIDAN CON TUS INPUTS
     const payload = {
         nombre: document.getElementById('nombre').value,
+        email: document.getElementById('email').value, // <-- El culpable estaba aquí
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
         lugar: document.getElementById('lugar').value
@@ -78,8 +80,6 @@ async function consultar() {
         });
         
         const data = await respuesta.json();
-        
-        // Esto borra todo y pone el briefing real
         resDiv.innerHTML = `
             <div class="p-4 border border-yellow-600 bg-black mt-4 text-left">
                 <p class="gold-gradient font-bold uppercase text-[10px] mb-2">Briefing de Inteligencia:</p>
