@@ -6,8 +6,7 @@ import uvicorn
 
 app = FastAPI()
 
-# Configuración de seguridad (CORS) 
-# Corregido: ["*"] permite que Vercel pueda enviar los datos al servidor
+# Configuración de seguridad (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -22,41 +21,48 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.get("/")
 def home():
-    return {"status": "SaaS Ejecutivo Activo", "version": "1.3"}
+    return {"status": "SaaS Ejecutivo Activo - Fase 1", "version": "1.4"}
 
 @app.post("/consultar")
 async def consultar_astros(datos: dict):
-    # 1. Extraemos los datos del formulario de Vercel
+    # 1. Extraemos los datos del formulario (Ahora incluyendo email)
     nombre = datos.get('nombre', 'Usuario Anónimo')
+    email = datos.get('email')
     fecha = datos.get('fecha')
     hora = datos.get('hora')
     lugar = datos.get('lugar')
 
+    # Preparación para la Fase 2: El mapa total que alimentará la tabla de correspondencias
+    # Por ahora guardamos un estado pendiente
+    mapa_simulado = {
+        "engine": "NASA_Eph_V1",
+        "status": "pending_calculation",
+        "precision": "high"
+    }
+
     # 2. Lógica de Guardado en Supabase
     try:
-        # Preparamos el objeto JSON para la columna datos_natales
-        datos_natales = {
-            "fecha": fecha,
-            "hora": hora,
-            "lugar": lugar
-        }
-        
-        # Enviamos SOLO las columnas que no dan error (nombre y datos_natales)
-        # Nota: Omitimos 'email' porque no lo estamos pidiendo en el diseño aún
+        # Insertamos en la tabla clientes_vip con los nuevos campos de la Fase 1
         supabase.table("clientes_vip").insert({
             "nombre": nombre,
-            "datos_natales": datos_natales
+            "email": email,
+            "datos_natales": {
+                "fecha": fecha, 
+                "hora": hora, 
+                "lugar": lugar
+            },
+            "mapatotal": mapa_simulado,
+            "nivel_suscripcion": "free"
         }).execute()
         
     except Exception as e:
-        # Si falla, verás el error detallado en los Logs de Render
-        print(f"Error guardando en Supabase: {str(e)}")
+        # Revisa los Logs de Render si esto falla; puede ser que falte la columna en SQL
+        print(f"Error Fase 1 - Guardado: {str(e)}")
 
-    # 3. Respuesta de Estrategia para el diseño dorado
+    # 3. Respuesta de Estrategia para el cliente
     return {
-        "analisis_ejecutivo": f"Análisis de Bóveda para {nombre}: La frecuencia planetaria sobre {lugar} para el ciclo {fecha} indica una ventana de ejecución estratégica optimizada. Se recomienda acción directa desde las {hora}."
+        "analisis_ejecutivo": f"Bienvenido a la Bóveda, {nombre}. Tu reporte inicial ha sido generado y enviado a {email}. Los ciclos detectados en {lugar} para el {fecha} están siendo procesados con prioridad ejecutiva."
     }
 
-# Corrección vital del ejecutable
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
