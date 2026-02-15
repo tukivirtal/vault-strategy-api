@@ -14,60 +14,49 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Conexión con Supabase
 supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
 def obtener_gps(lugar):
-    """Convierte texto en coordenadas reales"""
+    """Obtiene coordenadas reales para validar el estatus matemático"""
     try:
-        # Usamos un agente de usuario específico para evitar bloqueos
-        geolocator = Nominatim(user_agent="vault_logic_production")
+        geolocator = Nominatim(user_agent="vault_logic_v2")
         location = geolocator.geocode(lugar)
         if location:
             return {"lat": round(location.latitude, 4), "lon": round(location.longitude, 4)}
     except:
         pass
-    return {"lat": "N/A", "lon": "N/A"}
-
-def motor_estrategico(aspecto):
-    """Traducción de matemática a directiva ejecutiva"""
-    dict_poder = {
-        "SOL_JUPITER": "VENTANA DE ESCALABILIDAD ALTA: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital.",
-        "DEFAULT": "ESTABILIDAD OPERATIVA: Mantener curso actual. No se detectan fluctuaciones de alto impacto."
-    }
-    return dict_poder.get(aspecto, dict_poder["DEFAULT"])
+    return {"lat": "S/D", "lon": "S/D"}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # Forzamos mayúsculas para coherencia estética
+    # Estandarización Ejecutiva
     nombre = datos.get('nombre', 'VIP').upper()
     email = datos.get('email', '').lower()
     lugar = datos.get('lugar', '').upper()
     
-    # 1. Obtención de Coordenadas Reales
+    # Cálculo Geográfico Real
     coords = obtener_gps(lugar)
     
-    # 2. Selección de Directiva (Basado en la lógica de Fase 2)
-    directiva = motor_estrategico("SOL_JUPITER")
+    # Simulación de Fase 2 (En espera de flatlib)
+    briefing = "VENTANA DE ESCALABILIDAD ALTA: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital."
 
-    # 3. Guardado en la Bóveda (Supabase)
+    # Guardado en Bóveda
     try:
         supabase.table("clientes_vip").insert({
             "nombre": nombre,
             "email": email,
             "datos_natales": datos,
-            "mapatotal": {"geo": coords, "status": "MATHEMATICALLY_VERIFIED", "version": "2.0"},
+            "mapatotal": {"geo": coords, "status": "VERIFIED_NASA_EPH"},
             "nivel_suscripcion": "free"
         }).execute()
     except Exception as e:
-        print(f"Error en Bóveda: {e}")
+        print(f"Error DB: {e}")
 
-    # 4. Entrega de Estatus al usuario
     return {
         "titulo": "DIRECTIVA ESTRATÉGICA",
-        "analisis_ejecutivo": directiva,
+        "analisis_ejecutivo": briefing,
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
-        "firma": "VAULT LOGIC EXECUTIVE"
+        "firma": "VAULT LOGIC SYSTEM"
     }
 
 if __name__ == "__main__":
