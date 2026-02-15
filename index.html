@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executive Astro Logic | Strategic Timing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         .gold-gradient {
@@ -17,12 +16,10 @@
         .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
         .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .typing { border-right: 2px solid #d4af37; animation: blink 0.75s step-end infinite; }
-        @keyframes blink { from, to { border-color: transparent } 50% { border-color: #d4af37 } }
     </style>
 </head>
 <body class="p-4 md:p-10">
-    <header class="flex justify-between items-center mb-16">
+    <header class="flex justify-between items-center mb-16 px-4">
         <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
         <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-500">
             <a href="#" class="hover:text-white transition">Análisis</a>
@@ -31,85 +28,72 @@
         </nav>
     </header>
 
-    <main class="flex-grow flex flex-col items-center justify-center">
-        <div class="text-center mb-10">
-            <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
-            <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-tighter">
-                Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.
-            </p>
-        </div>
+<main class="flex-grow flex flex-col items-center justify-center">
+    <div class="text-center mb-10 px-4">
+        <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
+        <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-tighter">
+            Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.
+        </p>
+    </div>
 
-        <div class="card p-8 w-full max-w-md">
-            <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Acceso a la Bóveda</h3>
-            <div class="space-y-4">
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
-                <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
+    <div class="card p-8 w-full max-w-md">
+        <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Acceso a la Bóveda</h3>
+        <div class="space-y-4">
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
 
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
-                    <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
-                </div>
-                
-                <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
-                
-                <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em]">
-                    Iniciar Secuencia de Cálculo
-                </button>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
+                <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-500 outline-none text-xs mono">
             </div>
             
-            <div id="resultado" class="mt-8 hidden">
-                <div class="p-5 border-l-2 border-yellow-600 bg-[#0d0d0d] space-y-3">
-                    <div id="res-titulo" class="gold-gradient font-bold uppercase text-xs tracking-widest mono"></div>
-                    <div id="res-cuerpo" class="text-gray-300 text-sm leading-relaxed mono"></div>
-                    <div id="res-geo" class="text-[10px] text-gray-600 mono pt-2 border-t border-gray-900"></div>
-                </div>
+            <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
+            
+            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em]">
+                Iniciar Secuencia de Cálculo
+            </button>
+        </div>
+        
+        <div id="resultado" class="mt-8 hidden">
+            <div class="p-5 border-l-2 border-yellow-600 bg-[#0d0d0d] space-y-3 font-mono">
+                <div id="res-titulo" class="gold-gradient font-bold uppercase text-xs tracking-widest"></div>
+                <div id="res-cuerpo" class="text-gray-300 text-sm leading-relaxed"></div>
+                <div id="res-geo" class="text-[10px] text-gray-600 pt-2 border-t border-gray-900"></div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
-        © 2026 VAULT LOGIC - Executive Intelligence Suite
-    </footer>
+<footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
+    © 2026 VAULT LOGIC - Executive Intelligence Suite
+</footer>
 
 <script>
-async function escribirEfecto(elemento, texto, velocidad = 30) {
+// Efecto Teletipo Profesional
+async function escribirEfecto(elemento, texto, velocidad = 20) {
+    if (!texto) return;
     elemento.innerHTML = "";
-    let i = 0;
-    return new Promise(resolve => {
-        function escribir() {
-            if (i < texto.length) {
-                elemento.innerHTML += texto.charAt(i);
-                i++;
-                setTimeout(escribir, velocidad);
-            } else {
-                resolve();
-            }
-        }
-        escribir();
-    });
+    for (let i = 0; i < texto.length; i++) {
+        elemento.innerHTML += texto.charAt(i);
+        await new Promise(r => setTimeout(r, velocidad));
+    }
 }
-// Función para mayúsculas automáticas en todos los inputs
-document.querySelectorAll('input').forEach(input => {
+
+// Mayúsculas automáticas (Excepto Email por razones técnicas)
+document.querySelectorAll('input:not([type="email"])').forEach(input => {
     input.addEventListener('input', () => {
         input.value = input.value.toUpperCase();
     });
 });
 
-// Auto-Tab inteligente para la Fecha
-document.getElementById('fecha').addEventListener('input', (e) => {
-    const valor = e.target.value;
-    // Solo saltamos si el usuario terminó de escribir una fecha válida (YYYY-MM-DD)
-    // El formato del input date suele ser de 10 caracteres
-    if (valor.length === 10) {
-        document.getElementById('hora').focus();
-    }
+// NAVEGACIÓN INTELIGENTE (Auto-Tab corregido para usuario exigente)
+// Usamos 'change' en lugar de 'input' para evitar saltos prematuros
+document.getElementById('fecha').addEventListener('change', () => {
+    document.getElementById('hora').focus();
 });
 
-// Auto-Tab para la Hora (salta al lugar al completarse)
-document.getElementById('hora').addEventListener('input', (e) => {
-    if (e.target.value.length === 5) { // Formato HH:MM
-        document.getElementById('lugar').focus();
-    }
+document.getElementById('hora').addEventListener('change', () => {
+    document.getElementById('lugar').focus();
 });
 
 async function consultar() {
@@ -119,8 +103,9 @@ async function consultar() {
     const resGeo = document.getElementById('res-geo');
     
     resContainer.classList.remove('hidden');
-    resTitulo.innerHTML = "INICIANDO CÁLCULO...";
-    resCuerpo.innerHTML = "Sincronizando coordenadas con Bóveda Central...";
+    resTitulo.innerHTML = "SISTEMA:";
+    resCuerpo.innerHTML = "Procesando coordenadas y efemérides...";
+    resGeo.innerHTML = "";
 
     const payload = {
         nombre: document.getElementById('nombre').value,
@@ -139,13 +124,13 @@ async function consultar() {
         
         const data = await respuesta.json();
         
-        // Efecto teletipo para el resultado final
+        // Ejecución de respuesta con efecto visual
         await escribirEfecto(resTitulo, data.titulo);
         await escribirEfecto(resCuerpo, data.analisis_ejecutivo);
         resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "ERROR DE SINCRONIZACIÓN: NÚCLEO NO DISPONIBLE.";
+        resCuerpo.innerHTML = "CRITICAL ERROR: Sincronización fallida con el núcleo.";
     }
 }
 </script>
