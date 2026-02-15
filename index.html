@@ -79,21 +79,25 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// Mayúsculas automáticas (Excepto Email por razones técnicas)
-document.querySelectorAll('input:not([type="email"])').forEach(input => {
-    input.addEventListener('input', () => {
-        input.value = input.value.toUpperCase();
-    });
-});
+// 1. FORZAR MAYÚSCULAS Y AUTO-TAB (Lógica mejorada)
+document.addEventListener('input', (e) => {
+    const el = e.target;
 
-// NAVEGACIÓN INTELIGENTE (Auto-Tab corregido para usuario exigente)
-// Usamos 'change' en lugar de 'input' para evitar saltos prematuros
-document.getElementById('fecha').addEventListener('change', () => {
-    document.getElementById('hora').focus();
-});
+    // Forzar Mayúsculas (excepto en email)
+    if (el.tagName === 'INPUT' && el.id !== 'email') {
+        el.value = el.value.toUpperCase();
+    }
 
-document.getElementById('hora').addEventListener('change', () => {
-    document.getElementById('lugar').focus();
+    // Lógica de Salto Automático (Auto-Tab)
+    // Para la fecha: el formato interno de los navegadores es YYYY-MM-DD (10 caracteres)
+    if (el.id === 'fecha' && el.value.length === 10) {
+        document.getElementById('hora').focus();
+    }
+
+    // Para la hora: el formato es HH:MM (5 caracteres)
+    if (el.id === 'hora' && el.value.length === 5) {
+        document.getElementById('lugar').focus();
+    }
 });
 
 async function consultar() {
@@ -104,7 +108,7 @@ async function consultar() {
     
     resContainer.classList.remove('hidden');
     resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Procesando coordenadas y efemérides...";
+    resCuerpo.innerHTML = "Calculando coordenadas y vectores de poder...";
     resGeo.innerHTML = "";
 
     const payload = {
@@ -130,7 +134,7 @@ async function consultar() {
         resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "CRITICAL ERROR: Sincronización fallida con el núcleo.";
+        resCuerpo.innerHTML = "<span class='text-red-600'>CRITICAL ERROR: Fallo de enlace con el núcleo.</span>";
     }
 }
 </script>
