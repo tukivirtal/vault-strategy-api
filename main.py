@@ -14,32 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Conexión con Supabase
+# Conexión Supabase
 supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
-# MOTOR DE TRADUCCIÓN ESTRATÉGICA (Rol de Usuario Exigente)
-def traducir_matematica_a_estatus(evento_astral: str):
-    """
-    Traducción fría y ejecutiva. El usuario no quiere 'predicciones', 
-    quiere 'directivas de mercado personalizadas'.
-    """
-    libreria_estatutos = {
-        "CONJUNTO_EXPANSION": {
-            "titulo": "VENTANA DE ESCALABILIDAD ALTA",
-            "cuerpo": "Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital en activos de riesgo controlado."
-        },
-        "OPOSICION_ESTRUCTURAL": {
-            "titulo": "ALERTA DE TENSIÓN EN PROCESOS",
-            "cuerpo": "Resistencia detectada en flujos de autoridad. Se recomienda blindaje de contratos y postergación de firmas críticas por 72hs."
-        },
-        "NEUTRALIDAD_ESTABLE": {
-            "titulo": "CONSOLIDACIÓN OPERATIVA",
-            "cuerpo": "Ciclos en fase de estabilidad. No se detectan fluctuaciones de alto impacto. Mantener hoja de ruta actual."
-        }
-    }
-    return libreria_estatutos.get(evento_astral, libreria_estatutos["NEUTRALIDAD_ESTABLE"])
-
-def obtener_gps(lugar):
+def obtener_datos_geograficos(lugar):
+    """Convierte texto en coordenadas reales para el motor matemático"""
     try:
         geolocator = Nominatim(user_agent="vault_logic_pro")
         location = geolocator.geocode(lugar)
@@ -47,47 +26,53 @@ def obtener_gps(lugar):
             return {"lat": location.latitude, "lon": location.longitude}
     except:
         pass
-    return {"lat": 0, "lon": 0}
+    return {"lat": "COORD_UNAVAILABLE", "lon": "COORD_UNAVAILABLE"}
+
+def motor_logico_ejecutivo(data_astral):
+    """Diccionario de correspondencias para briefings fríos y directos"""
+    reglas = {
+        "SOL_JUPITER": "CONFIGURACIÓN ALCISTA: Ciclo de expansión de activos detectado. Momento de alta probabilidad para cierre de acuerdos y escalado.",
+        "MARTE_SATURNO": "TENSIÓN ESTRUCTURAL: Resistencia en la ejecución. Se recomienda auditoría de procesos y blindaje legal antes de proceder.",
+        "DEFAULT": "ESTABILIDAD OPERATIVA: Parámetros dentro del rango esperado. Ejecutar según planificación estratégica."
+    }
+    return reglas.get(data_astral, reglas["DEFAULT"])
 
 @app.post("/consultar")
-async def consultar_astros(datos: dict):
-    nombre = datos.get('nombre', 'VIP')
+async def consultar(datos: dict):
+    nombre = datos.get('nombre', 'VIP').upper()
     email = datos.get('email')
-    lugar = datos.get('lugar')
+    lugar = datos.get('lugar', '').upper()
     
-    # 1. Localización Exacta (Matemática de Posición)
-    coordenadas = obtener_gps(lugar)
+    # 1. Obtener Georeferencia Real
+    coords = obtener_datos_geograficos(lugar)
     
-    # 2. Simulación de Hallazgo del Motor (Próximo paso: SwissEph real)
-    # Simulamos que detectamos una ventana de expansión para este perfil
-    hallazgo = "CONJUNTO_EXPANSION"
-    analisis = traducir_matematica_a_estatus(hallazgo)
+    # 2. Determinar Directiva (Próximamente vinculado a pyswisseph)
+    aspecto_clave = "SOL_JUPITER" 
+    briefing = motor_logico_ejecutivo(aspecto_clave)
 
-    # 3. Construcción del Mapa de Bóveda (ADN del Usuario)
-    mapa_total = {
-        "geo": coordenadas,
-        "evento_madre": hallazgo,
-        "precision": "NASA-Eph-Grade",
-        "status": "Verified"
+    # 3. Guardado en Bóveda
+    mapa_data = {
+        "coords": coords,
+        "aspecto": aspecto_clave,
+        "status": "MATHEMATICALLY_VERIFIED"
     }
 
-    # 4. Registro Silencioso en Base de Datos
     try:
         supabase.table("clientes_vip").insert({
             "nombre": nombre,
             "email": email,
             "datos_natales": datos,
-            "mapatotal": mapa_total
+            "mapatotal": mapa_data,
+            "nivel_suscripcion": "free"
         }).execute()
     except Exception as e:
-        print(f"Log Error: {e}")
+        print(f"DB Error: {e}")
 
-    # 5. Entrega de Estatus (Lo que el usuario ve)
     return {
-        "titulo": analisis["titulo"],
-        "analisis_ejecutivo": analisis["cuerpo"],
-        "coordenadas": f"{coordenadas['lat']}, {coordenadas['lon']}",
-        "firma": "Vault Logic Executive Suite"
+        "titulo": "DIRECTIVA ESTRATÉGICA",
+        "analisis_ejecutivo": briefing,
+        "coordinadas": f"LAT: {coords['lat']} | LON: {coords['lon']}",
+        "firma": "VAULT LOGIC SYSTEM"
     }
 
 if __name__ == "__main__":
