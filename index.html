@@ -79,24 +79,41 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// 1. FORZAR MAYÚSCULAS Y AUTO-TAB (Lógica mejorada)
+// 1. FORZAR MAYÚSCULAS (Excepto email)
 document.addEventListener('input', (e) => {
-    const el = e.target;
-
-    // Forzar Mayúsculas (excepto en email)
-    if (el.tagName === 'INPUT' && el.id !== 'email') {
-        el.value = el.value.toUpperCase();
+    if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
+        e.target.value = e.target.value.toUpperCase();
     }
+});
 
-    // Lógica de Salto Automático (Auto-Tab)
-    // Para la fecha: el formato interno de los navegadores es YYYY-MM-DD (10 caracteres)
-    if (el.id === 'fecha' && el.value.length === 10) {
-        document.getElementById('hora').focus();
+// 2. NAVEGACIÓN INTELIGENTE (Auto-Tab corregido)
+document.getElementById('fecha').addEventListener('input', (e) => {
+    const fechaActual = e.target.value; // Formato YYYY-MM-DD
+    if (fechaActual && fechaActual.length === 10) {
+        // Solo si el año empieza por 19 o 20 (evita el error del 0001)
+        if (fechaActual.startsWith('19') || fechaActual.startsWith('20')) {
+            document.getElementById('hora').focus();
+        }
     }
+});
 
-    // Para la hora: el formato es HH:MM (5 caracteres)
-    if (el.id === 'hora' && el.value.length === 5) {
+document.getElementById('hora').addEventListener('input', (e) => {
+    // Los campos de hora suelen tener 5 caracteres (HH:MM)
+    if (e.target.value.length === 5) {
         document.getElementById('lugar').focus();
+    }
+});
+
+// 3. SALTO CON ENTER (Toque Premium)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const inputs = Array.from(document.querySelectorAll('input'));
+        const index = inputs.indexOf(document.activeElement);
+        if (index > -1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        } else if (index === inputs.length - 1) {
+            consultar(); // Si está en el último, ejecuta
+        }
     }
 });
 
