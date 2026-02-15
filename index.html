@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executive Astro Logic | Strategic Timing</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         .gold-gradient {
@@ -30,14 +31,14 @@
 
 <main class="flex-grow flex flex-col items-center justify-center">
     <div class="text-center mb-10 px-4">
-        <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
+        <h2 class="text-4xl md:text-5xl font-light mb-4 text-white">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
         <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-tighter">
             Inteligencia estratégica basada en ciclos planetarios de precisión para la toma de decisiones ejecutivas y escalado de negocios.
         </p>
     </div>
 
     <div class="card p-8 w-full max-w-md">
-        <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Acceso a la Bóveda</h3>
+        <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4 font-bold">Acceso a la Bóveda</h3>
         <div class="space-y-4">
             <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
             <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
@@ -49,7 +50,7 @@
             
             <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm focus:border-yellow-600 outline-none text-white text-xs mono">
             
-            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em]">
+            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-2">
                 Iniciar Secuencia de Cálculo
             </button>
         </div>
@@ -69,7 +70,7 @@
 </footer>
 
 <script>
-// Efecto Teletipo Profesional
+// Efecto Teletipo Profesional para la salida de datos
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -79,40 +80,33 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// 1. FORZAR MAYÚSCULAS (Excepto email)
-document.addEventListener('input', (e) => {
-    if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
+// 1. FORZAR MAYÚSCULAS (Excepto en el email por estándar técnico)
+document.querySelectorAll('input:not([type="email"])').forEach(input => {
+    input.addEventListener('input', (e) => {
         e.target.value = e.target.value.toUpperCase();
-    }
+    });
 });
 
 // 2. NAVEGACIÓN INTELIGENTE (Auto-Tab corregido)
-document.getElementById('fecha').addEventListener('input', (e) => {
-    const fechaActual = e.target.value; // Formato YYYY-MM-DD
-    if (fechaActual && fechaActual.length === 10) {
-        // Solo si el año empieza por 19 o 20 (evita el error del 0001)
-        if (fechaActual.startsWith('19') || fechaActual.startsWith('20')) {
-            document.getElementById('hora').focus();
-        }
-    }
+// Usamos 'change' para que el usuario termine de elegir antes de saltar
+document.getElementById('fecha').addEventListener('change', () => {
+    document.getElementById('hora').focus();
 });
 
-document.getElementById('hora').addEventListener('input', (e) => {
-    // Los campos de hora suelen tener 5 caracteres (HH:MM)
-    if (e.target.value.length === 5) {
-        document.getElementById('lugar').focus();
-    }
+document.getElementById('hora').addEventListener('change', () => {
+    document.getElementById('lugar').focus();
 });
 
-// 3. SALTO CON ENTER (Toque Premium)
+// 3. NAVEGACIÓN CON TECLA ENTER (Estilo Terminal Profesional)
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const inputs = Array.from(document.querySelectorAll('input'));
         const index = inputs.indexOf(document.activeElement);
         if (index > -1 && index < inputs.length - 1) {
+            e.preventDefault(); 
             inputs[index + 1].focus();
         } else if (index === inputs.length - 1) {
-            consultar(); // Si está en el último, ejecuta
+            consultar(); 
         }
     }
 });
@@ -125,7 +119,7 @@ async function consultar() {
     
     resContainer.classList.remove('hidden');
     resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Calculando coordenadas y vectores de poder...";
+    resCuerpo.innerHTML = "Analizando vectores de oportunidad y coordenadas...";
     resGeo.innerHTML = "";
 
     const payload = {
@@ -145,13 +139,13 @@ async function consultar() {
         
         const data = await respuesta.json();
         
-        // Ejecución de respuesta con efecto visual
-        await escribirEfecto(resTitulo, data.titulo);
+        // Ejecución de respuesta con efecto visual de terminal
+        await escribirEfecto(resTitulo, data.titulo || "DIRECTIVA RECIBIDA");
         await escribirEfecto(resCuerpo, data.analisis_ejecutivo);
         resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
 
     } catch (error) {
-        resCuerpo.innerHTML = "<span class='text-red-600'>CRITICAL ERROR: Fallo de enlace con el núcleo.</span>";
+        resCuerpo.innerHTML = "<span class='text-red-700'>CRITICAL ERROR: Enlace fallido con la Bóveda.</span>";
     }
 }
 </script>
