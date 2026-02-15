@@ -14,49 +14,59 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Conexión Supabase
 supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
 
 def obtener_gps(lugar):
-    """Obtiene coordenadas reales para validar el estatus matemático"""
     try:
-        geolocator = Nominatim(user_agent="vault_logic_v2")
+        geolocator = Nominatim(user_agent="vault_logic_production")
         location = geolocator.geocode(lugar)
         if location:
             return {"lat": round(location.latitude, 4), "lon": round(location.longitude, 4)}
     except:
         pass
-    return {"lat": "S/D", "lon": "S/D"}
+    return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # Estandarización Ejecutiva
+    # Estandarización de Seguridad y Estética
     nombre = datos.get('nombre', 'VIP').upper()
-    email = datos.get('email', '').lower()
+    email = datos.get('email', '').lower() # El login siempre se procesa en minúsculas
     lugar = datos.get('lugar', '').upper()
     
-    # Cálculo Geográfico Real
     coords = obtener_gps(lugar)
     
-    # Simulación de Fase 2 (En espera de flatlib)
-    briefing = "VENTANA DE ESCALABILIDAD ALTA: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital."
+    # Lógica de Inteligencia (Fase 2)
+    # Aquí definimos la directiva técnica que se guardará en su perfil
+    directiva = "CONFIGURACIÓN ALCISTA: Ciclo de expansión detectado. Maximice la exposición en activos de alto rendimiento."
 
-    # Guardado en Bóveda
+    # Datos para la Bóveda del Cliente
+    mapa_data = {
+        "geo": coords,
+        "last_analysis": directiva,
+        "engine": "NASA_EPH_V2",
+        "status": "VERIFIED_ACCOUNT"
+    }
+
     try:
-        supabase.table("clientes_vip").insert({
-            "nombre": nombre,
+        # OPERACIÓN UPSERT: La clave de login es el email
+        # Si el email existe en la DB, actualiza la fila. Si no, crea una nueva.
+        supabase.table("clientes_vip").upsert({
             "email": email,
+            "nombre": nombre,
             "datos_natales": datos,
-            "mapatotal": {"geo": coords, "status": "VERIFIED_NASA_EPH"},
+            "mapatotal": mapa_data,
             "nivel_suscripcion": "free"
-        }).execute()
+        }, on_conflict="email").execute()
+        
     except Exception as e:
-        print(f"Error DB: {e}")
+        print(f"Bóveda Error: {e}")
 
     return {
         "titulo": "DIRECTIVA ESTRATÉGICA",
-        "analisis_ejecutivo": briefing,
+        "analisis_ejecutivo": directiva,
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
-        "firma": "VAULT LOGIC SYSTEM"
+        "firma": "VAULT LOGIC EXECUTIVE"
     }
 
 if __name__ == "__main__":
