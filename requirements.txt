@@ -3,3 +3,5 @@ uvicorn
 gunicorn
 supabase
 python-dotenv
+flatlib
+pyswisseph
