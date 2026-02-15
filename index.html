@@ -88,7 +88,21 @@ async function escribirEfecto(elemento, texto, velocidad = 30) {
         escribir();
     });
 }
+// Función para mayúsculas automáticas
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', () => {
+        input.value = input.value.toUpperCase();
+    });
+});
 
+// Función para salto automático (Auto-Tab) en Fecha y Hora
+document.getElementById('fecha').addEventListener('change', () => {
+    document.getElementById('hora').focus();
+});
+
+document.getElementById('hora').addEventListener('change', () => {
+    document.getElementById('lugar').focus();
+});
 async function consultar() {
     const resContainer = document.getElementById('resultado');
     const resTitulo = document.getElementById('res-titulo');
