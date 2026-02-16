@@ -46,10 +46,10 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     
     payload = {
         "email": email,
-        "fields": {
-            "name": nombre,
-            "directiva": directiva,
-            "geo_ref": f"{coords['lat']}, {coords['lon']}"
+       "fields": {
+        "name": nombre,
+        "vl_directiva": directiva,
+        "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         },
         "status": "active"
     }
