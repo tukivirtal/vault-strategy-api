@@ -8,6 +8,7 @@ import httpx
 
 app = FastAPI()
 
+# Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,7 +19,7 @@ app.add_middleware(
 # Credenciales de Entorno
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-MAILERLITE_API_KEY = os.environ.get("MAILERLITE_API_KEY") 
+MAILERLITE_API_KEY = os.environ.get("MAILERLITE_API_KEY")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -35,8 +36,9 @@ def obtener_gps(lugar):
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
     """Envía el prospecto a MailerLite para el flujo de bienvenida"""
-    if not MAILERLITE_API_KEY: return
-    
+    if not MAILERLITE_API_KEY: 
+        return
+
     url = "https://connect.mailerlite.com/api/subscribers"
     headers = {
         "Authorization": f"Bearer {MAILERLITE_API_KEY}",
@@ -44,7 +46,8 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
     
- payload = {
+    # Indentación corregida para el payload
+    payload = {
         "email": email,
         "fields": {
             "name": nombre,
@@ -52,6 +55,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         }
     }
+    
     async with httpx.AsyncClient() as client:
         await client.post(url, headers=headers, json=payload)
 
@@ -61,14 +65,14 @@ async def consultar(datos: dict):
     nombre = datos.get('nombre', 'VIP MEMBER').upper()
     email = datos.get('email', '').lower()
     lugar = datos.get('lugar', '').upper()
-    
+
     # 1. Cálculo Geográfico Real
     coords = obtener_gps(lugar)
-    
-    # 2. Directiva Estratégica (Lógica de Fase 2)
+
+    # 2. Directiva Estratégica
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital."
 
-    # 3. Guardado en Supabase (UPSERT para evitar duplicados)
+    # 3. Guardado en Supabase
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
