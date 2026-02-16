@@ -61,30 +61,46 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # Procesamiento de datos recibidos
-    nombre = datos.get('nombre', 'VIP MEMBER').upper()
-    email = datos.get('email', '').lower()
-    lugar = datos.get('lugar', '').upper()
+    # 1. Limpieza y Validación de Entradas (Evita errores si el campo viene vacío)
+    nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
+    if not nombre: nombre = "VIP MEMBER"
+    
+    email = datos.get('email', '').strip().lower()
+    lugar = datos.get('lugar', '').strip().upper()
+    hora = datos.get('hora', '12:00') # Si no sabe la hora, usamos mediodía por defecto
+    if not hora: hora = "12:00"
 
-    # 1. Cálculo de coordenadas
+    # 2. Gestión inteligente de la ubicación (El tema de la coma)
+    # Si no puso coma, intentamos buscarlo igual; si falla, usamos el paracaídas.
     coords = obtener_gps(lugar)
+    
+    # 3. Directiva Estratégica
+    # Aquí es donde el sistema "decide" qué decir según los datos.
+    directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
-    # 2. Generación de Directiva
-    directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital."
-
-    # 3. Registro en Supabase (Bóveda)
+    # 4. Guardado en Supabase (Bóveda)
+    # Incluimos la hora y el lugar original para que tú lo veas en el admin
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
             "nombre": nombre,
-            "datos_natales": datos,
-            "mapatotal": {"geo": coords, "directive": directiva, "auth": "VERIFIED_VAULT"},
+            "datos_natales": {
+                "lugar_original": lugar,
+                "hora_nacimiento": hora,
+                "fecha": datos.get('fecha', 'SIN_FECHA')
+            },
+            "mapatotal": {
+                "geo": coords, 
+                "directive": directiva, 
+                "auth": "VERIFIED_VAULT"
+            },
             "nivel_suscripcion": "free"
         }, on_conflict="email").execute()
     except Exception as e:
         print(f"Error Bóveda Supabase: {e}")
 
-    # 4. Disparo de automatización MailerLite
+    # 5. Sincronización con MailerLite
+    # Enviamos los datos limpios para que el mail no llegue vacío
     try:
         await sincronizar_mailerlite(email, nombre, directiva, coords)
     except Exception as e:
