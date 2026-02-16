@@ -44,16 +44,14 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
     
-    payload = {
-        "email": email,
-       "fields": {
+  payload = {
+    "email": email,
+    "fields": {
         "name": nombre,
         "vl_directiva": directiva,
         "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        },
-        "status": "active"
     }
-
+}
     async with httpx.AsyncClient() as client:
         await client.post(url, headers=headers, json=payload)
 
