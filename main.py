@@ -8,7 +8,7 @@ import httpx
 
 app = FastAPI()
 
-# Configuración de CORS
+# Configuración de CORS - Permitir conexiones desde tu web en Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,10 +21,11 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 MAILERLITE_API_KEY = os.environ.get("MAILERLITE_API_KEY")
 
+# Inicialización de Supabase
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def obtener_gps(lugar):
-    """Geolocalización real para validación matemática"""
+    """Geolocalización real para validación técnica"""
     try:
         geolocator = Nominatim(user_agent="vault_logic_pro")
         location = geolocator.geocode(lugar)
@@ -35,8 +36,8 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Envía el prospecto a MailerLite para el flujo de bienvenida"""
-    if not MAILERLITE_API_KEY: 
+    """Envía el prospecto a MailerLite con las etiquetas corregidas"""
+    if not MAILERLITE_API_KEY:
         return
 
     url = "https://connect.mailerlite.com/api/subscribers"
@@ -45,8 +46,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
-    
-    # Indentación corregida para el payload
+
     payload = {
         "email": email,
         "fields": {
@@ -55,24 +55,24 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         }
     }
-    
+
     async with httpx.AsyncClient() as client:
         await client.post(url, headers=headers, json=payload)
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # Procesamiento Ejecutivo
+    # Procesamiento de datos recibidos
     nombre = datos.get('nombre', 'VIP MEMBER').upper()
     email = datos.get('email', '').lower()
     lugar = datos.get('lugar', '').upper()
 
-    # 1. Cálculo Geográfico Real
+    # 1. Cálculo de coordenadas
     coords = obtener_gps(lugar)
 
-    # 2. Directiva Estratégica
+    # 2. Generación de Directiva
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada en ciclos de crecimiento. Momento óptimo para la inyección de capital."
 
-    # 3. Guardado en Supabase
+    # 3. Registro en Supabase (Bóveda)
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
@@ -82,10 +82,13 @@ async def consultar(datos: dict):
             "nivel_suscripcion": "free"
         }, on_conflict="email").execute()
     except Exception as e:
-        print(f"Error Bóveda: {e}")
+        print(f"Error Bóveda Supabase: {e}")
 
-    # 4. Sincronización con MailerLite
-    await sincronizar_mailerlite(email, nombre, directiva, coords)
+    # 4. Disparo de automatización MailerLite
+    try:
+        await sincronizar_mailerlite(email, nombre, directiva, coords)
+    except Exception as e:
+        print(f"Error MailerLite: {e}")
 
     return {
         "titulo": "DIRECTIVA ESTRATÉGICA GENERADA",
