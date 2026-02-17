@@ -40,13 +40,15 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     if not MAILERLITE_API_KEY: return
 
     email_limpio = email.strip().lower()
+    
+    # 1. DEFINICIÓN DE HEADERS (Debe estar AQUÍ adentro para que no dé error)
     headers = {
         "Authorization": f"Bearer {MAILERLITE_API_KEY}",
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
 
-    # 1. Creamos/Actualizamos el suscriptor primero
+    # 2. Creamos/Actualizamos el suscriptor
     url_base = "https://connect.mailerlite.com/api/subscribers"
     payload = {
         "email": email_limpio,
@@ -59,18 +61,18 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     }
 
     async with httpx.AsyncClient() as client:
-        # Paso A: Asegurar el suscriptor
-        res = await client.post(url_base, headers=headers, json=payload, timeout=10.0)
+        # Paso A: Registro base
+        res = await client.post(url_base, headers=headers, json=payload, timeout=15.0)
         
-        # Paso B: Forzar entrada al grupo (ID SIN COMILLAS)
+        # Paso B: FORZAR GRUPO (Usando la URL corregida con f-string)
         if res.status_code in [200, 201]:
-            # ID numérico real de tu grupo Vault Logic
             grupo_id = 17952042256303511 
+            # Esta URL añade al suscriptor directamente al grupo de Vault Logic
             url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
             
-            # Mandamos solo el email al endpoint del grupo
-            await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=10.0)
-            print(f"Sincronización y Grupo OK para: {email_limpio}")
+            # Mandamos el email al grupo para disparar la automatización
+            await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
+            print(f"Sincronización y Grupo OK: {email_limpio}")
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza y Validación de Entradas
