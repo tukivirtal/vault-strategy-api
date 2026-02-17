@@ -8,7 +8,7 @@ import httpx
 
 app = FastAPI()
 
-# Configuración de CORS - Permitir conexiones desde tu web en Vercel
+# Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,13 +40,19 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     if not MAILERLITE_API_KEY:
         return
 
- # 1. URL de suscriptores (GENERAL)
-    url = "https://connect.mailerlite.com/api/subscribers"
+    # Limpieza de seguridad
+    email_limpio = email.strip().lower()
     
-    # 2. Payload simplificado
-    # Quitamos la lista de "groups" de aquí para que no bloquee el registro
+    url = "https://connect.mailerlite.com/api/subscribers"
+    headers = {
+        "Authorization": f"Bearer {MAILERLITE_API_KEY}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+
+    # Payload para crear/actualizar suscriptor
     payload = {
-        "email": email,
+        "email": email_limpio,
         "fields": {
             "name": nombre,
             "vl_nombre": nombre,
@@ -55,36 +61,36 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         }
     }
 
-    # 3. Envío con paracaídas
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, json=payload)
+        # 1. Crear o actualizar el suscriptor
+        response = await client.post(url, headers=headers, json=payload, timeout=10.0)
         
-        # Si el registro fue exitoso, intentamos meterlo al grupo en un paso aparte
+        # 2. Si tuvo éxito, forzar su entrada al grupo de Vault Logic
         if response.status_code in [200, 201]:
-            grupo_id = 17952042256303511  # Tu ID sin comillas
-            url_grupo = "https://connect.mailerlite.com/api/subscribers/{email}/groups/{grupo_id}"
-            await client.post(url_grupo, headers=headers)
+            grupo_id = 17952042256303511
+            # Corregido: Ahora usamos f-string real para inyectar las variables en la URL
+            url_grupo = f"https://connect.mailerlite.com/api/subscribers/{email_limpio}/groups/{grupo_id}"
+            await client.post(url_grupo, headers=headers, timeout=10.0)
+            print(f"Sincronización completa para: {email_limpio}")
+
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # 1. Limpieza y Validación de Entradas (Evita errores si el campo viene vacío)
+    # 1. Limpieza y Validación de Entradas
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
     if not nombre: nombre = "VIP MEMBER"
-    
+
     email = datos.get('email', '').strip().lower()
     lugar = datos.get('lugar', '').strip().upper()
-    hora = datos.get('hora', '12:00') # Si no sabe la hora, usamos mediodía por defecto
+    hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. Gestión inteligente de la ubicación (El tema de la coma)
-    # Si no puso coma, intentamos buscarlo igual; si falla, usamos el paracaídas.
+    # 2. Geolocalización
     coords = obtener_gps(lugar)
-    
+
     # 3. Directiva Estratégica
-    # Aquí es donde el sistema "decide" qué decir según los datos.
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
     # 4. Guardado en Supabase (Bóveda)
-    # Incluimos la hora y el lugar original para que tú lo veas en el admin
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
@@ -105,11 +111,10 @@ async def consultar(datos: dict):
         print(f"Error Bóveda Supabase: {e}")
 
     # 5. Sincronización con MailerLite
-    # Enviamos los datos limpios para que el mail no llegue vacío
     try:
         await sincronizar_mailerlite(email, nombre, directiva, coords)
     except Exception as e:
-        print(f"Error MailerLite: {e}")
+        print(f"Error Crítico MailerLite: {e}")
 
     return {
         "titulo": "DIRECTIVA ESTRATÉGICA GENERADA",
