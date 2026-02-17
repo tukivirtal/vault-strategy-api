@@ -40,7 +40,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     if not MAILERLITE_API_KEY:
         return
 
-    url = "https://connect.mailerlite.com/api/subscribers"
+    url = "https://connect.mailerlite.com/api/subscribers/179520042256303511"
     headers = {
         "Authorization": f"Bearer {MAILERLITE_API_KEY}",
         "Content-Type": "application/json",
