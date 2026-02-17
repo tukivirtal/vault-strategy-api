@@ -122,6 +122,20 @@ async def consultar(datos: dict):
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
         "firma": "VAULT LOGIC EXECUTIVE"
     }
+    async with httpx.AsyncClient() as client:
+        # PASO 1: Aseguramos que el suscriptor exista y tenga sus campos actualizados
+        res = await client.post(url_base, headers=headers, json=payload, timeout=15.0)
+        
+        # PASO 2: Forzamos la entrada al grupo usando el endpoint de GRUPOS
+        # Este endpoint añade el email al grupo sí o sí
+        if res.status_code in [200, 201, 204]:
+            grupo_id = 17952042256303511
+            # URL específica para añadir suscriptores a un grupo por ID
+            url_forzar_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
+            
+            # Mandamos el email dentro de un JSON al grupo
+            await client.post(url_forzar_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
+            print(f"ÉXITO TOTAL: {email_limpio} añadido al grupo {grupo_id}")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
