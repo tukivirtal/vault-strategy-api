@@ -40,9 +40,11 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     if not MAILERLITE_API_KEY:
         return
 
-   # URL estándar de suscriptores
+ # 1. URL de suscriptores (GENERAL)
     url = "https://connect.mailerlite.com/api/subscribers"
     
+    # 2. Payload simplificado
+    # Quitamos la lista de "groups" de aquí para que no bloquee el registro
     payload = {
         "email": email,
         "fields": {
@@ -50,12 +52,18 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
             "vl_nombre": nombre,
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        },
-        "groups": [179520042256303511] # <--- Agrégalo así, como una lista
+        }
     }
 
+    # 3. Envío con paracaídas
     async with httpx.AsyncClient() as client:
-        await client.post(url, headers=headers, json=payload)
+        response = await client.post(url, headers=headers, json=payload)
+        
+        # Si el registro fue exitoso, intentamos meterlo al grupo en un paso aparte
+        if response.status_code in [200, 201]:
+            grupo_id = 17952042256303511  # Tu ID sin comillas
+            url_grupo = "https://connect.mailerlite.com/api/subscribers/{email}/groups/{grupo_id}"
+            await client.post(url_grupo, headers=headers)
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza y Validación de Entradas (Evita errores si el campo viene vacío)
