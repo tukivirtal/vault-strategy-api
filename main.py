@@ -47,10 +47,11 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
 
-    payload = {
+  payload = {
         "email": email,
         "fields": {
-            "name": nombre,
+            "name": nombre,           # Mantenemos este por si acaso
+            "vl_nombre": nombre,      # Esta es la que usará tu diseño {$vl_nombre}
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         }
