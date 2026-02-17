@@ -47,11 +47,12 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
 
-  payload = {
+    # Esta es la línea 50 que causaba el error. Ahora está alineada con 4 espacios.
+    payload = {
         "email": email,
         "fields": {
-            "name": nombre,           # Mantenemos este por si acaso
-            "vl_nombre": nombre,      # Esta es la que usará tu diseño {$vl_nombre}
+            "name": nombre,           # Campo estándar
+            "vl_nombre": nombre,      # Tu nuevo campo para el diseño {$vl_nombre}
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         }
@@ -59,7 +60,6 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
 
     async with httpx.AsyncClient() as client:
         await client.post(url, headers=headers, json=payload)
-
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza y Validación de Entradas (Evita errores si el campo viene vacío)
