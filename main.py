@@ -40,22 +40,18 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     if not MAILERLITE_API_KEY:
         return
 
-    url = "https://connect.mailerlite.com/api/subscribers/179520042256303511"
-    headers = {
-        "Authorization": f"Bearer {MAILERLITE_API_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-
-    # Esta es la línea 50 que causaba el error. Ahora está alineada con 4 espacios.
+   # URL estándar de suscriptores
+    url = "https://connect.mailerlite.com/api/subscribers"
+    
     payload = {
         "email": email,
         "fields": {
-            "name": nombre,           # Campo estándar
-            "vl_nombre": nombre,      # Tu nuevo campo para el diseño {$vl_nombre}
+            "name": nombre,
+            "vl_nombre": nombre,
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        }
+        },
+        "groups": ["179520042256303511"] # <--- Agrégalo así, como una lista
     }
 
     async with httpx.AsyncClient() as client:
