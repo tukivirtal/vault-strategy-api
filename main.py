@@ -51,7 +51,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         },
-        "groups": ["179520042256303511"] # <--- Agrégalo así, como una lista
+        "groups": [179520042256303511] # <--- Agrégalo así, como una lista
     }
 
     async with httpx.AsyncClient() as client:
