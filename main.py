@@ -36,21 +36,18 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Envía el prospecto a MailerLite con las etiquetas corregidas"""
-    if not MAILERLITE_API_KEY:
-        print("Error: MAILERLITE_API_KEY no configurada")
-        return
+    """Envía el prospecto a MailerLite y fuerza su entrada al grupo"""
+    if not MAILERLITE_API_KEY: return
 
     email_limpio = email.strip().lower()
-    url = "https://connect.mailerlite.com/api/subscribers"
-    
-    # DEFINICIÓN EXPLÍCITA DE HEADERS (Aquí estaba el fallo del log)
     headers = {
         "Authorization": f"Bearer {MAILERLITE_API_KEY}",
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
 
+    # 1. Creamos/Actualizamos el suscriptor primero
+    url_base = "https://connect.mailerlite.com/api/subscribers"
     payload = {
         "email": email_limpio,
         "fields": {
@@ -62,20 +59,18 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     }
 
     async with httpx.AsyncClient() as client:
-        try:
-            # 1. Crear/Actualizar suscriptor
-            response = await client.post(url, headers=headers, json=payload, timeout=10.0)
+        # Paso A: Asegurar el suscriptor
+        res = await client.post(url_base, headers=headers, json=payload, timeout=10.0)
+        
+        # Paso B: Forzar entrada al grupo (ID SIN COMILLAS)
+        if res.status_code in [200, 201]:
+            # ID numérico real de tu grupo Vault Logic
+            grupo_id = 17952042256303511 
+            url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
             
-            if response.status_code in [200, 201]:
-                # 2. Forzar entrada al grupo (ID numérico)
-                grupo_id = 17952042256303511
-                url_grupo = f"https://connect.mailerlite.com/api/subscribers/{email_limpio}/groups/{grupo_id}"
-                await client.post(url_grupo, headers=headers, timeout=10.0)
-                print(f"Sincronización exitosa: {email_limpio}")
-            else:
-                print(f"Error MailerLite API: {response.status_code} - {response.text}")
-        except Exception as e:
-            print(f"Error de conexión MailerLite: {e}")
+            # Mandamos solo el email al endpoint del grupo
+            await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=10.0)
+            print(f"Sincronización y Grupo OK para: {email_limpio}")
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza y Validación de Entradas
