@@ -70,23 +70,41 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # 1. Limpieza y Validación de Entradas (Stress Test Proof)
+    # 1. Limpieza y Validación de Entradas
+    email = datos.get('email', '').strip().lower()
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
     if not nombre: nombre = "VIP MEMBER"
 
-    email = datos.get('email', '').strip().lower()
     lugar = datos.get('lugar', '').strip().upper()
     hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. Geolocalización automática
+    # 2. BLOQUE DE SEGURIDAD: Verificar si el usuario ya existe
+    try:
+        # Buscamos el email en la tabla antes de hacer nada más
+        check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
+        
+        if check_user.data:
+            # Si el email existe, enviamos una respuesta de advertencia
+            return {
+                "status": "exists",
+                "titulo": "ACCESO PREVIAMENTE REGISTRADO",
+                "analisis_ejecutivo": "Tu email ya se encuentra en nuestra base de datos estratégica. Revisa tu bandeja de entrada o contacta a soporte para recuperar tu acceso.",
+                "coordinadas": "SISTEMA BLOQUEADO: USUARIO EXISTENTE",
+                "firma": "VAULT LOGIC SECURITY"
+            }
+    except Exception as e:
+        print(f"Error al verificar duplicado en Supabase: {e}")
+
+    # 3. Si el usuario es nuevo, procedemos con la geolocalización
     coords = obtener_gps(lugar)
 
-    # 3. Directiva Estratégica (Comentario fijo por ahora)
+    # 4. Directiva Estratégica
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
-    # 4. Guardado en Supabase (Bóveda)
+    # 5. Guardado en Supabase (Bóveda)
     try:
+        # Aquí usamos upsert con on_conflict pero ya sabemos que es nuevo o falló el check
         supabase.table("clientes_vip").upsert({
             "email": email,
             "nombre": nombre,
@@ -105,19 +123,19 @@ async def consultar(datos: dict):
     except Exception as e:
         print(f"Error Bóveda Supabase: {e}")
 
-    # 5. Sincronización con MailerLite
+    # 6. Sincronización con MailerLite
     try:
         await sincronizar_mailerlite(email, nombre, directiva, coords)
     except Exception as e:
         print(f"Error Crítico MailerLite: {e}")
 
     return {
+        "status": "success",
         "titulo": "DIRECTIVA ESTRATÉGICA GENERADA",
         "analisis_ejecutivo": directiva,
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
         "firma": "VAULT LOGIC EXECUTIVE"
     }
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
