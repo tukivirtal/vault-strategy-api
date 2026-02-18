@@ -136,6 +136,35 @@ async def consultar(datos: dict):
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
         "firma": "VAULT LOGIC EXECUTIVE"
     }
+    @app.get("/obtener_reporte/{email}")
+async def obtener_reporte(email: str):
+    """Recupera los datos de la bóveda para mostrarlos en el reporte dinámico"""
+    try:
+        # Buscamos al usuario por email
+        email_limpio = email.strip().lower()
+        resultado = supabase.table("clientes_vip").select("*").eq("email", email_limpio).execute()
+        
+        if not resultado.data:
+            return {"status": "error", "message": "Acceso denegado: Firma no encontrada en la bóveda."}
+            
+        user = resultado.data[0]
+        
+        # Devolvemos el paquete de datos para el reporte
+        return {
+            "status": "success",
+            "data": {
+                "nombre": user['nombre'],
+                "directiva": user['mapatotal']['directive'],
+                "geo_ref": f"LAT: {user['mapatotal']['geo']['lat']} | LON: {user['mapatotal']['geo']['lon']}",
+                "fecha": user['datos_natales']['fecha'],
+                "hora": user['datos_natales']['hora_nacimiento'],
+                "lugar": user['datos_natales']['lugar_original'],
+                "auth_code": user['mapatotal']['auth']
+            }
+        }
+    except Exception as e:
+        print(f"Error al recuperar reporte: {e}")
+        return {"status": "error", "message": "Fallo en la conexión con la bóveda estratégica."}
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
