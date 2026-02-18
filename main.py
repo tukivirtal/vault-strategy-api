@@ -8,7 +8,7 @@ import httpx
 
 app = FastAPI()
 
-# Configuración de CORS
+# Configuración de CORS - Permitir todas para facilitar la conexión con Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,7 +36,10 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    if not MAILERLITE_API_KEY: return
+    """Sincronización en dos pasos: Datos -> Grupo"""
+    if not MAILERLITE_API_KEY:
+        print("Error: API Key de MailerLite no encontrada")
+        return
 
     email_limpio = email.strip().lower()
     headers = {
@@ -45,7 +48,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
 
-    # PASO 1: Crear/Actualizar los datos del suscriptor
+    # PASO 1: Crear/Actualizar los datos del suscriptor en la lista general
     url_sub = "https://connect.mailerlite.com/api/subscribers"
     payload_sub = {
         "email": email_limpio,
@@ -58,19 +61,26 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     }
 
     async with httpx.AsyncClient() as client:
-        # Aseguramos los datos
-        await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
-        
-        # PASO 2: Forzar la entrada al grupo (ID numérico exacto)
-        grupo_id = 17952042256303511 
-        url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
-        
-        # Enviamos el email para activar la automatización
-        res_grupo = await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
-        print(f"Resultado Grupo: {res_grupo.status_code}")
+        try:
+            # Aseguramos los datos básicos
+            res_sub = await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
+            
+            # PASO 2: Forzar la entrada al grupo específico de Vault Logic
+            if res_sub.status_code in [200, 201, 204]:
+                grupo_id = 17952042256303511 
+                url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
+                
+                # Enviamos el email al endpoint del grupo para disparar automatizaciones
+                res_g = await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
+                print(f"Sincronización completa: {email_limpio}. Resultado Grupo: {res_g.status_code}")
+            else:
+                print(f"Error al crear suscriptor: {res_sub.status_code} - {res_sub.text}")
+        except Exception as e:
+            print(f"Fallo crítico en sincronización: {e}")
+
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # 1. Limpieza y Validación de Entradas
+    # 1. Limpieza y Validación de Entradas (Stress Test Proof)
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
     if not nombre: nombre = "VIP MEMBER"
 
@@ -79,10 +89,10 @@ async def consultar(datos: dict):
     hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. Geolocalización
+    # 2. Geolocalización automática
     coords = obtener_gps(lugar)
 
-    # 3. Directiva Estratégica
+    # 3. Directiva Estratégica (Comentario fijo por ahora)
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
     # 4. Guardado en Supabase (Bóveda)
@@ -117,20 +127,6 @@ async def consultar(datos: dict):
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
         "firma": "VAULT LOGIC EXECUTIVE"
     }
-    async with httpx.AsyncClient() as client:
-        # PASO 1: Aseguramos que el suscriptor exista y tenga sus campos actualizados
-        res = await client.post(url_base, headers=headers, json=payload, timeout=15.0)
-        
-        # PASO 2: Forzamos la entrada al grupo usando el endpoint de GRUPOS
-        # Este endpoint añade el email al grupo sí o sí
-        if res.status_code in [200, 201, 204]:
-            grupo_id = 17952042256303511
-            # URL específica para añadir suscriptores a un grupo por ID
-            url_forzar_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
-            
-            # Mandamos el email dentro de un JSON al grupo
-            await client.post(url_forzar_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
-            print(f"ÉXITO TOTAL: {email_limpio} añadido al grupo {grupo_id}")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
