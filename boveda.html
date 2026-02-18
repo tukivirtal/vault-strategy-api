@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Logic | Bóveda VIP</title>
+    <style>
+        body { background-color: #0a0a0a; color: #d4af37; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; text-transform: uppercase; }
+        .report-container { border: 2px solid #d4af37; padding: 40px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); background: rgba(10, 10, 10, 0.9); }
+        h1 { border-bottom: 1px solid #d4af37; padding-bottom: 10px; font-size: 1.5rem; text-align: center; }
+        .data-row { margin: 20px 0; border-left: 3px solid #d4af37; padding-left: 15px; }
+        .label { font-size: 0.8rem; color: #888; }
+        .value { font-size: 1.1rem; margin-top: 5px; color: #fff; letter-spacing: 1px; }
+        .directiva { background: #1a1a1a; padding: 20px; border: 1px dashed #d4af37; margin-top: 30px; line-height: 1.6; color: #d4af37; font-weight: bold; }
+        .footer { margin-top: 30px; text-align: center; font-size: 0.7rem; color: #555; }
+        #loading { text-align: center; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">INICIALIZANDO ACCESO SEGURO...</div>
+
+    <div class="report-container" id="reporte" style="display: none;">
+        <h1>INFORME ESTRATÉGICO CONFIDENCIAL</h1>
+        
+        <div class="data-row">
+            <div class="label">Sujeto de Análisis</div>
+            <div class="value" id="nombre">---</div>
+        </div>
+
+        <div class="data-row">
+            <div class="label">Vector de Origen (Georreferencia)</div>
+            <div class="value" id="geo">---</div>
+            <div class="label" id="lugar" style="font-size: 0.7rem; margin-top: 5px;">---</div>
+        </div>
+
+        <div class="data-row">
+            <div class="label">Configuración Natal</div>
+            <div class="value" id="natal">---</div>
+        </div>
+
+        <div class="directiva">
+            <div class="label" style="margin-bottom: 10px;">DIRECTIVA DE EXPANSIÓN:</div>
+            <span id="directiva">---</span>
+        </div>
+
+        <div class="footer">
+            ESTE DOCUMENTO ES PROPIEDAD DE VAULT LOGIC EXECUTIVE. <br>
+            AUTENTICACIÓN: <span id="auth">---</span>
+        </div>
+    </div>
+
+    <script>
+        async function cargarReporte() {
+            // 1. Obtener email de la URL (ej: boveda.html?email=test@test.com)
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+
+            if (!email) {
+                document.getElementById('loading').innerText = "ERROR: CREDENCIALES NO ENCONTRADAS.";
+                return;
+            }
+
+            try {
+                // 2. Consultar a tu API en Render
+                const response = await fetch(`https://TU-URL-DE-RENDER.onrender.com/obtener_reporte/${email}`);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    const d = result.data;
+                    document.getElementById('nombre').innerText = d.nombre;
+                    document.getElementById('geo').innerText = d.geo_ref;
+                    document.getElementById('lugar').innerText = d.lugar;
+                    document.getElementById('natal').innerText = `${d.fecha} | ${d.hora} HS`;
+                    document.getElementById('directiva').innerText = d.directiva;
+                    document.getElementById('auth').innerText = d.auth_code;
+
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('reporte').style.display = 'block';
+                } else {
+                    document.getElementById('loading').innerText = result.message;
+                }
+            } catch (error) {
+                document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA.";
+            }
+        }
+
+        window.onload = cargarReporte;
+    </script>
+</body>
+</html>
