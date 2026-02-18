@@ -36,21 +36,18 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Envía el prospecto a MailerLite y fuerza su entrada al grupo"""
     if not MAILERLITE_API_KEY: return
 
     email_limpio = email.strip().lower()
-    
-    # 1. DEFINICIÓN DE HEADERS (Debe estar AQUÍ adentro para que no dé error)
     headers = {
         "Authorization": f"Bearer {MAILERLITE_API_KEY}",
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
 
-    # 2. Creamos/Actualizamos el suscriptor
-    url_base = "https://connect.mailerlite.com/api/subscribers"
-    payload = {
+    # PASO 1: Crear/Actualizar los datos del suscriptor
+    url_sub = "https://connect.mailerlite.com/api/subscribers"
+    payload_sub = {
         "email": email_limpio,
         "fields": {
             "name": nombre,
@@ -61,18 +58,16 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
     }
 
     async with httpx.AsyncClient() as client:
-        # Paso A: Registro base
-        res = await client.post(url_base, headers=headers, json=payload, timeout=15.0)
+        # Aseguramos los datos
+        await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
         
-        # Paso B: FORZAR GRUPO (Usando la URL corregida con f-string)
-        if res.status_code in [200, 201]:
-            grupo_id = 17952042256303511 
-            # Esta URL añade al suscriptor directamente al grupo de Vault Logic
-            url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
-            
-            # Mandamos el email al grupo para disparar la automatización
-            await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
-            print(f"Sincronización y Grupo OK: {email_limpio}")
+        # PASO 2: Forzar la entrada al grupo (ID numérico exacto)
+        grupo_id = 17952042256303511 
+        url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
+        
+        # Enviamos el email para activar la automatización
+        res_grupo = await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
+        print(f"Resultado Grupo: {res_grupo.status_code}")
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza y Validación de Entradas
