@@ -56,7 +56,7 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
         },
-        "groups": ["17952042256303511"] # Reemplaza con tu ID de grupo real
+        "groups": ["179520042256303511"] # Reemplaza con tu ID de grupo real
     }
 
     async with httpx.AsyncClient() as client:
