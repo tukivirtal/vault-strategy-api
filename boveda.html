@@ -50,42 +50,47 @@
         </div>
     </div>
 
-    <script>
-        async function cargarReporte() {
-            // 1. Obtener email de la URL (ej: boveda.html?email=test@test.com)
-            const urlParams = new URLSearchParams(window.location.search);
-            const email = urlParams.get('email');
+   <script>
+    async function cargarReporte() {
+        // 1. Obtener email de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
 
-            if (!email) {
-                document.getElementById('loading').innerText = "ERROR: CREDENCIALES NO ENCONTRADAS.";
-                return;
-            }
-
-            try {
-                // 2. Consultar a tu API en Render
-                const response = await fetch(`https://TU-URL-DE-RENDER.onrender.com/obtener_reporte/${email}`);
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    const d = result.data;
-                    document.getElementById('nombre').innerText = d.nombre;
-                    document.getElementById('geo').innerText = d.geo_ref;
-                    document.getElementById('lugar').innerText = d.lugar;
-                    document.getElementById('natal').innerText = `${d.fecha} | ${d.hora} HS`;
-                    document.getElementById('directiva').innerText = d.directiva;
-                    document.getElementById('auth').innerText = d.auth_code;
-
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('reporte').style.display = 'block';
-                } else {
-                    document.getElementById('loading').innerText = result.message;
-                }
-            } catch (error) {
-                document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA.";
-            }
+        if (!email) {
+            document.getElementById('loading').innerText = "ERROR: CREDENCIALES NO ENCONTRADAS.";
+            return;
         }
 
-        window.onload = cargarReporte;
-    </script>
+        try {
+            // 2. Consultar a tu API en Render (URL VALIDADA)
+            const apiUrl = `https://vault-strategy-api.onrender.com/obtener_reporte/${email}`;
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) throw new Error("Fallo en respuesta de servidor");
+            
+            const result = await response.json();
+
+            if (result.status === "success") {
+                const d = result.data;
+                document.getElementById('nombre').innerText = d.nombre;
+                document.getElementById('geo').innerText = d.geo_ref;
+                document.getElementById('lugar').innerText = d.lugar;
+                document.getElementById('natal').innerText = `${d.fecha} | ${d.hora} HS`;
+                document.getElementById('directiva').innerText = d.directiva;
+                document.getElementById('auth').innerText = d.auth_code;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('reporte').style.display = 'block';
+            } else {
+                document.getElementById('loading').innerText = result.message;
+            }
+        } catch (error) {
+            console.error("Error técnico:", error);
+            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA ESTRATÉGICA.";
+        }
+    }
+
+    window.onload = cargarReporte;
+</script>
 </body>
 </html>
