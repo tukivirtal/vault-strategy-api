@@ -36,10 +36,8 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Sincronización en dos pasos: Datos -> Grupo"""
-    if not MAILERLITE_API_KEY:
-        print("Error: API Key de MailerLite no encontrada")
-        return
+    """Versión simplificada y directa para forzar la entrada al grupo"""
+    if not MAILERLITE_API_KEY: return
 
     email_limpio = email.strip().lower()
     headers = {
@@ -48,35 +46,27 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
 
-    # PASO 1: Crear/Actualizar los datos del suscriptor en la lista general
-    url_sub = "https://connect.mailerlite.com/api/subscribers"
-    payload_sub = {
+    # PASO ÚNICO: Crear/Actualizar y asignar grupo en una sola instrucción
+    url = "https://connect.mailerlite.com/api/subscribers"
+    payload = {
         "email": email_limpio,
         "fields": {
             "name": nombre,
             "vl_nombre": nombre,
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        }
+        },
+        "groups": ["17952042256303511"] # Reemplaza con tu ID de grupo real
     }
 
     async with httpx.AsyncClient() as client:
         try:
-            # Aseguramos los datos básicos
-            res_sub = await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
-            
-            # PASO 2: Forzar la entrada al grupo específico de Vault Logic
-            if res_sub.status_code in [200, 201, 204]:
-                grupo_id = 17952042256303511 
-                url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
-                
-                # Enviamos el email al endpoint del grupo para disparar automatizaciones
-                res_g = await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
-                print(f"Sincronización completa: {email_limpio}. Resultado Grupo: {res_g.status_code}")
-            else:
-                print(f"Error al crear suscriptor: {res_sub.status_code} - {res_sub.text}")
+            response = await client.post(url, headers=headers, json=payload, timeout=15.0)
+            print(f"Respuesta MailerLite para {email_limpio}: {response.status_code}")
+            if response.status_code not in [200, 201]:
+                print(f"Detalle del error: {response.text}")
         except Exception as e:
-            print(f"Fallo crítico en sincronización: {e}")
+            print(f"Error de conexión: {e}")
 
 @app.post("/consultar")
 async def consultar(datos: dict):
