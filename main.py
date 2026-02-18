@@ -8,7 +8,7 @@ import httpx
 
 app = FastAPI()
 
-# Configuración de CORS - Permitir todas para facilitar la conexión con Vercel
+# Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,8 +36,9 @@ def obtener_gps(lugar):
     return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Versión simplificada y directa para forzar la entrada al grupo"""
-    if not MAILERLITE_API_KEY: return
+    """Sincronización en dos pasos: Datos -> Grupo"""
+    if not MAILERLITE_API_KEY:
+        return
 
     email_limpio = email.strip().lower()
     headers = {
@@ -46,65 +47,56 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
         "Accept": "application/json"
     }
 
-    # PASO ÚNICO: Crear/Actualizar y asignar grupo en una sola instrucción
-    url = "https://connect.mailerlite.com/api/subscribers"
-    payload = {
+    url_sub = "https://connect.mailerlite.com/api/subscribers"
+    payload_sub = {
         "email": email_limpio,
         "fields": {
             "name": nombre,
             "vl_nombre": nombre,
             "vl_directiva": directiva,
             "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        },
-        "groups": ["179520042256303511"] # Reemplaza con tu ID de grupo real
+        }
     }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(url, headers=headers, json=payload, timeout=15.0)
-            print(f"Respuesta MailerLite para {email_limpio}: {response.status_code}")
-            if response.status_code not in [200, 201]:
-                print(f"Detalle del error: {response.text}")
+            res_sub = await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
+            if res_sub.status_code in [200, 201, 204]:
+                grupo_id = 17952042256303511 
+                url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
+                await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
         except Exception as e:
-            print(f"Error de conexión: {e}")
+            print(f"Error MailerLite: {e}")
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # 1. Limpieza y Validación de Entradas
+    # 1. Limpieza de Entradas
     email = datos.get('email', '').strip().lower()
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
     if not nombre: nombre = "VIP MEMBER"
-
     lugar = datos.get('lugar', '').strip().upper()
     hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. BLOQUE DE SEGURIDAD: Verificar si el usuario ya existe
+    # 2. Verificar duplicado
     try:
-        # Buscamos el email en la tabla antes de hacer nada más
         check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
-        
         if check_user.data:
-            # Si el email existe, enviamos una respuesta de advertencia
             return {
                 "status": "exists",
                 "titulo": "ACCESO PREVIAMENTE REGISTRADO",
-                "analisis_ejecutivo": "Tu email ya se encuentra en nuestra base de datos estratégica. Revisa tu bandeja de entrada o contacta a soporte para recuperar tu acceso.",
+                "analisis_ejecutivo": "Tu email ya se encuentra en nuestra base de datos estratégica.",
                 "coordinadas": "SISTEMA BLOQUEADO: USUARIO EXISTENTE",
                 "firma": "VAULT LOGIC SECURITY"
             }
     except Exception as e:
-        print(f"Error al verificar duplicado en Supabase: {e}")
+        print(f"Error Check: {e}")
 
-    # 3. Si el usuario es nuevo, procedemos con la geolocalización
+    # 3. Procesar Nuevo
     coords = obtener_gps(lugar)
-
-    # 4. Directiva Estratégica
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
-    # 5. Guardado en Supabase (Bóveda)
     try:
-        # Aquí usamos upsert con on_conflict pero ya sabemos que es nuevo o falló el check
         supabase.table("clientes_vip").upsert({
             "email": email,
             "nombre": nombre,
@@ -121,13 +113,9 @@ async def consultar(datos: dict):
             "nivel_suscripcion": "free"
         }, on_conflict="email").execute()
     except Exception as e:
-        print(f"Error Bóveda Supabase: {e}")
+        print(f"Error Supabase: {e}")
 
-    # 6. Sincronización con MailerLite
-    try:
-        await sincronizar_mailerlite(email, nombre, directiva, coords)
-    except Exception as e:
-        print(f"Error Crítico MailerLite: {e}")
+    await sincronizar_mailerlite(email, nombre, directiva, coords)
 
     return {
         "status": "success",
@@ -136,20 +124,18 @@ async def consultar(datos: dict):
         "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
         "firma": "VAULT LOGIC EXECUTIVE"
     }
-    @app.get("/obtener_reporte/{email}")
+
+@app.get("/obtener_reporte/{email}")
 async def obtener_reporte(email: str):
-    """Recupera los datos de la bóveda para mostrarlos en el reporte dinámico"""
+    """Endpoint para la Bóveda dinámica"""
     try:
-        # Buscamos al usuario por email
         email_limpio = email.strip().lower()
         resultado = supabase.table("clientes_vip").select("*").eq("email", email_limpio).execute()
         
         if not resultado.data:
-            return {"status": "error", "message": "Acceso denegado: Firma no encontrada en la bóveda."}
+            return {"status": "error", "message": "Firma no encontrada."}
             
         user = resultado.data[0]
-        
-        # Devolvemos el paquete de datos para el reporte
         return {
             "status": "success",
             "data": {
@@ -163,8 +149,8 @@ async def obtener_reporte(email: str):
             }
         }
     except Exception as e:
-        print(f"Error al recuperar reporte: {e}")
-        return {"status": "error", "message": "Fallo en la conexión con la bóveda estratégica."}
+        return {"status": "error", "message": str(e)}
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
