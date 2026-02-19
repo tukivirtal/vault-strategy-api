@@ -72,40 +72,41 @@ from datetime import datetime
 
 def calcular_vectores_natales(fecha_str, hora_str, coords):
     try:
-        # Aseguramos limpieza de datos
-        fecha_str = fecha_str.strip()
-        hora_str = hora_str.strip()
-
-        # 1. Configuración de tiempo
-        # Formatos esperados: YYYY-MM-DD y HH:MM
-        fecha_dt = datetime.strptime(fecha_str, "%Y-%m-%d")
+        # 1. Parsing de Fecha (Formato: 1980-04-18)
+        # Usamos split para ser más seguros que con strptime
+        año, mes, día = map(int, fecha_str.split('-'))
         
-        # Manejo de hora (si viene vacía o mal formada)
-        try:
-            h, m = map(int, hora_str.split(':'))
-        except:
-            h, m = 12, 0  # Default al mediodía
+        # 2. Parsing de Hora (Formato: 09:45)
+        hora, minuto = map(int, hora_str.split(':'))
+        
+        # 3. Conversión a Julian Day
+        # La hora decimal es: hora + (minutos/60)
+        hora_decimal = hora + (minuto / 60.0)
+        jd = swe.julday(año, mes, día, hora_decimal)
 
-        # 2. Conversión a Julian Day (Cálculo Astronómico)
-        jd = swe.julday(fecha_dt.year, fecha_dt.month, fecha_dt.day, h + m/60.0)
-
-        # 3. Puntos de Datos Críticos
+        # 4. Puntos de Datos Críticos (Keplerian Logic)
         puntos = {
-            "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
-            "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
+            "SOL": swe.SUN, 
+            "LUNA": swe.MOON, 
+            "MERCURIO": swe.MERCURY, 
+            "VENUS": swe.VENUS, 
+            "MARTE": swe.MARS, 
+            "JUPITER": swe.JUPITER, 
             "SATURNO": swe.SATURN
         }
 
         vectores = {}
         for nombre, codigo in puntos.items():
-            # Cálculo de longitud eclíptica
+            # swe.calc_ut devuelve (longitud, latitud, distancia, velocidad...)
+            # Solo nos interesa la longitud [0]
             res = swe.calc_ut(jd, codigo)
             vectores[nombre] = round(res[0], 4)
 
         return vectores
+
     except Exception as e:
-        print(f"Falla crítica en motor matemático: {e}")
-        return {"status": "error_formato_datos", "detalle": str(e)}
+        print(f"DEBUG - Error procesando: {fecha_str} {hora_str}. Motivo: {e}")
+        return {"status": "error_tecnico", "detalle": str(e)}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
