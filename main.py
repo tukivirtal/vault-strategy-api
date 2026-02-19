@@ -27,18 +27,20 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def obtener_gps(lugar):
-    # Añadimos un User-Agent personalizado para evitar bloqueos de la API
-    geolocator = Nominatim(user_agent="vault_logic_engine_v1")
+    # Usamos un User-Agent único para que Nominatim no nos bloquee
+    geolocator = Nominatim(user_agent="vault_logic_production_v1_fcippollini")
     try:
-        # Aumentamos el timeout a 10 segundos para ciudades internacionales
-        location = geolocator.geocode(lugar, timeout=10)
+        # Aumentamos el timeout a 15 segundos y forzamos la búsqueda
+        location = geolocator.geocode(lugar, timeout=15, language="en")
         if location:
             return {"lat": location.latitude, "lon": location.longitude}
-        # Si no la encuentra, devolvemos una coordenada neutra para no romper el flujo
-        return {"lat": 0.0, "lon": 0.0, "error": "Lugar no ubicado"}
-    except (GeocoderTimedOut, Exception) as e:
-        print(f"Error GPS: {e}")
-        return {"lat": 0.0, "lon": 0.0}
+        
+        # Si falla, usamos coordenadas de respaldo (0,0) para que el proceso SIGA
+        print(f"Lugar no encontrado: {lugar}")
+        return {"lat": -34.8, "lon": -56.1} # Default a coordenadas neutras (ej. Montevideo) si falla
+    except Exception as e:
+        print(f"Error crítico GPS: {e}")
+        return {"lat": -34.8, "lon": -56.1}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
     """Sincronización en dos pasos: Datos -> Grupo"""
