@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executive Astro Logic | Strategic Timing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         .gold-gradient {
             background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             -webkit-text-fill-color: transparent;
         }
         .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -19,6 +17,32 @@
         .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); }
         .mono { font-family: 'JetBrains Mono', monospace; }
         input:focus { border-color: #d4af37 !important; }
+
+        /* Estilos Autocompletado */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #333;
+            background-color: #111;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .autocomplete-item {
+            padding: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #888;
+            border-bottom: 1px solid #222;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .autocomplete-item:hover {
+            background-color: #1a1a1a;
+            color: #d4af37;
+        }
     </style>
 </head>
 <body class="p-4 md:p-10 text-white">
@@ -50,7 +74,13 @@
                 <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
             </div>
             
-            <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
+            <div class="relative">
+                <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
+                <div id="lugar-list" class="autocomplete-items hidden"></div>
+            </div>
+
+            <input type="hidden" id="lat">
+            <input type="hidden" id="lon">
             
             <button onclick="consultar()" id="btn-submit" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-4">
                 Iniciar Secuencia de Cálculo
@@ -72,6 +102,42 @@
 </footer>
 
 <script>
+// --- MOTOR DE AUTOCOMPLETADO ---
+const lugarInput = document.getElementById('lugar');
+const lugarList = document.getElementById('lugar-list');
+
+lugarInput.addEventListener('input', async (e) => {
+    const val = e.target.value;
+    if (val.length < 3) { lugarList.classList.add('hidden'); return; }
+
+    try {
+        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+        const data = await res.json();
+        
+        lugarList.innerHTML = '';
+        lugarList.classList.remove('hidden');
+
+        data.features.forEach(feat => {
+            const prop = feat.properties;
+            const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
+            
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerText = label.toUpperCase();
+            item.onclick = () => {
+                lugarInput.value = label.toUpperCase();
+                document.getElementById('lat').value = feat.geometry.coordinates[1];
+                document.getElementById('lon').value = feat.geometry.coordinates[0];
+                lugarList.classList.add('hidden');
+            };
+            lugarList.appendChild(item);
+        });
+    } catch (err) { console.error("Error GPS:", err); }
+});
+
+document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
+
+// --- LÓGICA DE ENVÍO ---
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -87,32 +153,20 @@ document.addEventListener('input', (e) => {
     }
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const inputs = Array.from(document.querySelectorAll('input'));
-        const index = inputs.indexOf(document.activeElement);
-        if (index > -1 && index < inputs.length - 1) {
-            e.preventDefault(); 
-            inputs[index + 1].focus();
-        } else if (index === inputs.length - 1) {
-            consultar(); 
-        }
-    }
-});
-
 async function consultar() {
     const resContainer = document.getElementById('resultado');
     const resTitulo = document.getElementById('res-titulo');
     const resCuerpo = document.getElementById('res-cuerpo');
     const btn = document.getElementById('btn-submit');
     
-    // Validar campos antes de enviar
     const payload = {
         nombre: document.getElementById('nombre').value.trim(),
         email: document.getElementById('email').value.trim(),
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
-        lugar: document.getElementById('lugar').value.trim()
+        lugar: document.getElementById('lugar').value.trim(),
+        lat: document.getElementById('lat').value,
+        lon: document.getElementById('lon').value
     };
 
     if (!payload.email || !payload.fecha || !payload.lugar) {
@@ -122,54 +176,38 @@ async function consultar() {
         return;
     }
 
-    // Interfaz en modo espera
     btn.disabled = true;
     btn.innerText = "PROCESANDO VECTORES...";
     resContainer.classList.remove('hidden');
     resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Sincronizando con efemérides internacionales... (Esto puede tardar 10-15 segundos)";
+    resCuerpo.innerHTML = "Calculando geometría de precisión...";
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000); // Esperar hasta 25 seg
-
         const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload),
-            signal: controller.signal
+            body: JSON.stringify(payload)
         });
 
-        clearTimeout(timeoutId);
-
         if (!respuesta.ok) throw new Error("Status " + respuesta.status);
-
         const data = await respuesta.json();
         
         if (data.status === "success" || data.status === "exists") {
             await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
-            await escribirEfecto(resCuerpo, "Geometría calculada. Abriendo Bóveda...");
-            
+            await escribirEfecto(resCuerpo, "Geometría verificada. Abriendo Bóveda...");
             setTimeout(() => {
                 window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
             }, 1500);
-
         } else {
             btn.disabled = false;
             btn.innerText = "Iniciar Secuencia de Cálculo";
             await escribirEfecto(resTitulo, "ERROR DE PROTOCOLO");
             await escribirEfecto(resCuerpo, data.analisis_ejecutivo || "Error en el cálculo.");
         }
-
     } catch (error) {
         btn.disabled = false;
         btn.innerText = "Reintentar Secuencia";
-        console.error("Error detallado:", error);
-        if (error.name === 'AbortError') {
-            resCuerpo.innerHTML = "ERROR: TIEMPO EXCEDIDO. El motor de geolocalización está saturado. Reintente con 'Ciudad, País'.";
-        } else {
-            resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE. Verifique los datos o reintente en 10 segundos.";
-        }
+        resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE. Verifique su conexión.";
     }
 }
 </script>
