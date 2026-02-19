@@ -12,6 +12,7 @@
             background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            -webkit-text-fill-color: transparent;
         }
         .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
@@ -51,7 +52,7 @@
             
             <input type="text" id="lugar" placeholder="CIUDAD, PAÍS DE NACIMIENTO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
             
-            <button onclick="consultar()" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-4">
+            <button onclick="consultar()" id="btn-submit" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-4">
                 Iniciar Secuencia de Cálculo
             </button>
         </div>
@@ -71,7 +72,6 @@
 </footer>
 
 <script>
-// Efecto Teletipo
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -81,15 +81,12 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
-// 1. FORZAR MAYÚSCULAS EN TIEMPO REAL (Excepto email)
 document.addEventListener('input', (e) => {
     if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
         e.target.value = e.target.value.toUpperCase();
     }
 });
 
-// 2. NAVEGACIÓN TOTAL CON ENTER (UX Premium sin errores)
-// El usuario presiona Enter para avanzar de forma segura
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const inputs = Array.from(document.querySelectorAll('input'));
@@ -107,55 +104,73 @@ async function consultar() {
     const resContainer = document.getElementById('resultado');
     const resTitulo = document.getElementById('res-titulo');
     const resCuerpo = document.getElementById('res-cuerpo');
-    const resGeo = document.getElementById('res-geo');
+    const btn = document.getElementById('btn-submit');
     
-    resContainer.classList.remove('hidden');
-    resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Extrayendo efemérides y geolocalización...";
-
+    // Validar campos antes de enviar
     const payload = {
-        nombre: document.getElementById('nombre').value,
-        email: document.getElementById('email').value,
+        nombre: document.getElementById('nombre').value.trim(),
+        email: document.getElementById('email').value.trim(),
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
-        lugar: document.getElementById('lugar').value
+        lugar: document.getElementById('lugar').value.trim()
     };
 
-  try {
-    // Agregamos un log para ver si la petición sale
-    console.log("Iniciando secuencia internacional...");
-    
-    const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-    });
-
-    if (!respuesta.ok) {
-        throw new Error(`Servidor respondió con status ${respuesta.status}`);
+    if (!payload.email || !payload.fecha || !payload.lugar) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerHTML = "ERROR DE ENTRADA:";
+        resCuerpo.innerHTML = "Complete Email, Fecha y Lugar para proceder.";
+        return;
     }
 
-    const data = await respuesta.json();
-    
-    if (data.status === "success" || data.status === "exists") {
-        // 1. Mostrar éxito visual brevemente
-        await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
-        await escribirEfecto(resCuerpo, "Sincronizando con la Bóveda Estratégica...");
+    // Interfaz en modo espera
+    btn.disabled = true;
+    btn.innerText = "PROCESANDO VECTORES...";
+    resContainer.classList.remove('hidden');
+    resTitulo.innerHTML = "SISTEMA:";
+    resCuerpo.innerHTML = "Sincronizando con efemérides internacionales... (Esto puede tardar 10-15 segundos)";
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000); // Esperar hasta 25 seg
+
+        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!respuesta.ok) throw new Error("Status " + respuesta.status);
+
+        const data = await respuesta.json();
         
-        // 2. Redirección automática tras 2 segundos para que el usuario pueda leer
-        setTimeout(() => {
-            window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
-        }, 2000);
+        if (data.status === "success" || data.status === "exists") {
+            await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
+            await escribirEfecto(resCuerpo, "Geometría calculada. Abriendo Bóveda...");
+            
+            setTimeout(() => {
+                window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
+            }, 1500);
 
-    } else {
-        await escribirEfecto(resTitulo, "ERROR DE PROTOCOLO");
-        await escribirEfecto(resCuerpo, data.analisis_ejecutivo || "Error interno del sistema.");
+        } else {
+            btn.disabled = false;
+            btn.innerText = "Iniciar Secuencia de Cálculo";
+            await escribirEfecto(resTitulo, "ERROR DE PROTOCOLO");
+            await escribirEfecto(resCuerpo, data.analisis_ejecutivo || "Error en el cálculo.");
+        }
+
+    } catch (error) {
+        btn.disabled = false;
+        btn.innerText = "Reintentar Secuencia";
+        console.error("Error detallado:", error);
+        if (error.name === 'AbortError') {
+            resCuerpo.innerHTML = "ERROR: TIEMPO EXCEDIDO. El motor de geolocalización está saturado. Reintente con 'Ciudad, País'.";
+        } else {
+            resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE. Verifique los datos o reintente en 10 segundos.";
+        }
     }
-
-} catch (error) {
-    console.error("Error técnico:", error);
-    resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE DE DATOS. REVISE CONEXIÓN.";
-}
 }
 </script>
 </body>
