@@ -8,3 +8,4 @@ pyswisseph
 geopy
 httpx
 geopy
+pyswisseph==2.8.0.post1
