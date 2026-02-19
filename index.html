@@ -121,12 +121,19 @@ async function consultar() {
         lugar: document.getElementById('lugar').value
     };
 
-   try {
+  try {
+    // Agregamos un log para ver si la petición sale
+    console.log("Iniciando secuencia internacional...");
+    
     const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
     });
+
+    if (!respuesta.ok) {
+        throw new Error(`Servidor respondió con status ${respuesta.status}`);
+    }
 
     const data = await respuesta.json();
     
