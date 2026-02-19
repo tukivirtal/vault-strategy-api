@@ -121,22 +121,34 @@ async function consultar() {
         lugar: document.getElementById('lugar').value
     };
 
-    try {
-        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-        
-        const data = await respuesta.json();
-        
-        await escribirEfecto(resTitulo, data.titulo);
-        await escribirEfecto(resCuerpo, data.analisis_ejecutivo);
-        resGeo.innerHTML = `${data.coordinadas} | ${data.firma}`;
+   try {
+    const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    });
 
-    } catch (error) {
-        resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE DE DATOS.";
+    const data = await respuesta.json();
+    
+    if (data.status === "success" || data.status === "exists") {
+        // 1. Mostrar éxito visual brevemente
+        await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
+        await escribirEfecto(resCuerpo, "Sincronizando con la Bóveda Estratégica...");
+        
+        // 2. Redirección automática tras 2 segundos para que el usuario pueda leer
+        setTimeout(() => {
+            window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
+        }, 2000);
+
+    } else {
+        await escribirEfecto(resTitulo, "ERROR DE PROTOCOLO");
+        await escribirEfecto(resCuerpo, data.analisis_ejecutivo || "Error interno del sistema.");
     }
+
+} catch (error) {
+    console.error("Error técnico:", error);
+    resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE DE DATOS. REVISE CONEXIÓN.";
+}
 }
 </script>
 </body>
