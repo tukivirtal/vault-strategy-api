@@ -67,6 +67,37 @@ async def sincronizar_mailerlite(email, nombre, directiva, coords):
                 await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
         except Exception as e:
             print(f"Error MailerLite: {e}")
+import swisseph as swe
+from datetime import datetime
+
+def calcular_vectores_natales(fecha_str, hora_str, coords):
+    """
+    Transforma datos de tiempo y espacio en coordenadas eclípticas exactas.
+    Utiliza el motor de Efemérides Suizas.
+    """
+    # 1. Configurar fecha y hora UT (Tiempo Universal)
+    # Por ahora asumimos una zona horaria estándar, luego la haremos dinámica
+    fecha_dt = datetime.strptime(fecha_str, "%Y-%m-%d")
+    hora_dt = datetime.strptime(hora_str, "%H:%M")
+    
+    # Convertir a Julian Day (formato matemático de tiempo astronómico)
+    jd = swe.julday(fecha_dt.year, fecha_dt.month, fecha_dt.day, 
+                    hora_dt.hour + hora_dt.minute/60.0)
+
+    # 2. Lista de puntos de datos a analizar (Sol, Luna, Mercurio, etc.)
+    puntos_interes = {
+        "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
+        "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
+        "SATURNO": swe.SATURN
+    }
+
+    vectores = {}
+    for nombre, codigo in puntos_interes.items():
+        res = swe.calc_ut(jd, codigo)
+        # res[0] es la longitud exacta en el círculo de 360°
+        vectores[nombre] = round(res[0], 4)
+
+    return vectores
 
 @app.post("/consultar")
 async def consultar(datos: dict):
