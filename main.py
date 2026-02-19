@@ -153,7 +153,7 @@ async def consultar(datos: dict):
     hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. Verificar duplicado (Seguridad)
+    # 2. Verificar duplicado
     try:
         check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
         if check_user.data:
@@ -169,7 +169,7 @@ async def consultar(datos: dict):
 
     # 3. Procesar Nuevo: Geolocalización y Vectores Matemáticos
     coords = obtener_gps(lugar)
-    
+
     # EJECUCIÓN DEL MOTOR DE PRECISIÓN (Etapa 1)
     try:
         vectores = calcular_vectores_natales(fecha, hora, coords)
@@ -177,10 +177,17 @@ async def consultar(datos: dict):
         print(f"Error en Motor de Vectores: {e}")
         vectores = {"status": "error_calculo"}
 
-    # Directiva base (En la Etapa 3 será generada por algoritmo)
-    directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
+    # --- ETAPA 2: ANALIZADOR DE ÁNGULOS (KEPLER LOGIC) ---
+    geometria_hits = analizar_geometry_kepler(vectores)
+    
+    # Generamos la directiva dinámica basada en el primer "Hit" matemático encontrado
+    if isinstance(geometria_hits, list) and len(geometria_hits) > 0:
+        hit = geometria_hits[0] # Tomamos el aspecto más relevante
+        directiva = f"PROTOCOLO {hit['tipo']} DETECTADO: {hit['descripcion']} entre los vectores {hit['puntos']}. Distancia: {hit['distancia']}°."
+    else:
+        directiva = "NODO DE EXPANSIÓN ACTIVO: Estructura geométrica en equilibrio. Momento de consolidación estratégica."
 
-    # 4. Guardado en Supabase (Bóveda con Datos Técnicos)
+    # 4. Guardado en Supabase (Bóveda con Inteligencia Geométrica)
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
@@ -192,7 +199,8 @@ async def consultar(datos: dict):
             },
             "mapatotal": {
                 "geo": coords, 
-                "vectores_eclipticos": vectores, # NUEVOS DATOS NUMÉRICOS
+                "vectores_eclipticos": vectores,
+                "analisis_kepler": geometria_hits, # Guardamos la lista completa de ángulos
                 "directive": directiva, 
                 "auth": "VERIFIED_VAULT"
             },
