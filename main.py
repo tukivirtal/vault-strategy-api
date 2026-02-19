@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 import os
 import uvicorn
 import httpx
@@ -24,16 +25,20 @@ MAILERLITE_API_KEY = os.environ.get("MAILERLITE_API_KEY")
 # Inicialización de Supabase
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+
 def obtener_gps(lugar):
-    """Geolocalización real para validación técnica"""
+    # Añadimos un User-Agent personalizado para evitar bloqueos de la API
+    geolocator = Nominatim(user_agent="vault_logic_engine_v1")
     try:
-        geolocator = Nominatim(user_agent="vault_logic_pro")
-        location = geolocator.geocode(lugar)
+        # Aumentamos el timeout a 10 segundos para ciudades internacionales
+        location = geolocator.geocode(lugar, timeout=10)
         if location:
-            return {"lat": round(location.latitude, 4), "lon": round(location.longitude, 4)}
-    except:
-        pass
-    return {"lat": "COORD_PENDING", "lon": "COORD_PENDING"}
+            return {"lat": location.latitude, "lon": location.longitude}
+        # Si no la encuentra, devolvemos una coordenada neutra para no romper el flujo
+        return {"lat": 0.0, "lon": 0.0, "error": "Lugar no ubicado"}
+    except (GeocoderTimedOut, Exception) as e:
+        print(f"Error GPS: {e}")
+        return {"lat": 0.0, "lon": 0.0}
 
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
     """Sincronización en dos pasos: Datos -> Grupo"""
