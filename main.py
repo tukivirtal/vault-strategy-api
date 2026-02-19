@@ -27,21 +27,33 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def obtener_gps(lugar):
-    # Usamos un User-Agent único para que Nominatim no nos bloquee
-    geolocator = Nominatim(user_agent="vault_logic_production_v1_fcippollini")
+    # Diccionario de respaldo rápido para evitar consultar internet
+    respaldos = {
+        "SAN FRANCISCO": {"lat": 37.7749, "lon": -122.4194},
+        "BARRANQUILLA": {"lat": 10.9685, "lon": -74.7813},
+        "NEW YORK": {"lat": 40.7128, "lon": -74.0060},
+        "CARMELO": {"lat": -34.0000, "lon": -58.2833}
+    }
+
+    # 1. Verificar si es una ciudad conocida en nuestra base local
+    lugar_clean = lugar.upper()
+    for ciudad, coords in respaldos.items():
+        if ciudad in lugar_clean:
+            return coords
+
+    # 2. Si no es conocida, intentar búsqueda rápida con timeout agresivo
+    geolocator = Nominatim(user_agent="vault_logic_v1")
     try:
-        # Aumentamos el timeout a 15 segundos y forzamos la búsqueda
-        location = geolocator.geocode(lugar, timeout=15, language="en")
+        # Solo esperamos 3 segundos. Si no responde, saltamos al default.
+        location = geolocator.geocode(lugar, timeout=3)
         if location:
             return {"lat": location.latitude, "lon": location.longitude}
-        
-        # Si falla, usamos coordenadas de respaldo (0,0) para que el proceso SIGA
-        print(f"Lugar no encontrado: {lugar}")
-        return {"lat": -34.8, "lon": -56.1} # Default a coordenadas neutras (ej. Montevideo) si falla
-    except Exception as e:
-        print(f"Error crítico GPS: {e}")
-        return {"lat": -34.8, "lon": -56.1}
+    except:
+        pass
 
+    # 3. RESPALDO TOTAL: Si todo falla, devolvemos una coordenada neutra 
+    # para que el sistema de vectores PUEDA CALCULAR y no dé error de enlace.
+    return {"lat": 0.0, "lon": 0.0, "nota": "fallback_active"}
 async def sincronizar_mailerlite(email, nombre, directiva, coords):
     """Sincronización en dos pasos: Datos -> Grupo"""
     if not MAILERLITE_API_KEY:
