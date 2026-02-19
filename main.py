@@ -72,7 +72,7 @@ from datetime import datetime
 
 def calcular_vectores_natales(fecha_str, hora_str, coords):
     try:
-        # 1. Parsing de Fecha y Hora (Datos validados: 1980-04-18 | 09:45)
+        # 1. Parsing robusto de Fecha y Hora
         año, mes, día = map(int, fecha_str.split('-'))
         hora, minuto = map(int, hora_str.split(':'))
         
@@ -80,31 +80,33 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
         hora_decimal = hora + (minuto / 60.0)
         jd = swe.julday(año, mes, día, hora_decimal)
 
-        # 3. Puntos de Datos Críticos
+        # 3. Diccionario de puntos (Keplerian Logic)
         puntos = {
-            "SOL": swe.SUN, 
-            "LUNA": swe.MOON, 
-            "MERCURIO": swe.MERCURY, 
-            "VENUS": swe.VENUS, 
-            "MARTE": swe.MARS, 
-            "JUPITER": swe.JUPITER, 
+            "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
+            "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
             "SATURNO": swe.SATURN
         }
 
         vectores = {}
         for nombre, codigo in puntos.items():
-            # swe.calc_ut devuelve una tupla: (longitud, latitud, distancia, velocidad...)
-            res = swe.calc_ut(jd, codigo)
+            # Realizamos el cálculo
+            resultado_api = swe.calc_ut(jd, codigo)
             
-            # CORRECCIÓN: res[0] es el primer elemento de la tupla (longitud decimal)
-            longitud_decimal = res[0] 
-            vectores[nombre] = round(longitud_decimal, 4)
+            # EXTRAER CON SEGURIDAD: 
+            # swisseph devuelve (long, lat, dist, speed_long, speed_lat, speed_dist)
+            if isinstance(resultado_api, tuple):
+                valor_longitud = resultado_api[0]
+                # Redondeamos el número, NO la tupla
+                vectores[nombre] = float(f"{valor_longitud:.4f}")
+            else:
+                # Caso alternativo si la librería devuelve el número directo
+                vectores[nombre] = round(float(resultado_api), 4)
 
         return vectores
 
     except Exception as e:
-        print(f"DEBUG - Error procesando: {fecha_str} {hora_str}. Motivo: {e}")
-        return {"status": "error_tecnico", "detalle": str(e)}
+        print(f"DEBUG CRÍTICO: {e}")
+        return {"status": "error_sintaxis_python", "detalle": str(e)}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
