@@ -106,6 +106,42 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
         print(f"DEBUG FINAL: {e}")
         return {"status": "error_extraccion_bruta", "detalle": str(e)}
 
+def analizar_geometria_kepler(vectores):
+    aspectos_encontrados = []
+    nombres = list(vectores.keys())
+    
+    # Ángulos de interés (Kepler/Addey) y sus significados lógicos
+    definiciones = {
+        0: {"tipo": "CONJUNCIÓN", "label": "Singularidad de Energía"},
+        60: {"tipo": "SEXTIL", "label": "Oportunidad Operativa"},
+        90: {"tipo": "CUADRATURA", "label": "Tensión Estructural"},
+        120: {"tipo": "TRÍGONO", "label": "Fluidez de Expansión"},
+        180: {"tipo": "OPOSICIÓN", "label": "Punto de Contraste"}
+    }
+    
+    orbe_maximo = 5.0 # Margen de error de 5 grados
+
+    for i in range(len(nombres)):
+        for j in range(i + 1, len(nombres)):
+            p1, p2 = nombres[i], nombres[j]
+            v1, v2 = vectores[p1], vectores[p2]
+            
+            # Calcular distancia angular mínima en un círculo
+            distancia = abs(v1 - v2)
+            if distancia > 180: distancia = 360 - distancia
+            
+            # Verificar si encaja en algún ángulo de Kepler
+            for angulo_base, info in definiciones.items():
+                if abs(distancia - angulo_base) <= orbe_maximo:
+                    aspectos_encontrados.append({
+                        "puntos": f"{p1}-{p2}",
+                        "distancia": round(distancia, 2),
+                        "tipo": info["tipo"],
+                        "descripcion": info["label"]
+                    })
+    
+    return aspectos_encontrados
+
 @app.post("/consultar")
 async def consultar(datos: dict):
     # 1. Limpieza de Entradas
