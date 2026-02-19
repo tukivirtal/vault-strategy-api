@@ -163,50 +163,55 @@ def analizar_geometria_kepler(vectores):
 
 @app.post("/consultar")
 async def consultar(datos: dict):
-    # 1. Limpieza de Entradas
+    # 1. Extracción de datos del payload
     email = datos.get('email', '').strip().lower()
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
-    if not nombre: nombre = "VIP MEMBER"
     lugar = datos.get('lugar', '').strip().upper()
     fecha = datos.get('fecha', '1980-01-01')
     hora = datos.get('hora', '12:00')
-    if not hora: hora = "12:00"
+    
+    # 2. CAPTURA DE COORDENADAS DIRECTAS (NUEVO)
+    # Si el frontend envía lat/lon, las usamos. Si no, usamos un default.
+    lat = datos.get('lat')
+    lon = datos.get('lon')
+    
+    if lat and lon:
+        coords = {"lat": float(lat), "lon": float(lon)}
+    else:
+        # Respaldo por si algo falla en el frontend (Carmelo por defecto)
+        coords = {"lat": -33.9968, "lon": -58.2836}
 
-    # 2. Verificar duplicado
+    # 3. Verificar duplicado
     try:
         check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
         if check_user.data:
             return {
                 "status": "exists",
                 "titulo": "ACCESO PREVIAMENTE REGISTRADO",
-                "analisis_ejecutivo": "Tu email ya se encuentra en nuestra base de datos estratégica.",
-                "coordinadas": "SISTEMA BLOQUEADO: USUARIO EXISTENTE",
+                "analisis_ejecutivo": "Tu firma ya se encuentra en la Bóveda Estratégica.",
                 "firma": "VAULT LOGIC SECURITY"
             }
     except Exception as e:
         print(f"Error Check: {e}")
 
-    # 3. Procesar Nuevo: Geolocalización y Vectores Matemáticos
-    coords = obtener_gps(lugar)
-
-    # EJECUCIÓN DEL MOTOR DE PRECISIÓN (Etapa 1)
+    # 4. EJECUCIÓN DEL MOTOR DE PRECISIÓN
+    # Al tener las coords, este proceso es instantáneo
     try:
         vectores = calcular_vectores_natales(fecha, hora, coords)
+        geometria_hits = analizar_geometria_kepler(vectores) # Asegúrate de que el nombre coincida con tu función
     except Exception as e:
-        print(f"Error en Motor de Vectores: {e}")
-        vectores = {"status": "error_calculo"}
+        print(f"Error en Motor: {e}")
+        vectores = {"status": "error"}
+        geometria_hits = []
 
-    # --- ETAPA 2: ANALIZADOR DE ÁNGULOS (KEPLER LOGIC) ---
-    geometria_hits = analizar_geometry_kepler(vectores)
-    
-    # Generamos la directiva dinámica basada en el primer "Hit" matemático encontrado
-    if isinstance(geometria_hits, list) and len(geometria_hits) > 0:
-        hit = geometria_hits[0] # Tomamos el aspecto más relevante
-        directiva = f"PROTOCOLO {hit['tipo']} DETECTADO: {hit['descripcion']} entre los vectores {hit['puntos']}. Distancia: {hit['distancia']}°."
+    # 5. Lógica de Directiva Dinámica
+    if geometria_hits:
+        hit = geometria_hits[0]
+        directiva = f"PROTOCOLO {hit['tipo']} DETECTADO: {hit['descripcion']} entre {hit['puntos']}."
     else:
-        directiva = "NODO DE EXPANSIÓN ACTIVO: Estructura geométrica en equilibrio. Momento de consolidación estratégica."
+        directiva = "NODO DE EXPANSIÓN ACTIVO: Estructura en equilibrio armónico."
 
-    # 4. Guardado en Supabase (Bóveda con Inteligencia Geométrica)
+    # 6. Guardado en Supabase
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
@@ -219,7 +224,7 @@ async def consultar(datos: dict):
             "mapatotal": {
                 "geo": coords, 
                 "vectores_eclipticos": vectores,
-                "analisis_kepler": geometria_hits, # Guardamos la lista completa de ángulos
+                "analisis_kepler": geometria_hits,
                 "directive": directiva, 
                 "auth": "VERIFIED_VAULT"
             },
@@ -227,9 +232,6 @@ async def consultar(datos: dict):
         }, on_conflict="email").execute()
     except Exception as e:
         print(f"Error Supabase: {e}")
-
-    # 5. Sincronización Externa
-    await sincronizar_mailerlite(email, nombre, directiva, coords)
 
     return {
         "status": "success",
