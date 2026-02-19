@@ -72,7 +72,7 @@ from datetime import datetime
 
 def calcular_vectores_natales(fecha_str, hora_str, coords):
     try:
-        # 1. Parsing robusto de Fecha y Hora
+        # 1. Parsing de Fecha y Hora
         año, mes, día = map(int, fecha_str.split('-'))
         hora, minuto = map(int, hora_str.split(':'))
         
@@ -80,7 +80,7 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
         hora_decimal = hora + (minuto / 60.0)
         jd = swe.julday(año, mes, día, hora_decimal)
 
-        # 3. Diccionario de puntos (Keplerian Logic)
+        # 3. Puntos de Datos
         puntos = {
             "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
             "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
@@ -89,24 +89,22 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
 
         vectores = {}
         for nombre, codigo in puntos.items():
-            # Realizamos el cálculo
-            resultado_api = swe.calc_ut(jd, codigo)
+            # Llamada a la librería
+            resultado = swe.calc_ut(jd, codigo)
             
-            # EXTRAER CON SEGURIDAD: 
-            # swisseph devuelve (long, lat, dist, speed_long, speed_lat, speed_dist)
-            if isinstance(resultado_api, tuple):
-                valor_longitud = resultado_api[0]
-                # Redondeamos el número, NO la tupla
-                vectores[nombre] = float(f"{valor_longitud:.4f}")
-            else:
-                # Caso alternativo si la librería devuelve el número directo
-                vectores[nombre] = round(float(resultado_api), 4)
+            # EXTRACCIÓN RADICAL:
+            # Si es una tupla (o tupla de tuplas), entramos hasta encontrar el primer número
+            while isinstance(resultado, (tuple, list)):
+                resultado = resultado[0]
+            
+            # Ahora 'resultado' es garantizadamente un número (float)
+            vectores[nombre] = round(float(resultado), 4)
 
         return vectores
 
     except Exception as e:
-        print(f"DEBUG CRÍTICO: {e}")
-        return {"status": "error_sintaxis_python", "detalle": str(e)}
+        print(f"DEBUG FINAL: {e}")
+        return {"status": "error_extraccion_bruta", "detalle": str(e)}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
