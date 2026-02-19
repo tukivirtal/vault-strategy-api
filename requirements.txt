@@ -3,9 +3,6 @@ uvicorn
 gunicorn
 supabase
 python-dotenv
-flatlib
-pyswisseph
+pyswisseph==2.8.0.post1
 geopy
 httpx
-geopy
-pyswisseph==2.8.0.post1
