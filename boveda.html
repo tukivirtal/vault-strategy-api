@@ -12,47 +12,127 @@
         .label { font-size: 0.8rem; color: #888; }
         .value { font-size: 1.1rem; margin-top: 5px; color: #fff; letter-spacing: 1px; }
         .directiva { background: #1a1a1a; padding: 20px; border: 1px dashed #d4af37; margin-top: 30px; line-height: 1.6; color: #d4af37; font-weight: bold; }
-        .footer { margin-top: 30px; text-align: center; font-size: 0.7rem; color: #555; }
+        
+        /* Estilos del Mapa Geométrico */
+        #canvas-container { text-align: center; margin: 30px 0; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); border: 1px solid #333; padding: 20px; border-radius: 50%; width: 320px; height: 320px; margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: center; }
+        
+        .footer { margin-top: 30px; text-align: center; font-size: 0.7rem; color: #555; line-height: 1.4; }
+        .tech-footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.6rem; color: #444; text-align: justify; }
         #loading { text-align: center; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div id="loading">INICIALIZANDO ACCESO SEGURO...</div>
+<div id="loading">INICIALIZANDO ACCESO SEGURO...</div>
 
-    <div class="report-container" id="reporte" style="display: none;">
-        <h1>INFORME ESTRATÉGICO CONFIDENCIAL</h1>
-        
-        <div class="data-row">
-            <div class="label">Sujeto de Análisis</div>
-            <div class="value" id="nombre">---</div>
-        </div>
-
-        <div class="data-row">
-            <div class="label">Vector de Origen (Georreferencia)</div>
-            <div class="value" id="geo">---</div>
-            <div class="label" id="lugar" style="font-size: 0.7rem; margin-top: 5px;">---</div>
-        </div>
-
-        <div class="data-row">
-            <div class="label">Configuración Natal</div>
-            <div class="value" id="natal">---</div>
-        </div>
-
-        <div class="directiva">
-            <div class="label" style="margin-bottom: 10px;">DIRECTIVA DE EXPANSIÓN:</div>
-            <span id="directiva">---</span>
-        </div>
-
-        <div class="footer">
-            ESTE DOCUMENTO ES PROPIEDAD DE VAULT LOGIC EXECUTIVE. <br>
-            AUTENTICACIÓN: <span id="auth">---</span>
-        </div>
+<div class="report-container" id="reporte" style="display: none;">
+    <h1>INFORME ESTRATÉGICO CONFIDENCIAL</h1>
+    
+    <div class="data-row">
+        <div class="label">Sujeto de Análisis</div>
+        <div class="value" id="nombre">---</div>
     </div>
 
-   <script>
+    <div class="data-row">
+        <div class="label">Vector de Origen (Georreferencia)</div>
+        <div class="value" id="geo">---</div>
+        <div class="label" id="lugar" style="font-size: 0.7rem; margin-top: 5px;">---</div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="vaultWheel" width="300" height="300"></canvas>
+    </div>
+    
+
+    <div class="data-row">
+        <div class="label">Configuración Natal</div>
+        <div class="value" id="natal">---</div>
+    </div>
+
+    <div class="directiva">
+        <div class="label" style="margin-bottom: 10px;">ANÁLISIS DE SINCRONÍA:</div>
+        <span id="directiva">---</span>
+    </div>
+
+    <div class="footer">
+        ESTE DOCUMENTO ES PROPIEDAD DE VAULT LOGIC EXECUTIVE. <br>
+        AUTENTICACIÓN: <span id="auth">---</span>
+        
+        <div class="tech-footer">
+            MÉTRICA DE DATOS: Reporte generado mediante motor Swiss Ephemeris (NASA/JPL). 
+            Cálculo de longitudes eclípticas geocéntricas. Algoritmos de análisis: Armónicos de Addey & Geometría de Kepler. 
+            Tolerancia de error angular: ±0.0001°. Procesado por Vault Logic Core v1.0.
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- FUNCIÓN DE DIBUJO GEOMÉTRICO ---
+    function dibujarRueda(vectores, aspectos) {
+        const canvas = document.getElementById('vaultWheel');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const centro = 150;
+        const radio = 120;
+
+        ctx.clearRect(0, 0, 300, 300);
+
+        // 1. Círculo Base Dorado
+        ctx.beginPath();
+        ctx.arc(centro, centro, radio, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 2. Líneas de Aspectos (Geometría de Kepler)
+        aspectos.forEach(asp => {
+            const p1Nom = asp.puntos.split('-')[0];
+            const p2Nom = asp.puntos.split('-')[1];
+            
+            const v1 = vectores[p1Nom];
+            const v2 = vectores[p2Nom];
+
+            // Convertir grados a coordenadas Canvas (Ajuste -90 para que 0° sea arriba)
+            const x1 = centro + radio * Math.cos((v1 - 90) * Math.PI / 180);
+            const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
+            const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
+            const y2 = centro + radio * Math.sin((v2 - 90) * Math.PI / 180);
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            
+            // Color por tipo de tensión
+            if (asp.tipo === 'CUADRATURA' || asp.tipo === 'OPOSICIÓN') {
+                ctx.strokeStyle = '#ff4d4d'; // Rojo para tensión
+                ctx.setLineDash([4, 4]);
+            } else {
+                ctx.strokeStyle = '#d4af37'; // Dorado para armonía
+                ctx.setLineDash([]);
+            }
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+        });
+
+        // 3. Dibujar Puntos y Etiquetas
+        ctx.setLineDash([]);
+        Object.entries(vectores).forEach(([nombre, grado]) => {
+            const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
+            const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
+
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            
+            ctx.fillStyle = '#d4af37';
+            ctx.font = '8px Courier New';
+            ctx.fillText(nombre, x + 6, y + 3);
+        });
+    }
+
+    // --- CARGA DE DATOS ---
     async function cargarReporte() {
-        // 1. Obtener email de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
@@ -62,16 +142,16 @@
         }
 
         try {
-            // 2. Consultar a tu API en Render (URL VALIDADA)
             const apiUrl = `https://vault-strategy-api.onrender.com/obtener_reporte/${email}`;
             const response = await fetch(apiUrl);
-            
-            if (!response.ok) throw new Error("Fallo en respuesta de servidor");
+            if (!response.ok) throw new Error("Servidor no responde");
             
             const result = await response.json();
 
             if (result.status === "success") {
                 const d = result.data;
+                const meta = d.mapatotal || {};
+
                 document.getElementById('nombre').innerText = d.nombre;
                 document.getElementById('geo').innerText = d.geo_ref;
                 document.getElementById('lugar').innerText = d.lugar;
@@ -79,18 +159,23 @@
                 document.getElementById('directiva').innerText = d.directiva;
                 document.getElementById('auth').innerText = d.auth_code;
 
+                // Dibujar si existen los datos matemáticos
+                if (meta.vectores_eclipticos && meta.analisis_kepler) {
+                    dibujarRueda(meta.vectores_eclipticos, meta.analisis_kepler);
+                }
+
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('reporte').style.display = 'block';
             } else {
                 document.getElementById('loading').innerText = result.message;
             }
         } catch (error) {
-            console.error("Error técnico:", error);
-            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA ESTRATÉGICA.";
+            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA.";
         }
     }
 
     window.onload = cargarReporte;
 </script>
+
 </body>
 </html>
