@@ -71,33 +71,41 @@ import swisseph as swe
 from datetime import datetime
 
 def calcular_vectores_natales(fecha_str, hora_str, coords):
-    """
-    Transforma datos de tiempo y espacio en coordenadas eclípticas exactas.
-    Utiliza el motor de Efemérides Suizas.
-    """
-    # 1. Configurar fecha y hora UT (Tiempo Universal)
-    # Por ahora asumimos una zona horaria estándar, luego la haremos dinámica
-    fecha_dt = datetime.strptime(fecha_str, "%Y-%m-%d")
-    hora_dt = datetime.strptime(hora_str, "%H:%M")
-    
-    # Convertir a Julian Day (formato matemático de tiempo astronómico)
-    jd = swe.julday(fecha_dt.year, fecha_dt.month, fecha_dt.day, 
-                    hora_dt.hour + hora_dt.minute/60.0)
+    try:
+        # Aseguramos limpieza de datos
+        fecha_str = fecha_str.strip()
+        hora_str = hora_str.strip()
 
-    # 2. Lista de puntos de datos a analizar (Sol, Luna, Mercurio, etc.)
-    puntos_interes = {
-        "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
-        "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
-        "SATURNO": swe.SATURN
-    }
+        # 1. Configuración de tiempo
+        # Formatos esperados: YYYY-MM-DD y HH:MM
+        fecha_dt = datetime.strptime(fecha_str, "%Y-%m-%d")
+        
+        # Manejo de hora (si viene vacía o mal formada)
+        try:
+            h, m = map(int, hora_str.split(':'))
+        except:
+            h, m = 12, 0  # Default al mediodía
 
-    vectores = {}
-    for nombre, codigo in puntos_interes.items():
-        res = swe.calc_ut(jd, codigo)
-        # res[0] es la longitud exacta en el círculo de 360°
-        vectores[nombre] = round(res[0], 4)
+        # 2. Conversión a Julian Day (Cálculo Astronómico)
+        jd = swe.julday(fecha_dt.year, fecha_dt.month, fecha_dt.day, h + m/60.0)
 
-    return vectores
+        # 3. Puntos de Datos Críticos
+        puntos = {
+            "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
+            "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
+            "SATURNO": swe.SATURN
+        }
+
+        vectores = {}
+        for nombre, codigo in puntos.items():
+            # Cálculo de longitud eclíptica
+            res = swe.calc_ut(jd, codigo)
+            vectores[nombre] = round(res[0], 4)
+
+        return vectores
+    except Exception as e:
+        print(f"Falla crítica en motor matemático: {e}")
+        return {"status": "error_formato_datos", "detalle": str(e)}
 
 @app.post("/consultar")
 async def consultar(datos: dict):
