@@ -72,19 +72,15 @@ from datetime import datetime
 
 def calcular_vectores_natales(fecha_str, hora_str, coords):
     try:
-        # 1. Parsing de Fecha (Formato: 1980-04-18)
-        # Usamos split para ser más seguros que con strptime
+        # 1. Parsing de Fecha y Hora (Datos validados: 1980-04-18 | 09:45)
         año, mes, día = map(int, fecha_str.split('-'))
-        
-        # 2. Parsing de Hora (Formato: 09:45)
         hora, minuto = map(int, hora_str.split(':'))
         
-        # 3. Conversión a Julian Day
-        # La hora decimal es: hora + (minutos/60)
+        # 2. Conversión a Julian Day
         hora_decimal = hora + (minuto / 60.0)
         jd = swe.julday(año, mes, día, hora_decimal)
 
-        # 4. Puntos de Datos Críticos (Keplerian Logic)
+        # 3. Puntos de Datos Críticos
         puntos = {
             "SOL": swe.SUN, 
             "LUNA": swe.MOON, 
@@ -97,10 +93,12 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
 
         vectores = {}
         for nombre, codigo in puntos.items():
-            # swe.calc_ut devuelve (longitud, latitud, distancia, velocidad...)
-            # Solo nos interesa la longitud [0]
+            # swe.calc_ut devuelve una tupla: (longitud, latitud, distancia, velocidad...)
             res = swe.calc_ut(jd, codigo)
-            vectores[nombre] = round(res[0], 4)
+            
+            # CORRECCIÓN: res[0] es el primer elemento de la tupla (longitud decimal)
+            longitud_decimal = res[0] 
+            vectores[nombre] = round(longitud_decimal, 4)
 
         return vectores
 
