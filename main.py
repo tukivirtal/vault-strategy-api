@@ -106,10 +106,11 @@ async def consultar(datos: dict):
     nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
     if not nombre: nombre = "VIP MEMBER"
     lugar = datos.get('lugar', '').strip().upper()
+    fecha = datos.get('fecha', '1980-01-01')
     hora = datos.get('hora', '12:00')
     if not hora: hora = "12:00"
 
-    # 2. Verificar duplicado
+    # 2. Verificar duplicado (Seguridad)
     try:
         check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
         if check_user.data:
@@ -123,10 +124,20 @@ async def consultar(datos: dict):
     except Exception as e:
         print(f"Error Check: {e}")
 
-    # 3. Procesar Nuevo
+    # 3. Procesar Nuevo: Geolocalización y Vectores Matemáticos
     coords = obtener_gps(lugar)
+    
+    # EJECUCIÓN DEL MOTOR DE PRECISIÓN (Etapa 1)
+    try:
+        vectores = calcular_vectores_natales(fecha, hora, coords)
+    except Exception as e:
+        print(f"Error en Motor de Vectores: {e}")
+        vectores = {"status": "error_calculo"}
+
+    # Directiva base (En la Etapa 3 será generada por algoritmo)
     directiva = "NODO DE EXPANSIÓN ACTIVO: Sincronía detectada. Momento óptimo para la ejecución de protocolos de crecimiento."
 
+    # 4. Guardado en Supabase (Bóveda con Datos Técnicos)
     try:
         supabase.table("clientes_vip").upsert({
             "email": email,
@@ -134,10 +145,11 @@ async def consultar(datos: dict):
             "datos_natales": {
                 "lugar_original": lugar,
                 "hora_nacimiento": hora,
-                "fecha": datos.get('fecha', 'SIN_FECHA')
+                "fecha": fecha
             },
             "mapatotal": {
                 "geo": coords, 
+                "vectores_eclipticos": vectores, # NUEVOS DATOS NUMÉRICOS
                 "directive": directiva, 
                 "auth": "VERIFIED_VAULT"
             },
@@ -146,6 +158,7 @@ async def consultar(datos: dict):
     except Exception as e:
         print(f"Error Supabase: {e}")
 
+    # 5. Sincronización Externa
     await sincronizar_mailerlite(email, nombre, directiva, coords)
 
     return {
