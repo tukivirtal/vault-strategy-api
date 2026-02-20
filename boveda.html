@@ -72,7 +72,18 @@
         const ctx = canvas.getContext('2d');
         const centro = 170; const radio = 130;
         ctx.clearRect(0, 0, 340, 340);
+        // Dentro de dibujarRueda...
+        // 1. Planetas (Efecto estrella brillante)
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#fff";
+        ctx.fillStyle = "#fff"; // Blanco puro resalta sobre el mate
 
+// 2. Líneas de Aspectos
+if (asp.tipo === 'OPOSICIÓN') {
+    ctx.strokeStyle = 'rgba(255, 77, 77, 0.8)'; // Rojo vibrante para Sol-Saturno de Shakira
+} else {
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; // Dorado suave
+}
         aspectos.forEach(asp => {
             const v1 = vectores[asp.puntos.split('-')[0]];
             const v2 = vectores[asp.puntos.split('-')[1]];
