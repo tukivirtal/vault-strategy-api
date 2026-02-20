@@ -14,91 +14,55 @@
         }
 
         .report-container { 
-            background: rgba(10, 10, 10, 0.9);
+            background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(25px);
             border: 1px solid rgba(212, 175, 55, 0.2); 
             padding: 60px; 
             max-width: 750px; width: 100%; 
             box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9); 
             border-radius: 2px;
-            display: none; /* Se activa al cargar datos */
+            display: none; 
         }
 
-        h1 { 
-            letter-spacing: 0.8em; font-size: 1.4rem; 
-            text-align: center; margin-bottom: 60px;
-            color: #d4af37; font-weight: 300;
-        }
-
-        /* JERARQUÍA DE TEXTO MEJORADA */
+        h1 { letter-spacing: 0.8em; font-size: 1.4rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
         .data-row { margin: 40px 0; border-left: 2px solid #d4af37; padding-left: 30px; }
         .label { font-size: 0.9rem; color: #555; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; display: block; }
-        
-        /* LETRA GRANDE Y CLARA */
-        .value { 
-            font-size: 1.8rem; /* Tamaño ejecutivo */
-            color: #ffffff; 
-            font-weight: 500;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
-            line-height: 1.1;
-        }
+        .value { font-size: 1.8rem; color: #ffffff; font-weight: 500; text-shadow: 0 0 20px rgba(255,255,255,0.2); line-height: 1.1; }
 
-        /* MOTOR GRÁFICO MATE */
         #canvas-container { 
-            margin: 60px auto; 
-            background: #000; border: 2px solid #111; border-radius: 50%; 
-            width: 360px; height: 360px; 
-            display: flex; align-items: center; justify-content: center; 
+            margin: 60px auto; background: #000; border: 2px solid #111; border-radius: 50%; 
+            width: 360px; height: 360px; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 0 80px rgba(0,0,0,1), inset 0 0 40px rgba(212, 175, 55, 0.05);
         }
 
         .directiva { 
-            background: rgba(212, 175, 55, 0.04); 
-            padding: 45px; border: 1px solid rgba(212, 175, 55, 0.2);
-            margin-top: 60px; color: #d4af37; 
-            font-size: 1.3rem; /* Directiva muy legible */
-            text-align: center; font-weight: bold;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            background: rgba(212, 175, 55, 0.04); padding: 45px; border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-top: 60px; color: #d4af37; font-size: 1.3rem; text-align: center; font-weight: bold;
         }
 
-        .footer { margin-top: 60px; text-align: center; font-size: 0.8rem; color: #333; letter-spacing: 0.5em; }
-        #loading { font-size: 1.5rem; letter-spacing: 0.5em; color: #d4af37; }
+        #loading { font-size: 1.5rem; letter-spacing: 0.5em; color: #d4af37; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="loading">ACCEDIENDO A LA BÓVEDA...</div>
+<div id="loading">SINCRONIZANDO BÓVEDA...</div>
 
 <div class="report-container" id="reporte">
     <h1>VAULT LOGIC EXECUTIVE</h1>
-
-    <div class="data-row">
-        <span class="label">Identification</span>
-        <div class="value" id="nombre">---</div>
-    </div>
-
+    <div class="data-row"><span class="label">Identification</span><div class="value" id="nombre">---</div></div>
     <div class="data-row">
         <span class="label">Geo-Reference Vector</span>
         <div class="value" id="lugar">---</div>
         <div class="value" id="geo" style="font-size: 1.1rem; color: #666; margin-top: 10px;">---</div>
     </div>
-
-    <div id="canvas-container">
-        <canvas id="vaultWheel" width="340" height="340"></canvas>
-    </div>
-
-    <div class="data-row">
-        <span class="label">Temporal Configuration</span>
-        <div class="value" id="natal">---</div>
-    </div>
-
+    <div id="canvas-container"><canvas id="vaultWheel" width="340" height="340"></canvas></div>
+    <div class="data-row"><span class="label">Temporal Configuration</span><div class="value" id="natal">---</div></div>
     <div class="directiva">
         <span class="label" style="color: #d4af37; margin-bottom: 25px;">Strategic Directive:</span>
         <div id="directiva" style="margin-top: 15px;">---</div>
     </div>
-
-    <div class="footer">
-        CONFIDENTIAL DOCUMENT // ID: <span id="auth">---</span>
+    <div style="text-align: center; margin-top: 40px; font-size: 0.8rem; color: #333; letter-spacing: 0.5em;">
+        CONFIDENTIAL // ID: <span id="auth">---</span>
     </div>
 </div>
 
@@ -106,11 +70,9 @@
     function dibujarRueda(vectores, aspectos) {
         const canvas = document.getElementById('vaultWheel');
         const ctx = canvas.getContext('2d');
-        const centro = 170;
-        const radio = 130;
+        const centro = 170; const radio = 130;
         ctx.clearRect(0, 0, 340, 340);
 
-        // Aspectos (Líneas de Kepler)
         aspectos.forEach(asp => {
             const v1 = vectores[asp.puntos.split('-')[0]];
             const v2 = vectores[asp.puntos.split('-')[1]];
@@ -118,37 +80,32 @@
             const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
             const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
             const y2 = centro + radio * Math.sin((v2 - 90) * Math.PI / 180);
-
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
             ctx.strokeStyle = (asp.tipo === 'OPOSICIÓN') ? 'rgba(255, 77, 77, 0.8)' : 'rgba(212, 175, 55, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            ctx.lineWidth = 2; ctx.stroke();
         });
 
-        // Planetas (Puntos de luz)
         Object.entries(vectores).forEach(([nombre, grado]) => {
             const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
             const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
-            
             ctx.shadowBlur = 15; ctx.shadowColor = "#fff";
             ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = '#fff'; ctx.fill();
-            
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#d4af37';
+            ctx.shadowBlur = 0; ctx.fillStyle = '#d4af37';
             ctx.font = 'bold 11px JetBrains Mono';
             ctx.fillText(nombre, x + 12, y + 5);
         });
     }
 
     async function cargarReporte() {
-        const email = new URLSearchParams(window.location.search).get('email');
-        if (!email) return;
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        if (!email) { document.getElementById('loading').innerText = "ERROR: CREDENCIALES FALTANTES"; return; }
 
         try {
-            const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${email}`);
+            // USAMOS LA URL DE RENDER PARA LOS DATOS
+            const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+            if (!response.ok) throw new Error("Server error");
             const result = await response.json();
 
             if (result.status === "success") {
@@ -160,14 +117,19 @@
                 document.getElementById('directiva').innerText = d.directiva;
                 document.getElementById('auth').innerText = d.auth_code;
 
-                if (d.mapatotal.vectores_eclipticos) {
+                if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
                     dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler);
                 }
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('reporte').style.display = 'block';
+            } else {
+                document.getElementById('loading').innerText = "REGISTRO NO ENCONTRADO";
             }
-        } catch (e) { document.getElementById('loading').innerText = "CONNECTION ERROR"; }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON EL SERVIDOR";
+        }
     }
     window.onload = cargarReporte;
 </script>
