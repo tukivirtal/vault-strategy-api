@@ -18,27 +18,45 @@
             backdrop-filter: blur(25px);
             border: 1px solid rgba(212, 175, 55, 0.2); 
             padding: 60px; 
-            max-width: 750px; width: 100%; 
+            max-width: 850px; width: 100%; 
             box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9); 
             border-radius: 2px;
             display: none; 
         }
 
-        h1 { letter-spacing: 0.8em; font-size: 1.4rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
-        .data-row { margin: 40px 0; border-left: 2px solid #d4af37; padding-left: 30px; }
-        .label { font-size: 0.9rem; color: #555; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; display: block; }
-        .value { font-size: 1.8rem; color: #ffffff; font-weight: 500; text-shadow: 0 0 20px rgba(255,255,255,0.2); line-height: 1.1; }
+        h1 { letter-spacing: 0.8em; font-size: 1.2rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
+        .data-row { margin: 30px 0; border-left: 2px solid #d4af37; padding-left: 30px; }
+        .label { font-size: 0.75rem; color: #555; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .value { font-size: 1.6rem; color: #ffffff; font-weight: 500; text-shadow: 0 0 20px rgba(255,255,255,0.2); line-height: 1.1; }
 
+        /* Layout de la Rueda y Leyendas */
+        .wheel-section { display: flex; align-items: center; justify-content: center; gap: 30px; margin: 50px 0; }
+        .legend { width: 140px; font-size: 0.65rem; color: #444; letter-spacing: 0.1em; line-height: 1.4; }
+        
         #canvas-container { 
-            margin: 60px auto; background: #000; border: 2px solid #111; border-radius: 50%; 
+            background: #000; border: 2px solid #111; border-radius: 50%; 
             width: 360px; height: 360px; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 0 80px rgba(0,0,0,1), inset 0 0 40px rgba(212, 175, 55, 0.05);
+            position: relative;
         }
 
         .directiva { 
-            background: rgba(212, 175, 55, 0.04); padding: 45px; border: 1px solid rgba(212, 175, 55, 0.2);
-            margin-top: 60px; color: #d4af37; font-size: 1.3rem; text-align: center; font-weight: bold;
+            background: rgba(212, 175, 55, 0.04); padding: 40px; border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-top: 40px; color: #d4af37; font-size: 1.2rem; text-align: center; font-weight: bold;
         }
+
+        /* Bloque VIP / Gancho de Curiosidad */
+        .upgrade-card {
+            margin-top: 50px; padding: 30px; 
+            background: linear-gradient(180deg, #0a0a0a 0%, #151208 100%); 
+            border: 1px solid #2a2510; text-align: center;
+        }
+
+        .btn-upgrade {
+            margin-top: 20px; background: none; border: 1px solid #d4af37; color: #d4af37; 
+            padding: 12px 25px; font-size: 0.7rem; letter-spacing: 0.3em; cursor: pointer; transition: 0.3s;
+        }
+        .btn-upgrade:hover { background: #d4af37; color: #000; }
 
         #loading { font-size: 1.5rem; letter-spacing: 0.5em; color: #d4af37; text-align: center; }
     </style>
@@ -49,19 +67,66 @@
 
 <div class="report-container" id="reporte">
     <h1>VAULT LOGIC EXECUTIVE</h1>
-    <div class="data-row"><span class="label">Identification</span><div class="value" id="nombre">---</div></div>
+
     <div class="data-row">
-        <span class="label">Geo-Reference Vector</span>
+        <span class="label">Sujeto de Análisis</span>
+        <div class="value" id="nombre">---</div>
+    </div>
+
+    <div class="wheel-section">
+        <div class="legend" style="text-align: right;">
+            <div style="margin-bottom: 25px;">
+                <b style="color: #fff; display: block; margin-bottom: 5px;">NODOS [●]</b>
+                Emisiones planetarias calculadas vía NASA/JPL.
+            </div>
+            <div>
+                <b style="color: #d4af37; display: block; margin-bottom: 5px;">ARMONÍA [—]</b>
+                Vectores de Kepler en resonancia de flujo.
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="vaultWheel" width="340" height="340"></canvas>
+        </div>
+
+        <div class="legend" style="text-align: left;">
+            <div style="margin-bottom: 25px;">
+                <b style="color: #ff4d4d; display: block; margin-bottom: 5px;">TENSIÓN [---]</b>
+                Zonas de conflicto estructural. Dominio requerido.
+            </div>
+            <div style="padding: 10px; border: 1px solid #222; background: rgba(212,175,55,0.05);">
+                <b style="color: #d4af37; display: block; margin-bottom: 5px;">MODO VIP</b>
+                <span style="color: #666;">Sincronía de tránsitos en tiempo real desactivada.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-row">
+        <span class="label">Vector de Origen</span>
         <div class="value" id="lugar">---</div>
-        <div class="value" id="geo" style="font-size: 1.1rem; color: #666; margin-top: 10px;">---</div>
+        <div class="value" id="geo" style="font-size: 1rem; color: #666; margin-top: 8px;">---</div>
     </div>
-    <div id="canvas-container"><canvas id="vaultWheel" width="340" height="340"></canvas></div>
-    <div class="data-row"><span class="label">Temporal Configuration</span><div class="value" id="natal">---</div></div>
+
+    <div class="data-row">
+        <span class="label">Configuración Natal</span>
+        <div class="value" id="natal">---</div>
+    </div>
+
     <div class="directiva">
-        <span class="label" style="color: #d4af37; margin-bottom: 25px;">Strategic Directive:</span>
-        <div id="directiva" style="margin-top: 15px;">---</div>
+        <span class="label" style="color: #d4af37; margin-bottom: 15px;">Directiva Estratégica:</span>
+        <div id="directiva">---</div>
     </div>
-    <div style="text-align: center; margin-top: 40px; font-size: 0.8rem; color: #333; letter-spacing: 0.5em;">
+
+    <div class="upgrade-card">
+        <h4 style="font-size: 0.7rem; letter-spacing: 0.5em; color: #d4af37; margin-bottom: 10px;">PRÓXIMO NODO DE ALTA FRECUENCIA</h4>
+        <p style="color: #666; font-size: 0.85rem; font-style: italic; line-height: 1.6;">
+            "Se detecta una alineación de expansión Júpiter-Plutón en su vector de éxito en 72hs.<br>
+            Acceda al protocolo completo para ejecutar con precisión máxima."
+        </p>
+        <button class="btn-upgrade">UPGRADE TO VIP ACCESS</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; font-size: 0.7rem; color: #333; letter-spacing: 0.4em;">
         CONFIDENTIAL // ID: <span id="auth">---</span>
     </div>
 </div>
@@ -72,18 +137,8 @@
         const ctx = canvas.getContext('2d');
         const centro = 170; const radio = 130;
         ctx.clearRect(0, 0, 340, 340);
-        // Dentro de dibujarRueda...
-        // 1. Planetas (Efecto estrella brillante)
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "#fff";
-        ctx.fillStyle = "#fff"; // Blanco puro resalta sobre el mate
 
-// 2. Líneas de Aspectos
-if (asp.tipo === 'OPOSICIÓN') {
-    ctx.strokeStyle = 'rgba(255, 77, 77, 0.8)'; // Rojo vibrante para Sol-Saturno de Shakira
-} else {
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; // Dorado suave
-}
+        // 1. Dibujar Aspectos
         aspectos.forEach(asp => {
             const v1 = vectores[asp.puntos.split('-')[0]];
             const v2 = vectores[asp.puntos.split('-')[1]];
@@ -91,17 +146,32 @@ if (asp.tipo === 'OPOSICIÓN') {
             const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
             const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
             const y2 = centro + radio * Math.sin((v2 - 90) * Math.PI / 180);
-            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-            ctx.strokeStyle = (asp.tipo === 'OPOSICIÓN') ? 'rgba(255, 77, 77, 0.8)' : 'rgba(212, 175, 55, 0.4)';
-            ctx.lineWidth = 2; ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            
+            if (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') {
+                ctx.strokeStyle = 'rgba(255, 77, 77, 0.8)';
+                ctx.setLineDash([4, 4]);
+            } else {
+                ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+                ctx.setLineDash([]);
+            }
+            ctx.lineWidth = 2;
+            ctx.stroke();
         });
 
+        // 2. Dibujar Planetas (Efecto estrella)
+        ctx.setLineDash([]);
         Object.entries(vectores).forEach(([nombre, grado]) => {
             const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
             const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
+            
             ctx.shadowBlur = 15; ctx.shadowColor = "#fff";
             ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = '#fff'; ctx.fill();
+            
             ctx.shadowBlur = 0; ctx.fillStyle = '#d4af37';
             ctx.font = 'bold 11px JetBrains Mono';
             ctx.fillText(nombre, x + 12, y + 5);
@@ -114,9 +184,7 @@ if (asp.tipo === 'OPOSICIÓN') {
         if (!email) { document.getElementById('loading').innerText = "ERROR: CREDENCIALES FALTANTES"; return; }
 
         try {
-            // USAMOS LA URL DE RENDER PARA LOS DATOS
             const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
-            if (!response.ok) throw new Error("Server error");
             const result = await response.json();
 
             if (result.status === "success") {
@@ -134,12 +202,9 @@ if (asp.tipo === 'OPOSICIÓN') {
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('reporte').style.display = 'block';
-            } else {
-                document.getElementById('loading').innerText = "REGISTRO NO ENCONTRADO";
             }
         } catch (e) {
-            console.error(e);
-            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON EL SERVIDOR";
+            document.getElementById('loading').innerText = "ERROR DE ENLACE";
         }
     }
     window.onload = cargarReporte;
