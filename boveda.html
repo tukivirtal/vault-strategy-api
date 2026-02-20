@@ -2,97 +2,206 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault Logic | Bóveda VIP</title>
     <style>
-        body { background-color: #0a0a0a; color: #d4af37; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; text-transform: uppercase; }
-        .report-container { border: 2px solid #d4af37; padding: 40px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); background: rgba(10, 10, 10, 0.9); }
-        h1 { border-bottom: 1px solid #d4af37; padding-bottom: 10px; font-size: 1.5rem; text-align: center; }
-        .data-row { margin: 20px 0; border-left: 3px solid #d4af37; padding-left: 15px; }
-        .label { font-size: 0.8rem; color: #888; }
-        .value { font-size: 1.1rem; margin-top: 5px; color: #fff; letter-spacing: 1px; }
-        .directiva { background: #1a1a1a; padding: 20px; border: 1px dashed #d4af37; margin-top: 30px; line-height: 1.6; color: #d4af37; font-weight: bold; }
-        
-        /* Estilos del Mapa Geométrico */
-        #canvas-container { text-align: center; margin: 30px 0; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); border: 1px solid #333; padding: 20px; border-radius: 50%; width: 320px; height: 320px; margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: center; }
-        
-        .footer { margin-top: 30px; text-align: center; font-size: 0.7rem; color: #555; line-height: 1.4; }
-        .tech-footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.6rem; color: #444; text-align: justify; }
-        #loading { text-align: center; font-size: 1.2rem; }
+        /* RESET Y BASE MATE */
+        body { 
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); 
+            color: #d4af37; 
+            font-family: 'JetBrains Mono', 'Courier New', monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            overflow-x: hidden;
+        }
+
+        /* CONTENEDOR EFECTO SATINADO */
+        .report-container { 
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.15); 
+            padding: 50px; 
+            max-width: 650px; 
+            width: 100%; 
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(212, 175, 55, 0.02); 
+            border-radius: 2px;
+            position: relative;
+        }
+
+        /* LÍNEA DE CARGA ESTÉTICA */
+        .report-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+
+        h1 { 
+            letter-spacing: 0.5em;
+            font-size: 1rem; 
+            text-align: center; 
+            margin-bottom: 40px;
+            color: rgba(212, 175, 55, 0.8);
+            font-weight: 300;
+        }
+
+        /* FILAS DE DATOS MINIMALISTAS */
+        .data-row { 
+            margin: 30px 0; 
+            position: relative;
+            padding-left: 20px;
+            border-left: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .label { 
+            font-size: 0.65rem; 
+            color: #555; 
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .value { 
+            font-size: 1.2rem; 
+            margin-top: 8px; 
+            color: #fff; 
+            font-weight: 400;
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        /* RUEDA DE VECTORES - MODO NOCTURNO */
+        #canvas-container { 
+            margin: 40px auto; 
+            background: #000;
+            border: 1px solid #1a1a1a; 
+            border-radius: 50%; 
+            width: 320px; height: 320px; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 0 50px rgba(0,0,0,1), inset 0 0 30px rgba(212, 175, 55, 0.05);
+            position: relative;
+        }
+
+        /* BRILLO EXTERIOR DEL CANVAS */
+        #canvas-container::after {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+            pointer-events: none;
+        }
+
+        /* DIRECTIVA - BLOQUE DE COMANDO */
+        .directiva { 
+            background: rgba(212, 175, 55, 0.03); 
+            padding: 30px; 
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            margin-top: 40px; 
+            line-height: 1.8; 
+            color: #d4af37; 
+            font-size: 0.9rem;
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+
+        .footer { 
+            margin-top: 50px; 
+            text-align: center; 
+            font-size: 0.6rem; 
+            color: #333; 
+            letter-spacing: 0.3em;
+        }
+
+        #auth { color: #666; }
+
+        .tech-footer { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #111; 
+            font-size: 0.55rem; 
+            color: #222; 
+            text-align: justify; 
+            line-height: 1.5;
+            text-transform: none;
+        }
+
+        #loading { letter-spacing: 0.8em; color: #444; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
-<div id="loading">INICIALIZANDO ACCESO SEGURO...</div>
+<div id="loading">SINCRONIZANDO CONSOLA...</div>
 
 <div class="report-container" id="reporte" style="display: none;">
-    <h1>INFORME ESTRATÉGICO CONFIDENCIAL</h1>
-    
+    <h1>VAULT LOGIC EXECUTIVE REPORT</h1>
+
     <div class="data-row">
-        <div class="label">Sujeto de Análisis</div>
+        <div class="label">Identification</div>
         <div class="value" id="nombre">---</div>
     </div>
 
     <div class="data-row">
-        <div class="label">Vector de Origen (Georreferencia)</div>
-        <div class="value" id="geo">---</div>
-        <div class="label" id="lugar" style="font-size: 0.7rem; margin-top: 5px;">---</div>
+        <div class="label">Geo-Coordinates</div>
+        <div class="value" id="geo" style="font-size: 0.9rem; color: #888;">---</div>
+        <div class="value" id="lugar" style="font-size: 0.8rem; margin-top: 2px;">---</div>
     </div>
 
     <div id="canvas-container">
         <canvas id="vaultWheel" width="300" height="300"></canvas>
     </div>
-    
 
     <div class="data-row">
-        <div class="label">Configuración Natal</div>
+        <div class="label">Temporal Vector</div>
         <div class="value" id="natal">---</div>
     </div>
 
     <div class="directiva">
-        <div class="label" style="margin-bottom: 10px;">ANÁLISIS DE SINCRONÍA:</div>
+        <div class="label" style="margin-bottom: 15px; color: #d4af37;">Strategic Sync Analysis:</div>
         <span id="directiva">---</span>
     </div>
 
     <div class="footer">
-        ESTE DOCUMENTO ES PROPIEDAD DE VAULT LOGIC EXECUTIVE. <br>
-        AUTENTICACIÓN: <span id="auth">---</span>
-        
+        CONFIDENTIAL DOCUMENT // VAULT ID: <span id="auth">---</span>
         <div class="tech-footer">
-            MÉTRICA DE DATOS: Reporte generado mediante motor Swiss Ephemeris (NASA/JPL). 
-            Cálculo de longitudes eclípticas geocéntricas. Algoritmos de análisis: Armónicos de Addey & Geometría de Kepler. 
-            Tolerancia de error angular: ±0.0001°. Procesado por Vault Logic Core v1.0.
+            DATA METRIC: Core engine processed via Swiss Ephemeris (NASA/JPL). 
+            Ecliptic longitudes calculated with ±0.0001° tolerance. 
+            Algorithms: Harmonic Resonance & Keplerian Geometry. 
+            Unauthorized duplication strictly prohibited.
         </div>
     </div>
 </div>
 
 <script>
-    // --- FUNCIÓN DE DIBUJO GEOMÉTRICO ---
     function dibujarRueda(vectores, aspectos) {
         const canvas = document.getElementById('vaultWheel');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const centro = 150;
-        const radio = 120;
+        const radio = 115;
 
         ctx.clearRect(0, 0, 300, 300);
 
-        // 1. Círculo Base Dorado
+        // EFECTO DE RESPLANDOR GLOBAL
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "rgba(212, 175, 55, 0.2)";
+
+        // 1. Círculo Base (Mate)
         ctx.beginPath();
         ctx.arc(centro, centro, radio, 0, 2 * Math.PI);
-        ctx.strokeStyle = '#d4af37';
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // 2. Líneas de Aspectos (Geometría de Kepler)
+        // 2. Líneas de Aspectos
         aspectos.forEach(asp => {
             const p1Nom = asp.puntos.split('-')[0];
             const p2Nom = asp.puntos.split('-')[1];
-            
             const v1 = vectores[p1Nom];
             const v2 = vectores[p2Nom];
 
-            // Convertir grados a coordenadas Canvas (Ajuste -90 para que 0° sea arriba)
             const x1 = centro + radio * Math.cos((v1 - 90) * Math.PI / 180);
             const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
             const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
@@ -102,50 +211,53 @@
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
             
-            // Color por tipo de tensión
             if (asp.tipo === 'CUADRATURA' || asp.tipo === 'OPOSICIÓN') {
-                ctx.strokeStyle = '#ff4d4d'; // Rojo para tensión
-                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = 'rgba(255, 77, 77, 0.6)'; // Rojo neon suave
+                ctx.shadowColor = "rgba(255, 77, 77, 0.3)";
+                ctx.setLineDash([2, 3]);
             } else {
-                ctx.strokeStyle = '#d4af37'; // Dorado para armonía
+                ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)'; // Dorado neon suave
+                ctx.shadowColor = "rgba(212, 175, 55, 0.2)";
                 ctx.setLineDash([]);
             }
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = 1;
             ctx.stroke();
         });
 
-        // 3. Dibujar Puntos y Etiquetas
+        // 3. Puntos con Resplandor (Efecto Estrella)
         ctx.setLineDash([]);
         Object.entries(vectores).forEach(([nombre, grado]) => {
             const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
             const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
 
+            // Resplandor del punto
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#fff";
             ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
             ctx.fillStyle = '#fff';
             ctx.fill();
             
-            ctx.fillStyle = '#d4af37';
-            ctx.font = '8px Courier New';
-            ctx.fillText(nombre, x + 6, y + 3);
+            // Texto
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(212, 175, 55, 0.7)';
+            ctx.font = '7px JetBrains Mono';
+            ctx.fillText(nombre, x + 8, y + 3);
         });
     }
 
-    // --- CARGA DE DATOS ---
     async function cargarReporte() {
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
         if (!email) {
-            document.getElementById('loading').innerText = "ERROR: CREDENCIALES NO ENCONTRADAS.";
+            document.getElementById('loading').innerText = "ACCESS DENIED: NO CREDENTIALS";
             return;
         }
 
         try {
             const apiUrl = `https://vault-strategy-api.onrender.com/obtener_reporte/${email}`;
             const response = await fetch(apiUrl);
-            if (!response.ok) throw new Error("Servidor no responde");
-            
             const result = await response.json();
 
             if (result.status === "success") {
@@ -155,11 +267,10 @@
                 document.getElementById('nombre').innerText = d.nombre;
                 document.getElementById('geo').innerText = d.geo_ref;
                 document.getElementById('lugar').innerText = d.lugar;
-                document.getElementById('natal').innerText = `${d.fecha} | ${d.hora} HS`;
+                document.getElementById('natal').innerText = `${d.fecha} @ ${d.hora} UTC`;
                 document.getElementById('directiva').innerText = d.directiva;
                 document.getElementById('auth').innerText = d.auth_code;
 
-                // Dibujar si existen los datos matemáticos
                 if (meta.vectores_eclipticos && meta.analisis_kepler) {
                     dibujarRueda(meta.vectores_eclipticos, meta.analisis_kepler);
                 }
@@ -167,15 +278,14 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('reporte').style.display = 'block';
             } else {
-                document.getElementById('loading').innerText = result.message;
+                document.getElementById('loading').innerText = "RECORD NOT FOUND";
             }
         } catch (error) {
-            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA.";
+            document.getElementById('loading').innerText = "CONNECTION TIMEOUT";
         }
     }
 
     window.onload = cargarReporte;
 </script>
-
 </body>
 </html>
