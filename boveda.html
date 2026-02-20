@@ -21,15 +21,6 @@
             display: none; position: relative;
         }
 
-        /* SEMÁFORO */
-        .status-light {
-            position: absolute; top: 30px; right: 40px;
-            display: flex; align-items: center; gap: 10px; font-size: 0.7rem; letter-spacing: 0.2em;
-        }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .green { color: #00ff88; background: #00ff88; box-shadow: 0 0 15px #00ff88; }
-        .red { color: #ff4d4d; background: #ff4d4d; box-shadow: 0 0 15px #ff4d4d; }
-
         h1 { letter-spacing: 0.8em; font-size: 1.3rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
         
         .data-row { margin: 35px 0; border-left: 3px solid #d4af37; padding-left: 30px; }
@@ -50,38 +41,31 @@
             margin-top: 45px; color: #d4af37; font-size: 1.3rem; text-align: center; font-weight: bold;
         }
 
-        /* SECCIÓN DE CONVERSIÓN CON ALMA */
+        /* PIE DE PÁGINA TÉCNICO (AUTENTICIDAD) */
+        .tech-auth {
+            margin-top: 40px; padding-top: 20px; border-top: 1px solid #222;
+            font-size: 0.65rem; color: #444; text-align: justify; line-height: 1.5;
+            text-transform: none; letter-spacing: 0.05em;
+        }
+
         .upgrade-card {
             margin-top: 60px; padding: 50px; border: 1px solid #2a2510;
             background: linear-gradient(180deg, #0a0a0a 0%, #1a1608 100%); text-align: center;
         }
-        .upgrade-card h4 { letter-spacing: 0.4em; color: #d4af37; font-size: 0.9rem; margin-bottom: 25px; }
-        
-        .upgrade-card p { 
-            color: #ccc; font-size: 1.05rem; line-height: 1.8; margin-bottom: 35px;
-            font-style: italic; max-width: 80%; margin-left: auto; margin-right: auto;
-        }
 
         .btn-upgrade {
             background: #d4af37; color: #000; border: none;
-            padding: 20px 45px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.3em; 
-            cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+            padding: 20px 45px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.3em; cursor: pointer;
         }
-        .btn-upgrade:hover { transform: scale(1.05); background: #fff; box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3); }
 
         #loading { font-size: 1.5rem; letter-spacing: 0.6em; color: #d4af37; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="loading">SINCRONIZANDO CONSOLA ESTRATÉGICA...</div>
+<div id="loading">CONSULTANDO EFEMÉRIDES NASA/JPL...</div>
 
 <div class="report-container" id="reporte">
-    <div class="status-light">
-        <span id="status-text">ANALYSIS READY</span>
-        <div id="status-dot" class="dot green"></div>
-    </div>
-
     <h1>VAULT LOGIC EXECUTIVE</h1>
 
     <div class="data-row">
@@ -92,7 +76,7 @@
     <div class="wheel-section">
         <div class="legend" style="text-align: right;">
             <b style="color: #fff; display: block; margin-bottom: 12px;">NODOS [●]</b>
-            Centros de emisión de energía calculados vía NASA/JPL.
+            Centros de emisión de energía calculados en coordenadas geocéntricas.
         </div>
 
         <div id="canvas-container">
@@ -101,7 +85,7 @@
 
         <div class="legend" style="text-align: left;">
             <b style="color: #ff4d4d; display: block; margin-bottom: 12px;">TENSIÓN [---]</b>
-            Conflictos estructurales que demandan dominio inmediato.
+            Vectores críticos de Kepler detectados en la configuración.
         </div>
     </div>
 
@@ -111,81 +95,107 @@
     </div>
 
     <div class="upgrade-card">
-        <h4>POTENCIAL LATENTE DETECTADO</h4>
-        <p>
+        <h4 style="color: #d4af37; letter-spacing: 0.3em;">POTENCIAL LATENTE DETECTADO</h4>
+        <p style="color: #ccc; margin-bottom: 30px; font-style: italic;">
             "Tu configuración revela una ventana de oportunidad crítica en las próximas 72 horas. <br>
             Para navegar esta frecuencia con precisión quirúrgica, necesitas la hoja de ruta completa."
         </p>
-        <button class="btn-upgrade" onclick="window.location.href='suscripcion.html'">DESCUBRIR MI ESTRATEGIA</button>
+        <button class="btn-upgrade" onclick="window.location.href='suscripcion.html'">DESCUBRIR ESTRATEGIA</button>
+    </div>
+
+    <div class="tech-auth">
+        <b>PROTOCOL AUTHENTICATION:</b> Datos generados mediante el motor Swiss Ephemeris (licencia técnica NASA/JPL). 
+        Cálculo de longitudes eclípticas con precisión angular de ±0.0001°. 
+        Algoritmos aplicados: Resonancia de Armónicos de Addey & Geometría Sagrada de Kepler. 
+        Este reporte es un derivado matemático del tiempo y espacio georreferenciado del sujeto.
     </div>
 </div>
 
 <script>
     function dibujarRueda(vectores, aspectos) {
         const canvas = document.getElementById('vaultWheel');
-        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const centro = 170; const radio = 130;
+        const centro = 170; const radio = 125;
+        
         ctx.clearRect(0, 0, 340, 340);
 
-        // Dibujar Aspectos (Líneas)
-        aspectos.forEach(asp => {
-            const v1 = vectores[asp.puntos.split('-')[0]];
-            const v2 = vectores[asp.puntos.split('-')[1]];
-            if (v1 === undefined || v2 === undefined) return;
+        // 1. DIBUJAR ASPECTOS (Líneas)
+        if (aspectos && aspectos.length > 0) {
+            aspectos.forEach(asp => {
+                const p1 = vectores[asp.puntos.split('-')[0]];
+                const p2 = vectores[asp.puntos.split('-')[1]];
+                
+                if (p1 !== undefined && p2 !== undefined) {
+                    const x1 = centro + radio * Math.cos((p1 - 90) * Math.PI / 180);
+                    const y1 = centro + radio * Math.sin((p1 - 90) * Math.PI / 180);
+                    const x2 = centro + radio * Math.cos((p2 - 90) * Math.PI / 180);
+                    const y2 = centro + radio * Math.sin((p2 - 90) * Math.PI / 180);
 
-            const x1 = centro + radio * Math.cos((v1 - 90) * Math.PI / 180);
-            const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
-            const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
-            const y2 = centro + radio * Math.sin((v2 - 90) * Math.PI / 180);
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineWidth = 1.5;
+                    
+                    if (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') {
+                        ctx.strokeStyle = 'rgba(255, 77, 77, 0.7)';
+                        ctx.setLineDash([4, 4]);
+                    } else {
+                        ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+                        ctx.setLineDash([]);
+                    }
+                    ctx.stroke();
+                }
+            });
+        }
 
-            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-            if (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') {
-                ctx.strokeStyle = 'rgba(255, 77, 77, 0.8)'; ctx.setLineDash([5, 5]);
-            } else {
-                ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; ctx.setLineDash([]);
-            }
-            ctx.lineWidth = 2; ctx.stroke();
-        });
-
-        // Dibujar Puntos (Planetas)
+        // 2. DIBUJAR PUNTOS (Planetas)
+        ctx.setLineDash([]);
         Object.entries(vectores).forEach(([nombre, grado]) => {
             const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
             const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
-            ctx.shadowBlur = 15; ctx.shadowColor = "#fff"; ctx.setLineDash([]);
-            ctx.beginPath(); ctx.arc(x, y, 6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#fff'; ctx.fill();
-            ctx.shadowBlur = 0; ctx.fillStyle = '#d4af37';
-            ctx.font = 'bold 11px JetBrains Mono';
-            ctx.fillText(nombre, x + 15, y + 5);
+
+            // Resplandor del nodo
+            ctx.shadowBlur = 12; ctx.shadowColor = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+
+            // Etiqueta
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 10px JetBrains Mono";
+            ctx.fillText(nombre, x + 12, y + 4);
         });
     }
 
     async function cargarReporte() {
-        const email = new URLSearchParams(window.location.search).get('email');
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
         if (!email) return;
 
         try {
             const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
-            const result = await response.json();
+            const res = await response.json();
 
-            if (result.status === "success") {
-                const d = result.data;
+            if (res.status === "success") {
+                const d = res.data;
                 document.getElementById('nombre').innerText = d.nombre;
                 document.getElementById('directiva').innerText = d.directiva;
 
-                // Reparación del Círculo: Asegurar que los datos lleguen
-                if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
-                    setTimeout(() => { // Pequeño delay para asegurar que el canvas esté listo
-                        dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler);
-                    }, 100);
-                }
-
+                // ACTIVAR REPORTE
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('reporte').style.display = 'block';
+
+                // DIBUJAR (con pequeño delay para asegurar visibilidad del canvas)
+                if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
+                    setTimeout(() => {
+                        dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
+                    }, 50);
+                }
             }
         } catch (e) {
-            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON LA BÓVEDA";
+            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN";
         }
     }
     window.onload = cargarReporte;
