@@ -20,7 +20,15 @@
             box-shadow: 0 50px 100px rgba(0, 0, 0, 0.95); 
             display: none; position: relative;
         }
-
+    // En el script de boveda.html:
+    function prepararSalto() {
+        const btn = document.querySelector('.btn-upgrade');
+        btn.innerText = "ESTABLECIENDO CONEXIÓN GENESIS...";
+        btn.style.opacity = "0.7";
+    
+        setTimeout(() => {  window.location.href = 'suscripcion.html';
+        }, 1500); // 1.5 segundos de "suspenso" tecnológico
+    }
         h1 { letter-spacing: 0.8em; font-size: 1.3rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
         
         .data-row { margin: 35px 0; border-left: 3px solid #d4af37; padding-left: 30px; }
@@ -100,10 +108,13 @@
             "Tu configuración revela una ventana de oportunidad crítica en las próximas 72 horas. <br>
             Para navegar esta frecuencia con precisión quirúrgica, necesitas la hoja de ruta completa."
         </p>
-        <button class="btn-upgrade" onclick="window.location.href='suscripcion.html'">DESCUBRIR ESTRATEGIA</button>
-        
+       // En el HTML del botón:
+<button class="btn-upgrade" onclick="prepararSalto()">DESCUBRIR ESTRATEGIA</button>
+
+      
     </div>
 
+  
    <div class="tech-auth">
     <p>© VAULT LOGIC 2026 // SECURE ACCESS GRANTED</p>
     <hr style="border: 0; border-top: 1px solid #222; margin: 15px 0;">
