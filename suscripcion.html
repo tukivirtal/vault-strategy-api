@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Logic | Niveles de Acceso</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #050505;
+            --mate-card: rgba(15, 15, 15, 0.95);
+            --white-text: #ffffff;
+            --gray-text: #888888;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1a1a1a 0%, var(--dark-bg) 100%);
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            letter-spacing: 0.8em;
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--gray-text);
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+        }
+
+        .subscription-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .tier-card {
+            background: var(--mate-card);
+            border: 1px solid #222;
+            padding: 40px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* NIVEL 3: GENESIS (EL DESTACADO) */
+        .tier-card.genesis {
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1);
+            transform: scale(1.02);
+            background: linear-gradient(145deg, rgba(20, 20, 20, 0.98) 0%, rgba(10, 10, 10, 1) 100%);
+        }
+
+        .tier-card.genesis::before {
+            content: "RECOMENDADO";
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--gold);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: bold;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            letter-spacing: 0.1em;
+        }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 20px;
+        }
+
+        .tier-card.genesis .tier-header {
+            border-bottom-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .tier-title h3 {
+            margin: 0;
+            letter-spacing: 0.4em;
+            font-size: 1.1rem;
+        }
+
+        .tier-price {
+            text-align: right;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            color: var(--white-text);
+            display: block;
+        }
+
+        .price span {
+            font-size: 0.7rem;
+            color: var(--gray-text);
+            letter-spacing: 0.1em;
+        }
+
+        .tier-features {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .tier-features li {
+            font-size: 0.85rem;
+            color: var(--gray-text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tier-features li::before {
+            content: "▹";
+            color: var(--gold);
+        }
+
+        .tier-card.genesis .tier-features li {
+            color: var(--white-text);
+        }
+
+        .tier-description {
+            font-size: 0.75rem;
+            color: #555;
+            font-style: italic;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        .tier-card.genesis .tier-description {
+            color: #aaa;
+        }
+
+        .btn-cta {
+            margin-top: 30px;
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tier-card.genesis .btn-cta {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .btn-cta:hover {
+            background: var(--white-text);
+            color: #000;
+            border-color: var(--white-text);
+        }
+
+        .back-link {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #444;
+            text-decoration: none;
+            letter-spacing: 0.2em;
+        }
+
+        .back-link:hover {
+            color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ACCESO A LA BÓVEDA</h1>
+        <p>SELECCIONE NIVEL DE SINCRONIZACIÓN</p>
+    </header>
+
+    <div class="subscription-container">
+
+        <div class="tier-card" onclick="selectTier('sentinel')">
+            <div class="tier-header">
+                <div class="tier-title">
+                    <h3>SENTINEL</h3>
+                </div>
+                <div class="tier-price">
+                    <span class="price">$15<span>/MES</span></span>
+                </div>
+            </div>
+            <ul class="tier-features">
+                <li>Semáforo de Sincronía Diario</li>
+                <li>Alertas de Riesgo Estructural</li>
+                <li>Reporte Matutino vía Email</li>
+            </ul>
+            <p class="tier-description">Ideal para quienes buscan navegar el día a día sin colisiones innecesarias.</p>
+            <button class="btn-cta">ACTIVAR MONITOR</button>
+        </div>
+
+        <div class="tier-card" onclick="selectTier('executive')">
+            <div class="tier-header">
+                <div class="tier-title">
+                    <h3>EXECUTIVE</h3>
+                </div>
+                <div class="tier-price">
+                    <span class="price">$45<span>/MES</span></span>
+                </div>
+            </div>
+            <ul class="tier-features">
+                <li>Todo lo de Sentinel</li>
+                <li>Radar de Tránsitos en Vivo</li>
+                <li>Notificaciones de Oportunidad Real</li>
+                <li>Dashboard de Vectores Activos</li>
+            </ul>
+            <p class="tier-description">Para estrategas que requieren precisión en el timing de sus movimientos capitales.</p>
+            <button class="btn-cta">ELEVAR ACCESO</button>
+        </div>
+
+        <div class="tier-card genesis" onclick="selectTier('genesis')">
+            <div class="tier-header">
+                <div class="tier-title">
+                    <h3>GENESIS</h3>
+                </div>
+                <div class="tier-price">
+                    <span class="price">$150<span>/PAGO ÚNICO</span></span>
+                </div>
+            </div>
+            <ul class="tier-features">
+                <li>Todo lo anterior (Sentinel & Executive)</li>
+                <li><strong>La Llave Maestra del Origen</strong></li>
+                <li>Mapa de Geometría Sagrada de Nacimiento</li>
+                <li>Simulador de Frecuencia de Destino (10 años)</li>
+                <li>Protocolo de Ajuste de Líneas de Tensión</li>
+            </ul>
+            <p class="tier-description">"Donde la Matemática se vuelve Destino". El acceso total a la arquitectura de tu existencia.</p>
+            <button class="btn-cta">RECLAMAR MI ORIGEN</button>
+        </div>
+
+    </div>
+
+    <a href="index.html" class="back-link">← REGRESAR A LA TERMINAL</a>
+
+    <script>
+        function selectTier(plan) {
+            console.log("Plan seleccionado: " + plan);
+            // Aquí integrarás la pasarela de pago (Stripe/PayPal)
+        }
+    </script>
+</body>
+</html>
