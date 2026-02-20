@@ -13,35 +13,34 @@
         }
 
         .report-container { 
-            background: rgba(10, 10, 10, 0.95);
+            background: rgba(10, 10, 10, 0.96);
             backdrop-filter: blur(25px);
-            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border: 1px solid rgba(212, 175, 55, 0.25); 
             padding: 60px; max-width: 850px; width: 100%; 
-            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9); 
-            display: none; position: relative;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.95); 
+            display: none; position: relative; /* Se oculta hasta cargar datos */
         }
 
         /* SEMÁFORO DE ESTADO */
         .status-light {
             position: absolute; top: 30px; right: 40px;
             display: flex; align-items: center; gap: 10px;
-            font-size: 0.7rem; letter-spacing: 0.2em;
+            font-size: 0.75rem; letter-spacing: 0.2em;
         }
-        .dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
-        .green { color: #00ff88; background: #00ff88; }
-        .yellow { color: #ffcc00; background: #ffcc00; }
-        .red { color: #ff4d4d; background: #ff4d4d; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .green { color: #00ff88; background: #00ff88; box-shadow: 0 0 15px #00ff88; }
+        .yellow { color: #ffcc00; background: #ffcc00; box-shadow: 0 0 15px #ffcc00; }
+        .red { color: #ff4d4d; background: #ff4d4d; box-shadow: 0 0 15px #ff4d4d; }
 
-        h1 { letter-spacing: 0.8em; font-size: 1.2rem; text-align: center; margin-bottom: 60px; color: #d4af37; }
+        h1 { letter-spacing: 0.8em; font-size: 1.3rem; text-align: center; margin-bottom: 60px; color: #d4af37; font-weight: 300; }
         
-        /* LETRAS MÁS CLARAS Y GRANDES */
-        .data-row { margin: 30px 0; border-left: 2px solid #d4af37; padding-left: 30px; }
-        .label { font-size: 0.85rem; color: #888; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .value { font-size: 1.8rem; color: #ffffff; font-weight: 500; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        /* TEXTOS BLANCOS Y LEGIBLES */
+        .data-row { margin: 35px 0; border-left: 3px solid #d4af37; padding-left: 30px; }
+        .label { font-size: 0.9rem; color: #aaaaaa; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .value { font-size: 1.9rem; color: #ffffff; font-weight: 600; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-        /* SECCIÓN RUEDA */
         .wheel-section { display: flex; align-items: center; justify-content: center; gap: 40px; margin: 50px 0; }
-        .legend { width: 180px; font-size: 0.8rem; color: #eee; letter-spacing: 0.05em; line-height: 1.6; }
+        .legend { width: 190px; font-size: 0.85rem; color: #ffffff; letter-spacing: 0.05em; line-height: 1.6; }
         
         #canvas-container { 
             background: #000; border: 2px solid #111; border-radius: 50%; 
@@ -50,21 +49,22 @@
         }
 
         .directiva { 
-            background: rgba(212, 175, 55, 0.04); padding: 40px; border: 1px solid rgba(212, 175, 55, 0.2);
-            margin-top: 40px; color: #d4af37; font-size: 1.2rem; text-align: center; font-weight: bold;
+            background: rgba(212, 175, 55, 0.06); padding: 45px; border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-top: 45px; color: #d4af37; font-size: 1.4rem; text-align: center; font-weight: bold;
         }
 
-        /* GANCHO VIP */
         .upgrade-card {
-            margin-top: 50px; padding: 40px; border: 1px solid #2a2510;
-            background: linear-gradient(180deg, #0a0a0a 0%, #151208 100%); text-align: center;
+            margin-top: 55px; padding: 45px; border: 1px solid #2a2510;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1608 100%); text-align: center;
         }
         .btn-upgrade {
             margin-top: 25px; background: #d4af37; color: #000; border: none;
-            padding: 15px 35px; font-size: 0.8rem; font-weight: bold; letter-spacing: 0.3em; cursor: pointer;
+            padding: 18px 40px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.3em; cursor: pointer;
+            transition: transform 0.2s;
         }
+        .btn-upgrade:hover { transform: scale(1.05); background: #fff; }
 
-        #loading { font-size: 1.5rem; letter-spacing: 0.5em; color: #d4af37; text-align: center; }
+        #loading { font-size: 1.5rem; letter-spacing: 0.6em; color: #d4af37; text-align: center; }
     </style>
 </head>
 <body>
@@ -73,7 +73,7 @@
 
 <div class="report-container" id="reporte">
     <div class="status-light">
-        <span id="status-text">SYSTEM READY</span>
+        <span id="status-text">INITIALIZING</span>
         <div id="status-dot" class="dot green"></div>
     </div>
 
@@ -86,8 +86,8 @@
 
     <div class="wheel-section">
         <div class="legend" style="text-align: right;">
-            <b style="color: #fff; display: block; margin-bottom: 10px; font-size: 0.9rem;">NODOS [●]</b>
-            Emisiones planetarias. Datos brutos de la eclíptica.
+            <b style="color: #fff; display: block; margin-bottom: 12px; font-size: 1rem;">NODOS [●]</b>
+            Emisiones planetarias. Datos brutos de la eclíptica NASA.
         </div>
 
         <div id="canvas-container">
@@ -95,23 +95,23 @@
         </div>
 
         <div class="legend" style="text-align: left;">
-            <b style="color: #ff4d4d; display: block; margin-bottom: 10px; font-size: 0.9rem;">TENSIÓN [---]</b>
-            Conflictos estructurales que bloquean el flujo de capital.
+            <b style="color: #ff4d4d; display: block; margin-bottom: 12px; font-size: 1rem;">TENSIÓN [---]</b>
+            Conflictos estructurales detectados en el sector.
         </div>
     </div>
 
     <div class="directiva">
-        <span class="label" style="color: #d4af37; margin-bottom: 15px;">Strategic Directive:</span>
+        <span class="label" style="color: #d4af37; margin-bottom: 20px;">Strategic Directive:</span>
         <div id="directiva">---</div>
     </div>
 
     <div class="upgrade-card">
-        <h4 style="letter-spacing: 0.4em; color: #d4af37;">RESTRICCIÓN DE ACCESO DETECTADA</h4>
-        <p style="color: #888; font-size: 0.9rem; font-style: italic; margin-top: 15px;">
-            "Su vector de expansión indica una oportunidad crítica en las próximas 72hs.<br>
+        <h4 style="letter-spacing: 0.5em; color: #d4af37;">RESTRICCIÓN DE ACCESO</h4>
+        <p style="color: #bbb; font-size: 1rem; font-style: italic; margin-top: 20px; line-height: 1.6;">
+            "Su vector indica una oportunidad crítica en las próximas 72hs.<br>
             El análisis de tránsitos diarios está bloqueado para cuentas gratuitas."
         </p>
-        <button class="btn-upgrade" onclick="window.location.href='suscripcion.html'">DESBLOQUEAR ACCESO VIP</button>
+        <button class="btn-upgrade" onclick="window.location.href='suscripcion.html'">UPGRADE TO VIP</button>
     </div>
 </div>
 
@@ -119,21 +119,80 @@
     function actualizarSemaforo(directiva) {
         const dot = document.getElementById('status-dot');
         const text = document.getElementById('status-text');
+        const dir = directiva.toUpperCase();
         
-        if (directiva.includes("OPOSICIÓN") || directiva.includes("CUADRATURA")) {
-            dot.className = "dot red";
-            text.innerText = "CRITICAL ALERT";
-        } else if (directiva.includes("NODO")) {
-            dot.className = "dot yellow";
-            text.innerText = "PRECAUTION";
+        if (dir.includes("OPOSICIÓN") || dir.includes("CUADRATURA")) {
+            dot.className = "dot red"; text.innerText = "CRITICAL ALERT";
+        } else if (dir.includes("NODO") || dir.includes("PRECAUCIÓN")) {
+            dot.className = "dot yellow"; text.innerText = "PRECAUTION";
         } else {
-            dot.className = "dot green";
-            text.innerText = "OPTIMAL FLOW";
+            dot.className = "dot green"; text.innerText = "OPTIMAL FLOW";
         }
     }
 
-    // ... (El resto del script de dibujarRueda y cargarReporte se mantiene)
-    // Pero asegúrate de llamar a actualizarSemaforo(d.directiva) dentro de cargarReporte
+    function dibujarRueda(vectores, aspectos) {
+        const canvas = document.getElementById('vaultWheel');
+        const ctx = canvas.getContext('2d');
+        const centro = 170; const radio = 130;
+        ctx.clearRect(0, 0, 340, 340);
+
+        aspectos.forEach(asp => {
+            const v1 = vectores[asp.puntos.split('-')[0]];
+            const v2 = vectores[asp.puntos.split('-')[1]];
+            const x1 = centro + radio * Math.cos((v1 - 90) * Math.PI / 180);
+            const y1 = centro + radio * Math.sin((v1 - 90) * Math.PI / 180);
+            const x2 = centro + radio * Math.cos((v2 - 90) * Math.PI / 180);
+            const y2 = centro + radio * Math.sin((v2 - 90) * Math.PI / 180);
+
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+            if (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') {
+                ctx.strokeStyle = 'rgba(255, 77, 77, 0.8)'; ctx.setLineDash([5, 5]);
+            } else {
+                ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; ctx.setLineDash([]);
+            }
+            ctx.lineWidth = 2; ctx.stroke();
+        });
+
+        Object.entries(vectores).forEach(([nombre, grado]) => {
+            const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
+            const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
+            ctx.shadowBlur = 15; ctx.shadowColor = "#fff"; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.shadowBlur = 0; ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.fillText(nombre, x + 15, y + 5);
+        });
+    }
+
+    async function cargarReporte() {
+        const email = new URLSearchParams(window.location.search).get('email');
+        if (!email) { document.getElementById('loading').innerText = "ERROR: NO EMAIL"; return; }
+
+        try {
+            const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+            const result = await response.json();
+
+            if (result.status === "success") {
+                const d = result.data;
+                document.getElementById('nombre').innerText = d.nombre;
+                document.getElementById('directiva').innerText = d.directiva;
+                actualizarSemaforo(d.directiva);
+
+                if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
+                    dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler);
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('reporte').style.display = 'block';
+            } else {
+                document.getElementById('loading').innerText = "USER NOT FOUND";
+            }
+        } catch (e) {
+            document.getElementById('loading').innerText = "SERVER TIMEOUT";
+        }
+    }
+    window.onload = cargarReporte;
 </script>
 </body>
 </html>
