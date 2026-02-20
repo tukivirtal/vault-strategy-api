@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import uvicorn
 import httpx
@@ -16,7 +17,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://vault-strategy-api.vercel.app", # Tu nuevo dominio de Vercel
+        "http://localhost:3000",
+        "*" # Permitir todos temporalmente para pruebas
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Credenciales de Entorno
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
