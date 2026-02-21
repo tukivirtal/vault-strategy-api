@@ -230,33 +230,38 @@
         });
     }
 
-    async function cargarReporte() {
-        const email = new URLSearchParams(window.location.search).get('email');
-        if (!email) return;
+   // Reemplaza la función cargarReporte en boveda.html
+async function cargarReporte() {
+    const email = new URLSearchParams(window.location.search).get('email');
+    if (!email) return;
 
-        try {
-            const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
-            const res = await response.json();
+    try {
+        const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+        const res = await response.json();
 
-            if (res.status === "success") {
-                const d = res.data;
-                document.getElementById('nombre').innerText = d.nombre.toUpperCase();
-                document.getElementById('directiva').innerText = d.directiva;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('reporte').style.display = 'block';
+        if (res.status === "success") {
+            const d = res.data;
+            document.getElementById('nombre').innerText = d.nombre.toUpperCase();
+            document.getElementById('directiva').innerText = d.directiva;
+            
+            // Forzar visualización de contenedores
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('reporte').style.display = 'block';
 
-                if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
-                    // Timeout pequeño para asegurar que el canvas esté listo
-                    setTimeout(() => {
-                        dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
-                    }, 200);
-                }
+            // Verificación crítica de datos para el canvas
+            if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
+                console.log("Datos recibidos, iniciando trazado...");
+                // Pequeño delay para asegurar que el DOM del canvas sea visible
+                setTimeout(() => {
+                    dibujarRueda(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
+                }, 300);
             }
-        } catch (e) {
-            document.getElementById('loading').innerText = "ERROR DE CONEXIÓN: NÚCLEO NO DISPONIBLE";
-            console.error(e);
         }
+    } catch (e) {
+        console.error("Error en Bóveda:", e);
+        document.getElementById('loading').innerText = "ERROR CRÍTICO: NÚCLEO NO DISPONIBLE";
     }
+}
     window.onload = cargarReporte;
 </script>
 </body>
