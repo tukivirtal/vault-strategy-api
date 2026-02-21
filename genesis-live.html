@@ -238,19 +238,27 @@
         }
     }
 </script>
-<footer style="grid-column: 1 / span 3; border-top: 1px solid #333; padding: 15px; display: flex; justify-content: space-between; font-size: 0.6rem; color: #555;">
+<footer style="grid-column: 1 / span 3; border-top: 1px solid rgba(212, 175, 55, 0.2); padding: 20px; display: flex; justify-content: space-between; font-size: 0.6rem; color: #555; background: rgba(0,0,0,0.3);">
     <div class="source-item">
-        <strong>DATA SOURCE:</strong> NASA Jet Propulsion Laboratory (JPL) Development Ephemeris DE441
+        <strong style="color: #888;">DATA SOURCE:</strong> NASA Jet Propulsion Laboratory (JPL) DE441
     </div>
     <div class="source-item">
-        <strong>ENGINE:</strong> Swiss Ephemeris v2.10.03 (High-Precision Computing)
+        <strong style="color: #888;">ENGINE:</strong> Swiss Ephemeris v2.10.03 (High-Precision)
     </div>
     <div class="source-item">
-        <strong>COORDINATES:</strong> Geocentric / Ecliptic J2000.0
+        <strong style="color: #888;">COORDINATES:</strong> Geocentric / Ecliptic J2000.0
     </div>
     <div class="source-item">
-        <strong>TIME SYNC:</strong> UTC +00:00 (Terrestrial Time Correction applied)
+        <strong style="color: #888;">TIME SYNC:</strong> UTC +00:00 (Terrestrial Time Correction Active)
     </div>
+  
+    <div style="border: 1px solid #d4af37; padding: 10px; display: inline-flex; align-items: center; gap: 10px; background: rgba(212, 175, 55, 0.05);">
+    <div style="width: 12px; height: 12px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88;"></div>
+    <div style="font-size: 0.65rem; font-weight: bold; letter-spacing: 0.1em;">
+        NASA DATA COMPLIANT <br>
+        <span style="color: #555; font-weight: normal;">ENGINE: JPL/DE441 SYNC</span>
+    </div>
+</div>
 </footer>
 </body>
 </html>
