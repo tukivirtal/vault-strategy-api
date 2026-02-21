@@ -5,170 +5,112 @@
     <title>GÉNESIS | Terminal de Comando Estratégico</title>
     <style>
         :root {
-            --nasa-blue: #0b3d91;
             --gold-leaf: #d4af37;
             --alert: #ff4d4d;
             --safe: #00ff88;
             --bg: #020202;
-            --panel-bg: rgba(10, 10, 10, 0.8);
             --panel-border: rgba(212, 175, 55, 0.2);
         }
 
         body { 
-            background-color: var(--bg); 
-            color: white; 
-            font-family: 'JetBrains Mono', monospace;
-            margin: 0; padding: 20px;
-            overflow: hidden;
+            background-color: var(--bg); color: white; 
+            font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow: hidden;
         }
 
         .terminal-grid {
             display: grid;
-            grid-template-columns: 350px 1fr 350px;
-            grid-template-rows: 80px 1fr 120px;
+            grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 60px 1fr 100px;
             gap: 15px; height: 95vh;
         }
 
         .panel {
             border: 1px solid var(--panel-border);
-            background: var(--panel-bg);
-            padding: 20px;
-            position: relative;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 20px; position: relative;
         }
 
-        header { 
-            grid-column: 1 / span 3; display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid var(--gold-leaf); padding-bottom: 10px; 
-            font-size: 1.2rem; letter-spacing: 0.5em; 
+        /* CORRECCIÓN DE BARRA DE ESCANEO */
+        .scanner-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 10;
         }
-
-        /* SIMULADOR CENTRAL */
-        #core-sync {
-            grid-column: 2;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid var(--gold-leaf);
-            box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
         .scanner-line {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 2px;
+            position: absolute; width: 100%; height: 1px;
             background: linear-gradient(to right, transparent, var(--gold-leaf), transparent);
-            animation: scan 4s infinite linear;
+            box-shadow: 0 0 8px var(--gold-leaf);
+            animation: scan 6s infinite ease-in-out;
         }
-
         @keyframes scan {
-            0% { top: 0; }
-            50% { top: 100%; }
-            100% { top: 0; }
+            0% { top: 0%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
 
-        /* --- BOTÓN ESTILO NASA CON RELIEVE --- */
+        /* BOTÓN NASA PREMIUM CON RELIEVE */
         .btn-nasa {
-            background: var(--gold-leaf);
-            color: #000;
+            background: var(--gold-leaf); color: #000;
             border: 1px solid var(--gold-leaf);
-            outline: 1px solid var(--gold-leaf);
-            outline-offset: 2px;
-            padding: 12px 25px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            margin: 10px 0;
+            outline: 1px solid var(--gold-leaf); outline-offset: 2px;
+            padding: 12px 24px; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; font-weight: bold; letter-spacing: 0.2em;
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
         }
-
         .btn-nasa:hover {
-            background: #ffffff;
-            color: #000;
-            border-color: #ffffff;
-            outline-color: #ffffff;
+            background: #fff; border-color: #fff; outline-color: #fff;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
 
-        .sim-input-group {
-            margin-bottom: 15px;
-            width: 80%;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .sim-input-group label {
-            font-size: 0.7rem;
-            color: var(--gold-leaf);
-            width: 120px;
-        }
-
+        /* INPUTS ESTRATÉGICOS */
+        .sim-input-group { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; width: 100%; }
+        .sim-input-group label { font-size: 0.65rem; color: var(--gold-leaf); width: 100px; }
         .sim-input-group input, .sim-input-group select {
-            background: #111;
-            border: 1px solid #333;
-            color: white;
-            padding: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            flex-grow: 1;
+            background: #111; border: 1px solid #333; color: white; padding: 8px; flex-grow: 1; font-size: 0.8rem;
         }
 
+        /* REPORTE MÁS GRANDE */
         #simulation-output {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #222;
-            width: 85%;
-            height: 180px;
-            overflow-y: auto;
+            margin-top: 25px; padding: 20px; background: #050505; border: 1px solid #222; width: 90%;
         }
-
-        .output-status { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
-        .output-protocol { font-size: 0.7rem; color: #aaa; line-height: 1.4; white-space: pre-line; }
-
-        .data-stream { font-size: 0.65rem; color: var(--gold-leaf); line-height: 1.4; }
-        .alert-active { color: var(--alert); font-weight: bold; border: 1px solid var(--alert); padding: 5px; margin-top: 10px; font-size: 0.7rem; }
+        .output-status { font-size: 1.6rem; font-weight: bold; margin-bottom: 10px; }
+        .output-protocol { font-size: 0.85rem; color: #ccc; line-height: 1.6; }
 
         footer {
-            grid-column: 1 / span 3;
-            border-top: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
+            grid-column: 1 / span 3; border-top: 1px solid var(--panel-border);
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 0;
         }
-
         .source-item { font-size: 0.55rem; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="terminal-grid">
-    <header>
-        <div>GÉNESIS // COMMAND TERMINAL</div>
-        <div id="telemetry" style="font-size: 0.7rem; letter-spacing: 0.1em;">LATENCY: 14ms // NASA/JPL SYNC: ACTIVE</div>
+    <header style="grid-column: 1 / span 3; border-bottom: 1px solid var(--gold-leaf); display: flex; justify-content: space-between; align-items: center;">
+        <div style="letter-spacing: 0.5em;">GÉNESIS // STRATEGIC COMMAND</div>
+        <div id="telemetry" style="font-size: 0.7rem; color: #555;">SYNC: JPL/NASA ACTIVE // 17ms</div>
     </header>
 
     <aside class="panel">
-        <h2 style="font-size: 0.7rem; color: var(--gold-leaf); letter-spacing: 0.2em;">DIAGNÓSTICO ESTRATÉGICO</h2>
-        <div class="data-stream" id="diagnostic-output">
-            > SCANNING BIRTH_VECTOR... [OK]<br>
-            > ANALYZING TRANSITS... [PROCESS]<br>
-            > DETECTED: JUPITER TRINE SOL<br>
-            <div class="alert-active" style="color: var(--safe); border-color: var(--safe);">
-                ESTADO: EXPANSIÓN DE CAPITAL
+        <h2 style="font-size: 0.7rem; color: var(--gold-leaf);">ESTADO DE MERCADO VITAL</h2>
+        <div style="font-size: 0.65rem; color: var(--safe); margin-bottom: 20px;">● LIQUIDEZ TEMPORAL ALTA</div>
+        <div style="border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 15px;">
+            <div style="font-size: 0.6rem; color: #555;">VECTOR JÚPITER (Expansión)</div>
+            <div style="width: 100%; height: 4px; background: #222; margin-top: 5px;">
+                <div style="width: 85%; height: 100%; background: var(--safe);"></div>
             </div>
-            <p style="margin-top: 15px; font-size: 0.7rem; color: #888;">
-                "Tu configuración actual permite una toma de riesgos un 40% mayor a tu promedio histórico."
-            </p>
+        </div>
+        <div style="border-bottom: 1px solid #222; padding-bottom: 10px;">
+            <div style="font-size: 0.6rem; color: #555;">VECTOR SATURNO (Riesgo)</div>
+            <div style="width: 100%; height: 4px; background: #222; margin-top: 5px;">
+                <div style="width: 30%; height: 100%; background: var(--alert);"></div>
+            </div>
         </div>
     </aside>
 
     <main id="core-sync" class="panel">
-        <div class="scanner-line"></div>
-        <h2 style="font-size: 0.8rem; color: var(--gold-leaf); letter-spacing: 0.3em; margin-bottom: 20px;">SIMULADOR DE ESCENARIOS</h2>
+        <div class="scanner-container"><div class="scanner-line"></div></div>
+        <h2 style="font-size: 0.8rem; color: var(--gold-leaf); letter-spacing: 0.3em; margin-bottom: 30px;">SIMULADOR DE ESCENARIOS</h2>
         
         <div class="sim-input-group">
             <label>FECHA OBJETIVO:</label>
@@ -176,85 +118,67 @@
         </div>
 
         <div class="sim-input-group">
-            <label>ACCIÓN CLAVE:</label>
+            <label>ACCIÓN ESTRATÉGICA:</label>
             <select id="sim-action">
-                <option value="FIRMA DE CONTRATO">FIRMA DE CONTRATO</option>
-                <option value="LANZAMIENTO">LANZAMIENTO DE PRODUCTO</option>
-                <option value="INVERSIÓN">REUNIÓN DE INVERSIÓN</option>
-                <option value="CIERRE">CIERRE DE VENTA</option>
+                <option value="CIERRE DE VENTA">CIERRE DE NEGOCIACIÓN</option>
+                <option value="INVERSIÓN">DESPLIEGUE DE CAPITAL</option>
+                <option value="LANZAMIENTO">LANZAMIENTO ESTRATÉGICO</option>
             </select>
         </div>
 
-        <button class="btn-nasa" onclick="runSimulation()">RUN SIMULATION</button>
+        <button class="btn-nasa" onclick="runSimulation()">EJECUTAR SIMULACIÓN</button>
 
         <div id="simulation-output">
-            <div style="font-size: 0.6rem; color: var(--gold-leaf); margin-bottom: 5px;">REPORTE DE FACTIBILIDAD:</div>
-            <div class="output-status" id="out-status">STANDBY</div>
-            <div class="output-protocol" id="out-proto">Ingrese parámetros para iniciar escaneo...</div>
+            <div class="output-status" id="out-status" style="color: var(--gold-leaf);">READY</div>
+            <div class="output-protocol" id="out-proto">Esperando parámetros de entrada...</div>
         </div>
     </main>
 
     <aside class="panel">
-        <h2 style="font-size: 0.7rem; color: var(--gold-leaf); letter-spacing: 0.2em;">ALERTAS CRÍTICAS</h2>
-        <div class="alert-box">
-            <div class="alert-active">TENSIÓN DE MERCURIO (R)</div>
-            <p style="font-size: 0.65rem; color: #666; margin-top: 10px;">
-                Fallo potencial en comunicaciones digitales. Verifique transferencias bancarias.
-            </p>
-            <p style="font-size: 0.65rem; color: var(--safe); margin-top: 5px;">
-                ACCIÓN: Grabe todas las llamadas hoy.
-            </p>
+        <h2 style="font-size: 0.7rem; color: var(--gold-leaf);">PROTOCOLOS CRÍTICOS</h2>
+        <div style="border: 1px solid var(--alert); padding: 10px; font-size: 0.65rem;">
+            <b style="color: var(--alert);">TENSIÓN MERCURIO (R)</b>
+            <p style="color: #666; margin: 5px 0;">Riesgo en transferencia de datos y contratos legales.</p>
+            <span style="color: var(--safe);">ACCIÓN: Auditoría doble.</span>
         </div>
     </aside>
 
     <footer>
-        <div class="source-item"><strong>DATA:</strong> NASA JPL DE441</div>
-        <div class="source-item"><strong>ENGINE:</strong> Swiss Ephemeris v2.10</div>
-        <div class="source-item"><strong>SYNC:</strong> UTC+00:00</div>
-        
-        <div style="border: 1px solid var(--gold-leaf); padding: 5px 10px; display: flex; align-items: center; gap: 8px;">
-            <div style="width: 8px; height: 8px; background: var(--safe); border-radius: 50%;"></div>
-            <span style="font-size: 0.5rem; color: var(--gold-leaf);">NASA DATA COMPLIANT</span>
+        <div class="source-item">DATA: JPL DE441 // ENGINE: SWISS EPHEMERIS</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 0.55rem; color: var(--gold-leaf);">NASA COMPLIANT</div>
+            <button class="btn-nasa" style="padding: 8px 16px; font-size: 0.6rem;" onclick="downloadDossier()">DESCARGAR DOSSIER</button>
         </div>
-
-        <button class="btn-nasa" style="margin: 0; padding: 8px 15px;" onclick="alert('Generando Dossier...')">DESCARGAR DOSSIER</button>
     </footer>
 </div>
 
 <script>
-    setInterval(() => {
-        const ping = Math.floor(Math.random() * 20) + 10;
-        document.getElementById('telemetry').innerText = `LATENCY: ${ping}ms // NASA/JPL SYNC: ACTIVE`;
-    }, 2000);
-
     function runSimulation() {
-        const simAction = document.getElementById('sim-action').value;
         const outStatus = document.getElementById('out-status');
         const outProto = document.getElementById('out-proto');
-
         const prob = Math.random();
 
-        if (prob > 0.6) {
-            outStatus.style.color = "#00ff88";
-            outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // ÓPTIMO`;
-            outProto.innerText = `Alta sincronía detectada para [${simAction}]. 
-            Ventana de oportunidad de 72h activa.
-            RECOMENDACIÓN: LUZ VERDE. PROCEDER CON MÁXIMA ENERGÍA.`;
-        } else if (prob > 0.3) {
-            outStatus.style.color = "#d4af37";
-            outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // CAUTELA`;
-            outProto.innerText = `Tensión moderada en el vector de [${simAction}]. 
-            - REVISAR DOCUMENTACIÓN.
-            - PLANIFICAR CONTINGENCIA.
-            RECOMENDACIÓN: PROCEDER CON MONITOREO ACTIVO.`;
-        } else {
-            outStatus.style.color = "#ff4d4d";
-            outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // RIESGO`;
-            outProto.innerText = `Tensión Marte-Saturno bloqueando [${simAction}].
-            - RETRASAR ACCIÓN 48HS.
-            - REFORZAR CLÁUSULAS LEGALES.
-            RECOMENDACIÓN: RECONSIDERAR TIMING INMEDIATAMENTE.`;
-        }
+        outStatus.innerText = "SIMULANDO...";
+        setTimeout(() => {
+            if (prob > 0.5) {
+                outStatus.style.color = "#00ff88";
+                outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // ÓPTIMO`;
+                outProto.innerText = "Sincronía detectada. Ventana de liquidez abierta. Proceda con la ejecución inmediata.";
+            } else {
+                outStatus.style.color = "#ff4d4d";
+                outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // RIESGO`;
+                outProto.innerText = "Fricción estructural detectada. Riesgo de estancamiento de capital. Reevalúe timing.";
+            }
+        }, 800);
+    }
+
+    function downloadDossier() {
+        const btn = event.target;
+        btn.innerText = "GENERANDO...";
+        setTimeout(() => {
+            btn.innerText = "DESCARGADO";
+            alert("Dossier Génesis generado exitosamente. Iniciando transferencia de datos segura...");
+        }, 2000);
     }
 </script>
 </body>
