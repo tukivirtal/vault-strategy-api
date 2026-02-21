@@ -165,6 +165,18 @@
 </div>
 
 <script>
+// Al inicio del script, establecer fecha de hoy
+window.onload = function() {
+    const fechaInput = document.getElementById('sim-date');
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaInput.value = hoy;
+    
+    // Ejecutar simulación automática al entrar
+    setTimeout(() => {
+        console.log("Sincronía inicial activada...");
+        runSimulation();
+    }, 1500); // Espera a que termine la animación de entrada
+}; 
     function runSimulation() {
         const outStatus = document.getElementById('out-status');
         const outProto = document.getElementById('out-proto');
@@ -187,28 +199,17 @@
         }, 1200);
     }
 
-    function downloadDossier() {
-        const btn = document.getElementById('dossier-btn');
-        let progress = 0;
-        btn.disabled = true;
-
-        const interval = setInterval(() => {
-            progress += 10;
-            btn.innerText = `ENCRYPTING... ${progress}%`;
-            if (progress >= 100) {
-                clearInterval(interval);
-                btn.innerText = "TRANSFER COMPLETE";
-                btn.style.background = "var(--safe)";
-                setTimeout(() => {
-                    alert("DOC_ID: GX-2026. Dossier de Inteligencia Estratégica descargado.");
-                    btn.innerText = "DESCARGAR DOSSIER";
-                    btn.disabled = false;
-                    btn.style.background = "var(--gold-leaf)";
-                }, 1000);
-            }
-        }, 200);
-    }
-
+   // Función de descarga corregida (simula proceso real)
+function downloadDossier() {
+    const btn = document.getElementById('dossier-btn');
+    btn.innerText = "ESTABLECIENDO PROTOCOLO...";
+    
+    // Aquí puedes redirigir al HTML del dossier que creamos
+    setTimeout(() => {
+        window.open('dossier-final.html', '_blank');
+        btn.innerText = "DESCARGAR DOSSIER";
+    }, 2000);
+}
     setInterval(() => {
         const ping = Math.floor(Math.random() * 20) + 10;
         document.getElementById('telemetry').innerText = `SYNC: JPL/NASA ACTIVE // ${ping}ms`;
