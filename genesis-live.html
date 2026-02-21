@@ -153,32 +153,58 @@
 </div>
 
 <script>
+   // Refuerzo de la función Run Simulation para mayor impacto visual
     function runSimulation() {
         const outStatus = document.getElementById('out-status');
         const outProto = document.getElementById('out-proto');
         const prob = Math.random();
 
-        outStatus.innerText = "SIMULANDO...";
+        outStatus.innerText = "ANALYZING VECTORS...";
+        outStatus.style.color = "var(--gold-leaf)";
+        outProto.innerText = "Accediendo a base de datos JPL... Verificando sincronía de efemérides...";
+
         setTimeout(() => {
-            if (prob > 0.5) {
-                outStatus.style.color = "#00ff88";
-                outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // ÓPTIMO`;
-                outProto.innerText = "Sincronía detectada. Ventana de liquidez abierta. Proceda con la ejecución inmediata.";
+            if (prob > 0.6) {
+                outStatus.style.color = "var(--safe)";
+                outStatus.innerHTML = `PROBABILIDAD DE ÉXITO: ${Math.floor(prob * 100)}% <br> <span style="font-size: 0.8rem;">ESTADO: ÓPTIMO PARA DESPLIEGUE</span>`;
+                outProto.innerHTML = `<b>ANÁLISIS ESTRATÉGICO:</b><br>Sincronía detectada con el sector de expansión. La resistencia estructural es mínima.<br><br><b>RECOMENDACIÓN:</b> Ejecutar movimientos de capital antes del cierre del ciclo.`;
             } else {
-                outStatus.style.color = "#ff4d4d";
-                outStatus.innerText = `ÉXITO: ${Math.floor(prob * 100)}% // RIESGO`;
-                outProto.innerText = "Fricción estructural detectada. Riesgo de estancamiento de capital. Reevalúe timing.";
+                outStatus.style.color = "var(--alert)";
+                outStatus.innerHTML = `PROBABILIDAD DE ÉXITO: ${Math.floor(prob * 100)}% <br> <span style="font-size: 0.8rem;">ESTADO: RIESGO DETECTADO</span>`;
+                outProto.innerHTML = `<b>ANÁLISIS DE RIESGO:</b><br>Fricción detectada en el eje de comunicación (Mercurio-Saturno). Posibles bloqueos administrativos o legales.<br><br><b>RECOMENDACIÓN:</b> Postergar firmas de contratos críticos 72 horas. Activar protocolo de auditoría interna.`;
             }
-        }, 800);
+        }, 1500); // Un poco más de tiempo para dar sensación de "cálculo real"
     }
 
-    function downloadDossier() {
+   function downloadDossier() {
         const btn = event.target;
-        btn.innerText = "GENERANDO...";
-        setTimeout(() => {
-            btn.innerText = "DESCARGADO";
-            alert("Dossier Génesis generado exitosamente. Iniciando transferencia de datos segura...");
-        }, 2000);
+        const originalText = btn.innerText;
+        let progress = 0;
+        
+        btn.disabled = true;
+        btn.style.background = "#444";
+        btn.style.outlineColor = "#444";
+
+        const interval = setInterval(() => {
+            progress += 10;
+            btn.innerText = `ENCRYPTING... ${progress}%`;
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                btn.innerText = "TRANSFER COMPLETE";
+                btn.style.background = "#00ff88";
+                btn.style.outlineColor = "#00ff88";
+                
+                // Simulación de descarga de archivo
+                setTimeout(() => {
+                    alert("DOC_ID: GX-2026-B. Dossier de Inteligencia Estratégica descargado con éxito. Verifique su carpeta de descargas seguras.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.style.background = "var(--gold-leaf)";
+                    btn.style.outlineColor = "var(--gold-leaf)";
+                }, 1000);
+            }
+        }, 200);
     }
 </script>
 </body>
