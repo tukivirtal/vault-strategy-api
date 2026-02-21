@@ -57,7 +57,6 @@
             padding: 40px;
             position: relative;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
             overflow: hidden;
         }
 
@@ -81,6 +80,7 @@
             padding: 5px 40px;
             transform: rotate(45deg);
             letter-spacing: 0.1em;
+            z-index: 1;
         }
 
         .tier-header {
@@ -92,18 +92,10 @@
             padding-bottom: 20px;
         }
 
-        .tier-card.genesis .tier-header {
-            border-bottom-color: rgba(212, 175, 55, 0.2);
-        }
-
         .tier-title h3 {
             margin: 0;
             letter-spacing: 0.4em;
             font-size: 1.1rem;
-        }
-
-        .tier-price {
-            text-align: right;
         }
 
         .price {
@@ -154,30 +146,33 @@
             color: #aaa;
         }
 
-        .btn-cta {
+        /* --- BOTÓN ESTILO NASA CON RELIEVE --- */
+        .btn-nasa {
             margin-top: 30px;
             width: 100%;
-            padding: 18px;
-            background: transparent;
+            background: var(--gold);
+            color: #000;
             border: 1px solid var(--gold);
-            color: var(--gold);
+            outline: 1px solid var(--gold);
+            outline-offset: 2px;
+            padding: 18px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             letter-spacing: 0.3em;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
         }
 
-        .tier-card.genesis .btn-cta {
-            background: var(--gold);
+        /* Efecto cuando el mouse pasa por arriba (Hover) */
+        .btn-nasa:hover {
+            background: #ffffff;
             color: #000;
-        }
-
-        .btn-cta:hover {
-            background: var(--white-text);
-            color: #000;
-            border-color: var(--white-text);
+            border-color: #ffffff;
+            outline-color: #ffffff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px); /* Pequeño salto hacia arriba */
         }
 
         .back-link {
@@ -202,7 +197,7 @@
 
     <div class="subscription-container">
 
-        <div class="tier-card" onclick="selectTier('sentinel')">
+        <div class="tier-card">
             <div class="tier-header">
                 <div class="tier-title">
                     <h3>SENTINEL</h3>
@@ -217,10 +212,10 @@
                 <li>Reporte Matutino vía Email</li>
             </ul>
             <p class="tier-description">Ideal para quienes buscan navegar el día a día sin colisiones innecesarias.</p>
-            <button class="btn-cta">ACTIVAR MONITOR</button>
+            <button class="btn-nasa" onclick="selectTier('sentinel')">ACTIVAR MONITOR</button>
         </div>
 
-        <div class="tier-card" onclick="selectTier('executive')">
+        <div class="tier-card">
             <div class="tier-header">
                 <div class="tier-title">
                     <h3>EXECUTIVE</h3>
@@ -236,10 +231,10 @@
                 <li>Dashboard de Vectores Activos</li>
             </ul>
             <p class="tier-description">Para estrategas que requieren precisión en el timing de sus movimientos capitales.</p>
-            <button class="btn-cta">ELEVAR ACCESO</button>
+            <button class="btn-nasa" onclick="selectTier('executive')">ELEVAR ACCESO</button>
         </div>
 
-        <div class="tier-card genesis" onclick="selectTier('genesis')">
+        <div class="tier-card genesis">
             <div class="tier-header">
                 <div class="tier-title">
                     <h3>GENESIS</h3>
@@ -256,17 +251,7 @@
                 <li>Protocolo de Ajuste de Líneas de Tensión</li>
             </ul>
             <p class="tier-description">"Donde la Matemática se vuelve Destino". El acceso total a la arquitectura de tu existencia.</p>
-            <button class="btn-cta-gold" onclick="iniciarProtocoloGenesis()">RECLAMAR MI ORIGEN</button>
-
-                <script>
-                function iniciarProtocoloGenesis() {
-                    // Aquí puedes simular una validación de pago antes de redirigir
-                    window.location.href = 'boot-sequence.html';
-                }
-                </script>
-
-
-            
+            <button class="btn-nasa" onclick="iniciarProtocoloGenesis()">RECLAMAR MI ORIGEN</button>
         </div>
 
     </div>
@@ -276,7 +261,18 @@
     <script>
         function selectTier(plan) {
             console.log("Plan seleccionado: " + plan);
-            // Aquí integrarás la pasarela de pago (Stripe/PayPal)
+            // Simulación de redirección para otros planes
+            alert("Acceso " + plan.toUpperCase() + " en proceso de sincronización.");
+        }
+
+        function iniciarProtocoloGenesis() {
+            // Animación de salida opcional antes del boot
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 1s ease';
+            
+            setTimeout(() => {
+                window.location.href = 'boot-sequence.html';
+            }, 1000);
         }
     </script>
 </body>
