@@ -162,73 +162,44 @@
         setTimeout(() => { window.location.href = 'suscripcion.html'; }, 1200);
     }
 
-    function dibujarRueda(vectores, aspectos) {
-        const canvas = document.getElementById('vaultWheel');
-        const ctx = canvas.getContext('2d');
-        const centro = 190; 
-        const radio = 145; // Radio ligeramente mayor para mejor visibilidad
-        
-        ctx.clearRect(0, 0, 380, 380);
+   // Sustituir la función dibujarRueda por un generador de SVG
+function renderizarVectoresSVG(vectores, aspectos) {
+    const container = document.getElementById('canvas-container');
+    const centro = 190; const radio = 145;
+    
+    let contenidoSVG = `<svg viewBox="0 0 380 380" style="width:100%; height:100%;">
+        <circle cx="${centro}" cy="${centro}" r="${radio}" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />`;
 
-        // Anillo de Referencia Técnico
-        ctx.beginPath(); 
-        ctx.arc(centro, centro, radio + 5, 0, 2 * Math.PI);
-        ctx.strokeStyle = "rgba(212, 175, 55, 0.15)"; 
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        document.getElementById('tension-count').innerText = (aspectos ? aspectos.length : 0) + " PUNTOS CRÍTICOS";
-
-        // Dibujar Aspectos (Líneas de Tensión/Armonía)
-        if (aspectos) {
-            aspectos.forEach(asp => {
-                const p1 = vectores[asp.puntos.split('-')[0]];
-                const p2 = vectores[asp.puntos.split('-')[1]];
-                if (p1 !== undefined && p2 !== undefined) {
-                    const x1 = centro + radio * Math.cos((p1 - 90) * Math.PI / 180);
-                    const y1 = centro + radio * Math.sin((p1 - 90) * Math.PI / 180);
-                    const x2 = centro + radio * Math.cos((p2 - 90) * Math.PI / 180);
-                    const y2 = centro + radio * Math.sin((p2 - 90) * Math.PI / 180);
-
-                    ctx.beginPath(); 
-                    ctx.moveTo(x1, y1); 
-                    ctx.lineTo(x2, y2);
-                    
-                    if (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') {
-                        ctx.lineWidth = 1.5;
-                        ctx.strokeStyle = 'rgba(255, 77, 77, 0.5)'; // Rojo Tensión
-                        ctx.setLineDash([5, 5]);
-                    } else {
-                        ctx.lineWidth = 1;
-                        ctx.strokeStyle = 'rgba(0, 255, 136, 0.25)'; // Verde Armonía
-                        ctx.setLineDash([]);
-                    }
-                    ctx.stroke();
-                }
-            });
+    // Dibujar Aspectos (Líneas de Tensión)
+    aspectos.forEach(asp => {
+        const p1 = vectores[asp.puntos.split('-')[0]];
+        const p2 = vectores[asp.puntos.split('-')[1]];
+        if (p1 !== undefined && p2 !== undefined) {
+            const x1 = centro + radio * Math.cos((p1 - 90) * Math.PI / 180);
+            const y1 = centro + radio * Math.sin((p1 - 90) * Math.PI / 180);
+            const x2 = centro + radio * Math.cos((p2 - 90) * Math.PI / 180);
+            const y2 = centro + radio * Math.sin((p2 - 90) * Math.PI / 180);
+            
+            const color = (asp.tipo === 'OPOSICIÓN') ? 'var(--alert)' : 'var(--safe)';
+            const dash = (asp.tipo === 'OPOSICIÓN') ? '5,5' : '0';
+            contenidoSVG += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-dasharray="${dash}" opacity="0.5" />`;
         }
+    });
 
-        // Dibujar Nodos (Planetas)
-        ctx.setLineDash([]);
-        Object.entries(vectores).forEach(([nombre, grado]) => {
-            const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
-            const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
-            
-            // Efecto de brillo profesional en Nodos
-            ctx.shadowBlur = 15; 
-            ctx.shadowColor = "#ffffff";
-            ctx.beginPath(); 
-            ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
-            ctx.fillStyle = "#ffffff"; 
-            ctx.fill();
-            
-            // Etiquetas con jerarquía
-            ctx.shadowBlur = 0; 
-            ctx.fillStyle = "rgba(212, 175, 55, 0.9)";
-            ctx.font = "bold 9px 'JetBrains Mono'";
-            ctx.fillText(nombre.toUpperCase(), x + 14, y + 4);
-        });
-    }
+    // Dibujar Nodos
+    Object.entries(vectores).forEach(([nombre, grado]) => {
+        const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
+        const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
+        contenidoSVG += `
+            <circle cx="${x}" cy="${y}" r="4" fill="#fff">
+                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <text x="${x + 12}" y="${y + 4}" fill="var(--gold)" font-size="9" font-family="JetBrains Mono">${nombre.toUpperCase()}</text>`;
+    });
+
+    contenidoSVG += `</svg>`;
+    container.innerHTML = contenidoSVG;
+}
 
    // Reemplaza la función cargarReporte en boveda.html
 async function cargarReporte() {
