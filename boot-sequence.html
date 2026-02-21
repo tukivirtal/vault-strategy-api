@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>GÉNESIS | Secure Boot Sequence</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #d4af37;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #boot-log {
+            width: 80%;
+            max-width: 800px;
+            height: 400px;
+            overflow-y: hidden;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #00ff88; /* Verde terminal */
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .system-status {
+            margin-top: 40px;
+            letter-spacing: 0.5em;
+            font-size: 0.7rem;
+            color: #d4af37;
+        }
+
+        .progress-bar-container {
+            width: 300px;
+            height: 2px;
+            background: #222;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #d4af37;
+            box-shadow: 0 0 15px #d4af37;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: #00ff88;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="boot-log"></div>
+    
+    <div class="system-status" id="status-msg">INITIALIZING KERNEL...</div>
+    
+    <div class="progress-bar-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <script>
+        const log = document.getElementById('boot-log');
+        const bar = document.getElementById('progress-bar');
+        const statusMsg = document.getElementById('status-msg');
+
+        const commands = [
+            "> [INFO] STARTING VAULT_LOGIC CORE V3.0.1",
+            "> [INFO] CONNECTING TO JPL/NASA EPHEMERIS DATABASE DE441...",
+            "> [OK] CONNECTION ESTABLISHED (LATENCY 12ms)",
+            "> [INFO] LOADING SWISS_EPHEMERIS LIBRARY V2.10.03",
+            "> [PROCESS] CALCULATING DELTA_T CORRECTION (72.18s)",
+            "> [PROCESS] SYNCHRONIZING GEOCENTRIC COORDINATES J2000.0",
+            "> [INFO] RETRIEVING PLANETARY VECTORS: SUN, MOON, MERCURY, VENUS, MARS...",
+            "> [OK] JUPITER HARMONIC RESONANCE DETECTED",
+            "> [OK] SATURN STRUCTURAL TENSION IDENTIFIED",
+            "> [PROCESS] APPLYING KEPLERIAN GEOMETRY ALGORITHMS",
+            "> [INFO] BUILDING PERSONAL SYNC MAP...",
+            "> [OK] ENCRYPTION LAYER ACTIVE (AES-256)",
+            "> [OK] GENESIS ENVIRONMENT READY FOR EXECUTIVE ACCESS",
+            "> [INFO] SYSTEM STABLE. LAUNCHING INTERFACE..."
+        ];
+
+        let currentLine = 0;
+        let progress = 0;
+
+        function typeLog() {
+            if (currentLine < commands.length) {
+                const line = document.createElement('div');
+                line.innerHTML = commands[currentLine];
+                log.appendChild(line);
+                
+                // Efecto de scroll automático
+                log.scrollTop = log.scrollHeight;
+                
+                currentLine++;
+                progress = (currentLine / commands.length) * 100;
+                bar.style.width = progress + "%";
+
+                if (currentLine > 10) statusMsg.innerText = "AUTHENTICATING ACCESS...";
+                
+                setTimeout(typeLog, Math.random() * 400 + 100);
+            } else {
+                statusMsg.innerText = "ACCESS GRANTED";
+                statusMsg.style.color = "#00ff88";
+                setTimeout(() => {
+                    // Aquí es donde saltas a la terminal real de Génesis
+                    window.location.href = 'genesis-live.html';
+                }, 1000);
+            }
+        }
+
+        window.onload = typeLog;
+    </script>
+</body>
+</html>
