@@ -85,17 +85,18 @@
         
         <aside>
             <div class="panel">
-                <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">Rentabilidad Temporal</span>
+                <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">RENTABILIDAD (PROYECCIÓN SEMANAL)</span>
+                
                 <div id="chart-roi" style="margin-top: 20px;"></div>
                 
                 <div style="margin-top: 30px;">
-                    <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ASIGNACIÓN DE ENFOQUE (DIARIO)</span>
+                    <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ASIGNACIÓN DE ENFOQUE DIARIO</span>
                     <div id="chart-donut"></div>
                 </div>
             </div>
 
             <div class="panel" style="margin-top: 20px;">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">FLUJO SEMANAL DE OPERACIONES</span>
+                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">FLUJO OPERATIVO DE LA SEMANA</span>
                 <div class="heatmap-grid">
                     <div class="day-box" style="background: var(--safe); color: #000;">L</div>
                     <div class="day-box" style="background: var(--safe); color: #000; opacity: 0.7;">M</div>
@@ -105,58 +106,67 @@
                     <div class="day-box" style="background: var(--gold); color: #000; opacity: 0.5;">S</div>
                     <div class="day-box" style="background: var(--gold); color: #000; opacity: 0.3;">D</div>
                 </div>
-                <p style="font-size: 0.6rem; color: #555; margin-top: 10px;">Evite firmas legales el día Miércoles (Tensión Mercurio-Saturno).</p>
+                <p style="font-size: 0.6rem; color: #555; margin-top: 10px;">*Sincronía detectada: Evite firmas legales en periodos de tensión (Rojo).</p>
             </div>
         </aside>
 
         <main class="panel">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA EJECUTIVA</span>
+                    <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA DE CONTROL</span>
                     <div id="foco-diario" style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;">
-                        MODO: <span class="gold">EXPANSIÓN DE CAPITAL</span>
+                        ESTADO: <span class="gold" id="user-status">CÁLCULO EN PROCESO</span>
                     </div>
                 </div>
-                <input type="date" id="sim-date" onchange="actualizarEstrategia()">
+                <div style="text-align: right;">
+                    <input type="date" id="sim-date" onchange="actualizarEstrategia()">
+                    <div style="font-size: 0.6rem; color: var(--safe); margin-top: 5px;">● LOCAL SYNC ACTIVE</div>
+                </div>
             </div>
             
             <div class="executive-summary">
-                <b style="font-size: 1.2rem; display: block; margin-bottom: 10px;" class="gold">ESTRATEGIA PARA EL EJECUTIVO:</b>
+                <b style="font-size: 1.2rem; display: block; margin-bottom: 10px;" class="gold" id="welcome-msg">BIENVENIDA...</b>
                 <p id="exec-msg" style="font-size: 1.1rem; color: #eee; line-height: 1.6;">
-                    Bienvenida, Fatima. Hoy su configuración natural <i>Sol-Marte</i> le otorga un 40% más de efectividad en la toma de decisiones rápidas. 
-                    <b>No postergue lo importante.</b> El mercado temporal está alineado con su visión. Use este día para cerrar el acuerdo que ha estado madurando.
+                    Analizando su configuración de nacimiento frente a los tránsitos actuales del JPL...
                 </p>
             </div>
 
             <div class="decision-matrix">
                 <div class="decision-card active">
-                    <h3>CAPITAL</h3>
+                    <h3>CAPITAL (ROI)</h3>
                     <div class="roi">+24.8%</div>
-                    <span class="status" style="background: var(--safe); color: #000;">ÓPTIMO</span>
+                    <span class="status" style="background: var(--safe); color: #000;">ALTA RENTABILIDAD</span>
                 </div>
                 <div class="decision-card">
                     <h3>NEGOCIACIÓN</h3>
                     <div class="roi">+12.2%</div>
-                    <span class="status" style="background: var(--gold); color: #000;">ESTABLE</span>
+                    <span class="status" style="background: var(--gold); color: #000;">FLUJO ESTABLE</span>
                 </div>
                 <div class="decision-card">
                     <h3>LANZAMIENTO</h3>
                     <div class="roi">-18.5%</div>
-                    <span class="status" style="background: var(--alert); color: #fff;">RIESGO</span>
+                    <span class="status" style="background: var(--alert); color: #fff;">RIESGO DE FRICCIÓN</span>
                 </div>
             </div>
 
             <div style="margin-top: 40px;">
                 <button class="btn-nasa" id="dossier-btn" onclick="transferData()">DESCARGAR DOSSIER DE INTELIGENCIA</button>
                 <div style="font-size: 0.6rem; color: #444; margin-top: 15px; text-align: center;">
-                    SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT
+                    SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT // ID: GX-992
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // GRÁFICO ROI - LEYENDAS GRANDES
+        // LÓGICA DE NOMBRE VARIABLE
+        const urlParams = new URLSearchParams(window.location.search);
+        const userEmail = urlParams.get('email') || "";
+        
+        // Simulación de búsqueda de nombre basada en email (puedes conectarlo a tu API real)
+        const userName = userEmail.split('@')[0].toUpperCase() || "EJECUTIVO";
+
+        // GRÁFICO ROI - LEYENDAS CLARAS
         var roiOptions = {
             series: [{ name: 'HISTÓRICO', data: [15, 12, 18, 22, 19, 25, 23] }, 
                      { name: 'PROYECCIÓN', data: [23, 30, 45, 38, 52, 60, 68] }],
@@ -164,7 +174,7 @@
             colors: ['#444', '#d4af37'],
             stroke: { curve: 'smooth', width: 3 },
             fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
-            legend: { show: true, fontSize: '14px', fontFamily: 'JetBrains Mono', labels: { colors: '#fff' }, position: 'top' },
+            legend: { show: true, fontSize: '14px', labels: { colors: '#fff' }, position: 'top' },
             dataLabels: { enabled: false },
             grid: { borderColor: '#111' },
             xaxis: { categories: ['S-3','S-2','S-1','HOY','S+1','S+2','S+3'], labels: {style:{colors:'#555'}} },
@@ -180,21 +190,32 @@
             colors: ['#d4af37', '#222', '#111'],
             stroke: { show: false },
             legend: { show: true, fontSize: '11px', labels: { colors: '#888' }, position: 'bottom' },
-            plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'FOCO', color: '#555', formatter: () => '60%' } } } } }
+            plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'ENFOQUE', color: '#555', formatter: () => '60%' } } } } }
         };
         new ApexCharts(document.querySelector("#chart-donut"), donutOptions).render();
 
-        // RELOJ Y FECHA AUTO
+        // RELOJ Y FECHA LOCAL EXACTA
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).toUpperCase().replace(',', ' //');
             
-            // Cambio de día automático
-            const hoyStr = now.toISOString().split('T')[0];
+            const hoyLocal = new Date();
+            const offset = hoyLocal.getTimezoneOffset() * 60000;
+            const isoLocal = (new Date(hoyLocal - offset)).toISOString().split('T')[0];
             const input = document.getElementById('sim-date');
-            if (!input.value) input.value = hoyStr;
-            if (now.getHours() === 0 && now.getMinutes() === 1) { location.reload(); }
+            
+            if (!input.value) {
+                input.value = isoLocal;
+                ejecutarInicio();
+            }
         }
+
+        function ejecutarInicio() {
+            document.getElementById('welcome-msg').innerText = `DIRECTIVA PARA: ${userName}`;
+            document.getElementById('user-status').innerText = "EXPANSIÓN DE CAPITAL";
+            document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName.split(' ')[0]}. Hoy su configuración natural indica un <b>Trígono Sol-Marte</b>: su capacidad de ejecución está un 40% por encima de su promedio. <br><br><b>FOCO DEL DÍA:</b> No se pierda en detalles operativos. Use esta ventana para cerrar negociaciones o iniciar proyectos de alto impacto. El mercado temporal no opone resistencia a su voluntad hoy.`;
+        }
+
         setInterval(updateClock, 1000);
         window.onload = updateClock;
 
@@ -202,7 +223,7 @@
             const msg = document.getElementById('exec-msg');
             msg.style.opacity = 0.5;
             setTimeout(() => {
-                msg.innerHTML = "<b>ANÁLISIS COMPLETADO:</b> Los vectores para esta fecha indican un cambio en la marea de liquidez. Ajuste su presupuesto de marketing y priorice la auditoría interna.";
+                msg.innerHTML = "<b>ANÁLISIS DE VENTANA COMPLETADO:</b> Los vectores para esta fecha indican un cambio en la marea de liquidez. Ajuste su presupuesto de marketing y priorice la auditoría interna antes del cierre del ciclo.";
                 msg.style.opacity = 1;
             }, 800);
         }
@@ -213,7 +234,7 @@
             btn.disabled = true;
             const int = setInterval(() => {
                 p += 5; btn.innerText = `ENCRYPTING DATA... ${p}%`;
-                if(p >= 100) { clearInterval(int); window.location.href = 'dossier-final.html'; }
+                if(p >= 100) { clearInterval(int); window.location.href = `dossier-final.html?email=${userEmail}`; }
             }, 80);
         }
     </script>
