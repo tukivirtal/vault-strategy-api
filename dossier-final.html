@@ -5,12 +5,12 @@
     <title>GÉNESIS | Dossier de Inteligencia Estratégica GX-2026</title>
     <style>
         @media print { .no-print { display: none; } }
-        
         :root {
             --gold: #d4af37;
             --alert: #ff4d4d;
             --safe: #00ff88;
             --dark: #050505;
+            --gray: #222;
         }
 
         body { 
@@ -23,7 +23,7 @@
         .page { 
             width: 210mm; 
             min-height: 297mm; 
-            padding: 30mm; 
+            padding: 25mm 30mm; 
             margin: 20px auto; 
             background: var(--dark); 
             border: 1px solid #111; 
@@ -39,17 +39,19 @@
             border: 2px solid var(--alert); color: var(--alert); 
             padding: 5px 15px; font-size: 0.65rem; font-weight: bold; 
             transform: rotate(10deg); letter-spacing: 0.1em;
+            background: rgba(255, 77, 77, 0.05);
         }
 
         h1 { 
             font-size: 1.4rem; letter-spacing: 0.6em; 
-            border-bottom: 1px solid #222; padding-bottom: 25px; 
+            border-bottom: 1px solid var(--gray); padding-bottom: 25px; 
             font-weight: 300; margin-bottom: 40px;
+            text-transform: uppercase;
         }
 
         .section-title { 
             font-size: 0.75rem; color: #555; 
-            letter-spacing: 0.3em; margin-top: 50px; 
+            letter-spacing: 0.3em; margin-top: 45px; 
             margin-bottom: 20px; border-left: 3px solid var(--gold);
             padding-left: 15px; text-transform: uppercase;
         }
@@ -59,11 +61,11 @@
         /* MATRIZ DE IMPACTO ROI */
         .impact-matrix { 
             width: 100%; border-collapse: collapse; margin-top: 25px; 
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.01);
         }
         .impact-matrix th { 
-            text-align: left; font-size: 0.6rem; color: #555; 
-            padding: 12px; border-bottom: 2px solid #222; text-transform: uppercase;
+            text-align: left; font-size: 0.6rem; color: #666; 
+            padding: 12px; border-bottom: 2px solid var(--gray); text-transform: uppercase;
         }
         .impact-matrix td { 
             padding: 18px 12px; font-size: 0.75rem; border-bottom: 1px solid #111; 
@@ -72,20 +74,21 @@
         /* ASIGNACIÓN DE RECURSOS */
         .allocation-container {
             display: flex; align-items: center; gap: 40px; margin-top: 30px;
-            padding: 25px; border: 1px solid #111; background: rgba(212, 175, 55, 0.02);
+            padding: 30px; border: 1px solid var(--gray); background: rgba(212, 175, 55, 0.02);
         }
 
         .allocation-chart-mock {
-            width: 150px; height: 150px; border-radius: 50%;
-            border: 10px solid #111;
+            width: 140px; height: 140px; border-radius: 50%;
+            border: 8px solid #111;
             background: conic-gradient(var(--gold) 0% 60%, #333 60% 85%, #1a1a1a 85% 100%);
-            display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
-            text-align: center; color: var(--gold);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-size: 0.55rem; text-align: center; color: var(--gold);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
         /* PIE DE PÁGINA TÉCNICO */
         .footer-tech { 
-            position: absolute; bottom: 20mm; left: 30mm; width: calc(100% - 60mm);
+            position: absolute; bottom: 15mm; left: 30mm; width: calc(100% - 60mm);
             font-size: 0.6rem; color: #333; line-height: 1.6;
             border-top: 1px solid #111; padding-top: 20px;
         }
@@ -93,94 +96,114 @@
         .btn-print { 
             position: fixed; bottom: 30px; right: 30px; 
             background: var(--gold); color: #000; border: none; 
-            padding: 15px 30px; font-family: inherit; font-weight: bold; 
+            padding: 15px 35px; font-family: inherit; font-weight: bold; 
             cursor: pointer; letter-spacing: 0.2em; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
-        .btn-print:hover { background: #fff; transform: scale(1.05); }
+        .btn-print:hover { background: #fff; transform: translateY(-2px); }
+
+        .signature-block { margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .stamp-nasa { border: 1px solid var(--gold); padding: 10px; font-size: 0.5rem; color: var(--gold); opacity: 0.5; }
 
         @media print {
             .page { margin: 0; border: none; width: 100%; height: 100%; }
             body { background: #fff; }
             .page { background: #fff; color: #000; }
-            .content, h1, .section-title, .gold, .value { color: #000 !important; }
+            .content, h1, .section-title, .gold { color: #000 !important; }
             .impact-matrix td, .impact-matrix th { border-color: #eee; color: #000 !important; }
-            .allocation-container { border-color: #eee; }
+            .allocation-container { border-color: #eee; background: none; }
+            .executive-summary { border-top: 1px solid #eee !important; color: #444 !important; }
+            .confidential-stamp { border-color: #000; color: #000; }
         }
     </style>
 </head>
 <body>
 
-    <div class="page">
-        <div class="confidential-stamp">EYES ONLY // ID: GX-2026-CONF</div>
-        <h1 class="gold">DOSSIER DE INTELIGENCIA ESTRATÉGICA</h1>
-        
-        <div class="section-title">CARTA DE TRANSMISIÓN</div>
-        <div class="content">
-            Estimado Ejecutivo,<br><br>
-            Este activo de inteligencia constituye su <span class="gold">ventaja competitiva injusta</span>. Los datos procesados bajo el protocolo <strong>NASA JPL DE441</strong> confirman que su infraestructura personal se encuentra en una fase de <strong>Resonancia de Orden Superior</strong>.<br><br>
-            Usted ya no opera bajo las leyes del azar. Este dossier le otorga la hoja de ruta para la optimización de activos y la mitigación proactiva de riesgos estructurales para los próximos ciclos operativos. La información aquí contenida es un derivado matemático estricto de su vector espacio-temporal.
+<div class="page">
+    <div class="confidential-stamp">EYES ONLY // SUBJECT: FATIMA CIPPOLLINI</div>
+    <h1 class="gold">Dossier de Inteligencia Estratégica</h1>
+    
+    <div class="section-title">Análisis de Transmisión Directa</div>
+    <div class="content">
+        Estimada <span class="gold">Fatima Cippollini</span>,<br><br>
+        Este documento constituye un activo de inteligencia de alto valor, diseñado para eliminar la incertidumbre en su toma de decisiones. Los datos procesados bajo el protocolo <strong>NASA JPL DE441</strong> confirman que su infraestructura personal se encuentra en una fase de <strong>Resonancia de Orden Superior</strong>.<br><br>
+        Usted posee una configuración que favorece la ejecución masiva; sin embargo, operar fuera de las ventanas de sincronía detectadas aumenta su costo operativo en un 40%. Este manual es su hoja de ruta para la optimización de capital y la mitigación de riesgos estructurales.
+    </div>
+
+    <div class="section-title">Matriz de Impacto y Optimización de ROI</div>
+    
+    
+
+    <table class="impact-matrix">
+        <thead>
+            <tr>
+                <th>VENTANA</th>
+                <th>INDICADOR</th>
+                <th>ROI EST.</th>
+                <th>ESTRATEGIA DE CAPITAL</th>
+                <th>MITIGACIÓN</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Q1 2026</td>
+                <td class="gold">Oportunidad Alta</td>
+                <td>+24.8%</td>
+                <td><strong>Inversión Agresiva:</strong> Despliegue en activos de escala.</td>
+                <td>Mantener pasivos al mínimo.</td>
+            </tr>
+            <tr>
+                <td>Q2 2026</td>
+                <td style="color: var(--alert);">Riesgo Estructural</td>
+                <td>-12.0%</td>
+                <td><strong>Defensivo:</strong> Reasignar a estabilidad/auditoría.</td>
+                <td>Revisión de contratos legales.</td>
+            </tr>
+            <tr>
+                <td>Q3 2026</td>
+                <td style="color: var(--safe);">Sincronía Óptima</td>
+                <td>+18.5%</td>
+                <td><strong>Escalabilidad:</strong> Enfoque en marketing y marca.</td>
+                <td>Optimizar sistemas de venta.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="executive-summary" style="margin-top: 25px; font-size: 0.8rem; color: #888; border-top: 1px solid #222; padding-top: 20px; line-height: 1.6;">
+        <strong>AUDITORÍA:</strong> Su configuración revela que su mayor rentabilidad se obtiene al operar en ventanas de <i class="gold">Sincronía Óptima</i>. Intentar forzar resultados durante periodos de <i>Riesgo Estructural</i> genera un agotamiento innecesario de sus recursos críticos.
+    </div>
+
+    <div class="section-title">Asignación de Recursos y Enfoque (Q1)</div>
+    <div class="allocation-container">
+        <div class="allocation-chart-mock">
+            <span style="font-size: 1.2rem; font-weight: bold;">60%</span>
+            <span>STRATEGY</span>
         </div>
-
-        <div class="section-title">MATRIZ DE IMPACTO Y OPTIMIZACIÓN DE ROI</div>
-        
-        <table class="impact-matrix">
-            <thead>
-                <tr>
-                    <th>PROYECCIÓN</th>
-                    <th>INDICADOR</th>
-                    <th>ROI EST.</th>
-                    <th>ESTRATEGIA DE CAPITAL</th>
-                    <th>MITIGACIÓN</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Q1 2026</td>
-                    <td class="gold">Oportunidad Alta</td>
-                    <td>+24.8%</td>
-                    <td><strong>Inversión Agresiva:</strong> 70% en activos de alto crecimiento.</td>
-                    <td>Mantener liquidez operativa baja.</td>
-                </tr>
-                <tr>
-                    <td>Q2 2026</td>
-                    <td style="color: var(--alert);">Riesgo Estructural</td>
-                    <td>-12.0%</td>
-                    <td><strong>Defensivo:</strong> Reasignar 60% a bonos/estabilidad.</td>
-                    <td>Auditoría de contratos y personal.</td>
-                </tr>
-                <tr>
-                    <td>Q3 2026</td>
-                    <td style="color: var(--safe);">Sincronía Óptima</td>
-                    <td>+18.5%</td>
-                    <td><strong>Escalabilidad:</strong> 50% en marketing y marca.</td>
-                    <td>Optimizar procesos de venta.</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="executive-summary" style="margin-top: 25px; font-size: 0.8rem; color: #888; border-top: 1px solid #222; padding-top: 20px; line-height: 1.6;">
-            <strong>NOTA DEL ANALISTA:</strong> Su configuración revela que su mayor ROI se obtiene al operar en ventanas de <i class="gold">Sincronía Óptima</i>. Operar durante periodos de <i>Riesgo Estructural</i> duplica sus costos operativos y aumenta la fricción administrativa.
-        </div>
-
-        <div class="section-title">ASIGNACIÓN DE RECURSOS CRÍTICOS</div>
-        <div class="allocation-container">
-            <div class="allocation-chart-mock">
-                60%<br>ESTRATEGIA
-            </div>
-            <div class="content" style="font-size: 0.75rem; flex: 1;">
-                <p><strong class="gold">ESTRATEGIA (60%):</strong> Enfoque prioritario en alianzas, diseño de oferta y visión macro. Su ROI es máximo en este sector.</p>
-                <p><strong>OPERACIÓN (25%):</strong> Gestión administrativa y técnica. Se recomienda delegar para evitar el agotamiento del nodo solar.</p>
-                <p><strong>RECUPERACIÓN (15%):</strong> Tiempo de desconexión obligatorio para recalibrar la toma de decisiones.</p>
-            </div>
-        </div>
-
-        <div class="footer-tech">
-            <p><strong>CERTIFICACIÓN TÉCNICA:</strong> DATOS PROCESADOS MEDIANTE NÚCLEO SWISS EPHEMERIS V2.10 // LICENCIA NASA/JPL DE441 // PRECISIÓN ANGULAR ±0.0001° // COORDINADAS GEOCÉNTRICAS J2000.0 // TIMESTAMP: 2026-02-21 21:00:29 UTC</p>
-            <p style="font-style: italic;">"La matemática del cielo es el mapa de las corrientes. Un gran navegante utiliza el viento para alcanzar su puerto."</p>
+        <div class="content" style="font-size: 0.75rem; flex: 1;">
+            <p><strong class="gold">ESTRATEGIA (60%):</strong> Priorice el diseño de ofertas y alianzas de alto nivel. Su cerebro reacciona mejor a estímulos de planificación hoy.</p>
+            <p><strong>OPERACIÓN (25%):</strong> Ejecución técnica y administración. Se recomienda la delegación sistemática de estos vectores.</p>
+            <p><strong>RECUPERACIÓN (15%):</strong> Ventana obligatoria de desconexión para preservar la agudeza en la toma de decisiones.</p>
         </div>
     </div>
 
-    <button class="btn-print no-print" onclick="window.print()">IMPRIMIR / GUARDAR PDF</button>
+    <div class="signature-block">
+        <div class="stamp-nasa">
+            NASA DATA COMPLIANT<br>
+            JPL/DE441 SOURCE SYNC
+        </div>
+        <div style="text-align: right;">
+            <p class="gold" style="font-size: 0.7rem; margin-bottom: 5px;">FIRMA DIGITAL AUTORIZADA</p>
+            <p style="font-size: 0.6rem; color: #444;">VAULT LOGIC SYSTEMS CORE</p>
+        </div>
+    </div>
+
+    <div class="footer-tech">
+        <p><strong>CERTIFICACIÓN:</strong> SWISS EPHEMERIS V2.10 // LICENCIA NASA/JPL // PRECISIÓN ±0.0001° // COORDINADAS J2000.0 // FECHA: 2026-02-21</p>
+        <p style="font-style: italic;">"El conocimiento de los ciclos es la base del control ejecutivo. Use este mapa con la discreción que su cargo requiere."</p>
+    </div>
+</div>
+
+<button class="btn-print no-print" onclick="window.print()">DESCARGAR DOSSIER PDF</button>
 
 </body>
 </html>
