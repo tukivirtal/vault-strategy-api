@@ -43,7 +43,7 @@
             background: rgba(0,0,0,0.5); transition: 0.3s;
         }
         .decision-card.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.1); }
-        .decision-card h3 { font-size: 0.85rem; color: var(--gold); margin: 0; letter-spacing: 0.2em; text-transform: uppercase; }
+        .decision-card h3 { font-size: 0.8rem; color: var(--gold); margin: 0; letter-spacing: 0.2em; text-transform: uppercase; }
         .decision-card .roi { font-size: 2.2rem; font-weight: bold; margin: 10px 0; }
         .decision-card .status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 2px; }
 
@@ -82,21 +82,20 @@
     </header>
 
     <div class="dashboard-grid">
-        
         <aside>
             <div class="panel">
-                <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">RENTABILIDAD (PROYECCIÓN)</span>
+                <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">Rentabilidad Temporal</span>
                 <div id="chart-roi" style="margin-top: 20px;"></div>
                 
                 <div style="margin-top: 30px;">
-                    <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ASIGNACIÓN DE ENFOQUE DIARIO</span>
+                    <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ASIGNACIÓN DE ENFOQUE (DIARIO)</span>
                     <div id="chart-donut"></div>
                 </div>
             </div>
 
             <div class="panel" style="margin-top: 20px;">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">FLUJO OPERATIVO SEMANAL</span>
-                <div class="heatmap-grid" id="heatmap">
+                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">FLUJO SEMANAL DE OPERACIONES</span>
+                <div class="heatmap-grid" id="heatmap-week">
                     </div>
                 <p style="font-size: 0.6rem; color: #555; margin-top: 10px;">*Sincronía detectada: Evite firmas legales en periodos de tensión (Rojo).</p>
             </div>
@@ -105,39 +104,36 @@
         <main class="panel">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA DE CONTROL</span>
+                    <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA EJECUTIVA</span>
                     <div id="foco-diario" style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;">
-                        MODO: <span class="gold" id="user-status">CARGANDO...</span>
+                        MODO: <span class="gold" id="user-status">CÁLCULO EN PROCESO</span>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <input type="date" id="sim-date" onchange="actualizarEstrategia()">
-                    <div style="font-size: 0.6rem; color: var(--safe); margin-top: 5px;">● LOCAL SYNC ACTIVE</div>
-                </div>
+                <input type="date" id="sim-date" onchange="actualizarEstrategia()">
             </div>
             
             <div class="executive-summary">
-                <b style="font-size: 1.2rem; display: block; margin-bottom: 10px;" class="gold" id="welcome-msg">IDENTIFICANDO SUJETO...</b>
+                <b style="font-size: 1.2rem; display: block; margin-bottom: 10px;" class="gold" id="welcome-msg">BIENVENIDA...</b>
                 <p id="exec-msg" style="font-size: 1.1rem; color: #eee; line-height: 1.6;">
-                    Sincronizando su infraestructura personal con los tránsitos del JPL...
+                    Sincronizando radar con el núcleo NASA JPL...
                 </p>
             </div>
 
             <div class="decision-matrix">
                 <div class="decision-card active">
-                    <h3>CAPITAL (ROI)</h3>
-                    <div class="roi" id="val-cap">+24.8%</div>
-                    <span class="status" style="background: var(--safe); color: #000;">ÓPTIMO</span>
+                    <h3 id="label-cap">CAPITAL</h3>
+                    <div class="roi" id="roi-cap">+24.8%</div>
+                    <span class="status" id="status-cap" style="background: var(--safe); color: #000;">ÓPTIMO</span>
                 </div>
                 <div class="decision-card">
                     <h3>NEGOCIACIÓN</h3>
-                    <div class="roi" id="val-neg">+12.2%</div>
+                    <div class="roi" id="roi-neg">+12.2%</div>
                     <span class="status" style="background: var(--gold); color: #000;">ESTABLE</span>
                 </div>
                 <div class="decision-card">
                     <h3>LANZAMIENTO</h3>
-                    <div class="roi" id="val-lau">-18.5%</div>
-                    <span class="status" style="background: var(--alert); color: #fff;">RIESGO</span>
+                    <div class="roi" id="roi-lau">-18.5%</div>
+                    <span class="status" id="status-lau" style="background: var(--alert); color: #fff;">RIESGO</span>
                 </div>
             </div>
 
@@ -151,31 +147,13 @@
     </div>
 
     <script>
-        // --- 1. GESTIÓN DE VARIABLES DE USUARIO ---
+        // --- 1. CONFIGURACIÓN DE USUARIO ---
         const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('nombre') || "FATIMA"; 
         const userEmail = urlParams.get('email') || "";
-        const userName = urlParams.get('nombre')?.toUpperCase() || userEmail.split('@')[0].toUpperCase() || "LÍDER";
 
-        // --- 2. RELOJ Y FECHA LOCAL (CORRECCIÓN DÍA 22) ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString('es-ES', { 
-                day: '2-digit', month: 'short', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            }).toUpperCase().replace(',', ' //');
-            
-            // Si el input está vacío, poner la fecha local real (no UTC)
-            const input = document.getElementById('sim-date');
-            if (!input.value) {
-                const hoy = new Date();
-                const offset = hoy.getTimezoneOffset() * 60000;
-                input.value = (new Date(hoy - offset)).toISOString().split('T')[0];
-                ejecutarAnalisisInicial();
-            }
-        }
-
-        // --- 3. GRÁFICOS (APEXCHARTS) ---
-        var roiChart, donutChart;
+        // --- 2. GRÁFICOS APEX ---
+        let roiChart, donutChart;
 
         function initCharts() {
             roiChart = new ApexCharts(document.querySelector("#chart-roi"), {
@@ -185,7 +163,7 @@
                 colors: ['#444', '#d4af37'],
                 stroke: { curve: 'smooth', width: 3 },
                 fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
-                legend: { show: true, fontSize: '13px', labels: { colors: '#fff' }, position: 'top' },
+                legend: { show: true, fontSize: '14px', fontFamily: 'JetBrains Mono', labels: { colors: '#fff' }, position: 'top' },
                 xaxis: { categories: ['S-3','S-2','S-1','HOY','S+1','S+2','S+3'], labels: {style:{colors:'#555'}} },
                 yaxis: { show: false }, theme: { mode: 'dark' }
             });
@@ -197,62 +175,76 @@
                 labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
                 colors: ['#d4af37', '#222', '#111'],
                 stroke: { show: false },
-                legend: { show: true, fontSize: '10px', labels: { colors: '#888' }, position: 'bottom' },
+                legend: { show: true, fontSize: '11px', labels: { colors: '#888' }, position: 'bottom' },
                 plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'FOCO', color: '#555', formatter: () => '60%' } } } } }
             });
             donutChart.render();
             
-            // Generar Heatmap
-            const heat = document.getElementById('heatmap');
+            // Heatmap inicial
+            const heat = document.getElementById('heatmap-week');
             const days = ['L','M','M','J','V','S','D'];
-            const colors = [varColor('--safe'), varColor('--safe'), varColor('--alert'), varColor('--gold'), varColor('--safe'), varColor('--gold'), varColor('--gold')];
-            heat.innerHTML = days.map((d, i) => `<div class="day-box" style="background:${colors[i]}; color:#000; opacity:${1 - (i*0.1)}">${d}</div>`).join('');
+            const colors = ['var(--safe)','var(--safe)','var(--alert)','var(--gold)','var(--safe)','var(--gold)','var(--gold)'];
+            heat.innerHTML = days.map((d, i) => `<div class="day-box" style="background:${colors[i]}; color:#000;">${d}</div>`).join('');
         }
 
-        function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+        // --- 3. LÓGICA DE TIEMPO Y SINCRONÍA ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString('es-ES', { 
+                day: '2-digit', month: 'short', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase().replace(',', ' //');
+            
+            // Sincronizar fecha local al cargar (Evita el error del día 22)
+            const input = document.getElementById('sim-date');
+            if (!input.value) {
+                const hoy = new Date();
+                const offset = hoy.getTimezoneOffset() * 60000;
+                input.value = (new Date(hoy - offset)).toISOString().split('T')[0];
+                ejecutarBienvenida();
+            }
+        }
 
-        // --- 4. LÓGICA DE DINAMISMO (CAMBIO DE FECHA) ---
-        function ejecutarAnalisisInicial() {
-            document.getElementById('welcome-msg').innerText = `DIRECTIVA PARA: ${userName}`;
+        function ejecutarBienvenida() {
+            document.getElementById('welcome-msg').innerText = `DIRECTIVA PARA: ${userName.toUpperCase()}`;
             document.getElementById('user-status').innerText = "EXPANSIÓN DE CAPITAL";
-            document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName.split(' ')[0]}. Hoy su configuración <b>Sol-Marte</b> le otorga un 40% más de efectividad en la ejecución. <br><br><b>PROYECTO DEL DÍA:</b> Use este impulso para cerrar negociaciones de alto nivel. El cerebro reacciona mejor a estímulos de expansión hoy.`;
+            document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName}. Hoy su configuración natural <b>Sol-Marte</b> le otorga un 40% más de efectividad en decisiones de riesgo. <br><br><b>PROYECTO DEL DÍA:</b> No delegue el cierre de negociaciones hoy. Su autoridad está en fase de resonancia con el mercado temporal.`;
             initCharts();
         }
 
+        // --- 4. DINAMISMO (¿QUÉ PASA EN JUNIO?) ---
         function actualizarEstrategia() {
             const date = new Date(document.getElementById('sim-date').value);
             const msg = document.getElementById('exec-msg');
             const status = document.getElementById('user-status');
-            
+            const mes = date.getMonth() + 1;
+
             msg.style.opacity = 0.3;
             
-            // Simulación de cálculo dinámico para el futuro
             setTimeout(() => {
-                const mes = date.getMonth() + 1;
-                if(mes === 5 || mes === 6) { // Si es Mayo o Junio
-                    status.innerText = "ALERTA DE FRICCIÓN";
-                    msg.innerHTML = `<b>ANÁLISIS PARA ${date.toLocaleDateString()}:</b> Los vectores detectan una fase de cuadratura. La rentabilidad en 'Lanzamientos' cae al 12%. <br><br><b>ESTRATEGIA:</b> No fuerce resultados. Use este periodo para auditoría interna y fortalecimiento de infraestructura.`;
-                    roiChart.updateSeries([{ data: [20, 18, 15, 10, 5, 8, 12] }, { data: [12, 10, 8, 5, 15, 20, 25] }]);
+                if(mes === 6) { // SIMULACIÓN JUNIO
+                    status.innerText = "OPORTUNIDAD ALTA";
+                    msg.innerHTML = `<b>PROYECCIÓN PARA JUNIO:</b> Los vectores detectan un pico de liquidez inusual. La rentabilidad proyectada sube al 45%. <br><br><b>ESTRATEGIA:</b> Prepare lanzamientos masivos. Es su ventana de mayor ROI del año.`;
+                    roiChart.updateSeries([{ data: [10, 15, 20, 25, 45, 60, 75] }, { data: [25, 35, 40, 45, 55, 65, 80] }]);
+                    document.getElementById('roi-cap').innerText = "+45.2%";
+                    document.getElementById('roi-lau').innerText = "+38.1%";
+                    document.getElementById('status-lau').style.background = "var(--safe)";
+                    document.getElementById('status-lau').innerText = "ÓPTIMO";
                 } else {
-                    status.innerText = "ESTADO ESTABLE";
-                    msg.innerHTML = `<b>ANÁLISIS PARA ${date.toLocaleDateString()}:</b> Sincronía recuperada. Los niveles de rentabilidad vuelven a la media histórica. Proceda con operaciones estándar.`;
+                    status.innerText = "EXPANSIÓN DE CAPITAL";
+                    msg.innerHTML = `<b>ANÁLISIS COMPLETADO:</b> Sincronía estable para esta fecha. Mantenga los protocolos de inversión vigentes.`;
                     roiChart.updateSeries([{ data: [15, 12, 18, 22, 19, 25, 23] }, { data: [23, 30, 45, 38, 52, 60, 68] }]);
                 }
                 msg.style.opacity = 1;
             }, 800);
         }
 
-        // --- 5. EXPORTACIÓN ---
         function transferData() {
             const btn = document.getElementById('dossier-btn');
-            let p = 0;
-            btn.disabled = true;
+            let p = 0; btn.disabled = true;
             const int = setInterval(() => {
-                p += 5; btn.innerText = `PROCESANDO... ${p}%`;
-                if(p >= 100) { 
-                    clearInterval(int); 
-                    window.location.href = `dossier-final.html?nombre=${userName}&email=${userEmail}`; 
-                }
+                p += 5; btn.innerText = `ENCRIPTANDO... ${p}%`;
+                if(p >= 100) { clearInterval(int); window.location.href = 'dossier-final.html'; }
             }, 80);
         }
 
