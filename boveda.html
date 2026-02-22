@@ -6,64 +6,88 @@
     <style>
         :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --dark: #050505; }
         body { background: radial-gradient(circle, #1a1a1a 0%, var(--dark) 100%); color: var(--gold); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .report-container { background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); padding: 50px; max-width: 900px; width: 100%; display: none; }
-        h1 { letter-spacing: 0.6em; font-size: 1.1rem; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        .report-container { background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); padding: 50px; max-width: 900px; width: 100%; display: none; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        h1 { letter-spacing: 0.6em; font-size: 1.1rem; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; font-weight: 300; }
         .data-row { margin: 40px 0; border-left: 4px solid var(--gold); padding-left: 35px; }
-        .value { font-size: 2.6rem; color: #fff; font-weight: 600; }
+        .value { font-size: 2.6rem; color: #fff; font-weight: 600; text-transform: uppercase; }
         .wheel-section { display: flex; align-items: center; justify-content: space-around; margin: 60px 0; }
+        
+        /* Contenedor SVG */
         #canvas-container { width: 380px; height: 380px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .directiva { background: rgba(212, 175, 55, 0.03); padding: 30px; border: 1px solid rgba(212, 175, 55, 0.1); border-left: 5px solid var(--gold); margin-top: 40px; color: #fff; }
-        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; letter-spacing: 0.3em; cursor: pointer; text-transform: uppercase; margin-top: 30px; outline: 1px solid var(--gold); outline-offset: 3px; }
-        .footer-tech { margin-top: 50px; padding-top: 20px; border-top: 1px solid #222; font-size: 0.6rem; color: #444; line-height: 1.6; }
+        
+        .directiva { background: rgba(212, 175, 55, 0.03); padding: 30px; border: 1px solid rgba(212, 175, 55, 0.1); border-left: 5px solid var(--gold); margin-top: 40px; color: #fff; line-height: 1.6; }
+        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; letter-spacing: 0.3em; cursor: pointer; text-transform: uppercase; margin-top: 30px; outline: 1px solid var(--gold); outline-offset: 3px; transition: 0.3s; }
+        .btn-nasa:hover { background: #fff; outline-color: #fff; }
+        
+        /* Pie de página mejorado */
+        .footer-tech { margin-top: 50px; padding-top: 25px; border-top: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .tech-info { font-size: 0.6rem; color: #444; line-height: 1.6; max-width: 70%; }
+        .stamp { border: 1px solid #d4af37; padding: 8px; font-size: 0.5rem; color: #d4af37; text-align: center; opacity: 0.6; }
     </style>
 </head>
 <body>
-    <div id="loading">CONECTANDO CON NÚCLEO NASA/JPL...</div>
-    <div class="report-container" id="reporte">
-        <h1>VAULT LOGIC // EXECUTIVE TERMINAL</h1>
-        <div class="data-row">
-            <span style="font-size: 0.7rem; color: #555; letter-spacing: 0.2em;">SUJETO DE ANÁLISIS</span>
-            <div class="value" id="nombre">---</div>
-        </div>
-        <div class="wheel-section">
-            <div style="text-align: right; font-size: 0.7rem; color: #666;">NODOS ACTIVOS<br><b style="color:#fff">10/10 [SECURE]</b></div>
-            <div id="canvas-container"></div>
-            <div style="text-align: left; font-size: 0.7rem; color: #666;">VECTORES TENSIÓN<br><b id="tension-count" style="color:var(--alert)">CALCULANDO...</b></div>
-        </div>
-        <div class="directiva">
-            <span style="font-size: 0.7rem; color: var(--gold); display: block; margin-bottom: 10px;">DIRECTIVA DE SINCRONÍA:</span>
-            <div id="directiva">---</div>
-        </div>
-        <button class="btn-nasa" onclick="location.href='suscripcion.html'">ACTIVAR CENTRO DE COMANDO GÉNESIS</button>
-        <div class="footer-tech">
-            PROTOCOL ID: GX-992-B // DATA SOURCE: NASA JPL DE441 // PRECISION: ±0.0001°<br>
-            Este reporte constituye un activo de inteligencia estratégica bajo licencia técnica.
-        </div>
+
+<div id="loading" style="letter-spacing: 0.3em;">CONECTANDO CON NÚCLEO NASA/JPL...</div>
+
+<div class="report-container" id="reporte">
+    <h1>VAULT LOGIC // EXECUTIVE TERMINAL</h1>
+
+    <div class="data-row">
+        <span style="font-size: 0.7rem; color: #555; letter-spacing: 0.2em; text-transform: uppercase;">Sujeto de Análisis</span>
+        <div class="value" id="nombre">---</div>
     </div>
 
-    <script>
+    <div class="wheel-section">
+        <div style="text-align: right; font-size: 0.7rem; color: #444;">NODOS ACTIVOS<br><b style="color:#fff">10/10 [SECURE]</b></div>
+        
+        <div id="canvas-container">
+            </div>
+
+        <div style="text-align: left; font-size: 0.7rem; color: #444;">VECTORES TENSIÓN<br><b id="tension-count" style="color:var(--alert)">0 DETECTADOS</b></div>
+    </div>
+
+    <div class="directiva">
+        <span style="font-size: 0.7rem; color: var(--gold); display: block; margin-bottom: 10px; letter-spacing: 0.2em;">DIRECTIVA DE SINCRONÍA:</span>
+        <div id="directiva" style="font-weight: 300;">---</div>
+    </div>
+
+    <button class="btn-nasa" onclick="irAGenesis()">ACTIVAR CENTRO DE COMANDO GÉNESIS</button>
+    
+    <div class="footer-tech">
+        <div class="tech-info">
+            <strong>CERTIFICACIÓN TÉCNICA:</strong> PROCESADO MEDIANTE NÚCLEO SWISS EPHEMERIS V2.10 // 
+            EFEMÉRIDES NASA JPL DE441 // PRECISIÓN ±0.0001° // COORDINADAS J2000.0
+            <br>Este reporte es un activo de inteligencia estratégica bajo licencia técnica de alta precisión.
+        </div>
+        <div class="stamp">
+            NASA DATA COMPLIANT<br>JPL SOURCE SYNC
+        </div>
+    </div>
+</div>
+
+<script>
+function irAGenesis() {
+    const email = new URLSearchParams(window.location.search).get('email');
+    const nombre = document.getElementById('nombre').innerText;
+    window.location.href = `genesis.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(nombre)}`;
+}
+
 // MOTOR DE RENDERIZADO SVG - INGENIERÍA NASA JPL
 function renderizarVectoresSVG(vectores, aspectos) {
     const container = document.getElementById('canvas-container');
     if (!container) return;
-    
+
     const centro = 190; const radio = 145;
-    
-    // Si no hay vectores aún, dejamos un círculo de carga
-    if (!vectores) {
-        container.innerHTML = `<svg viewBox="0 0 380 380"><circle cx="190" cy="190" r="145" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="5,5"/></svg>`;
-        return;
-    }
 
     let svg = `<svg viewBox="0 0 380 380" style="width:100%; height:100%;">
         <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <circle cx="${centro}" cy="${centro}" r="${radio}" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="1.5" />
+        <circle cx="${centro}" cy="${centro}" r="${radio}" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="1" />
         <circle cx="${centro}" cy="${centro}" r="${radio + 12}" fill="none" stroke="rgba(212,175,55,0.05)" stroke-width="1" />`;
 
-    // 1. Dibujar Líneas de Tensión/Armonía
-    if (aspectos) {
+    // 1. Dibujar Líneas (Aspectos)
+    if (aspectos && aspectos.length > 0) {
         aspectos.forEach(asp => {
             const p1 = vectores[asp.puntos.split('-')[0]];
             const p2 = vectores[asp.puntos.split('-')[1]];
@@ -76,14 +100,16 @@ function renderizarVectoresSVG(vectores, aspectos) {
                 svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="${asp.tipo === 'OPOSICIÓN' ? '5,5' : '0'}" opacity="0.6" />`;
             }
         });
+        document.getElementById('tension-count').innerText = aspectos.length + " VECTORES";
     }
 
     // 2. Dibujar Nodos (Planetas)
     Object.entries(vectores).forEach(([nombre, grado]) => {
         const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
         const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
-        svg += `<circle cx="${x}" cy="${y}" r="5" fill="#fff" filter="url(#glow)" />
-                <text x="${x + 15}" y="${y + 5}" fill="#d4af37" font-size="11" font-family="JetBrains Mono" font-weight="bold">${nombre.toUpperCase()}</text>`;
+        svg += `
+            <circle cx="${x}" cy="${y}" r="4.5" fill="#fff" filter="url(#glow)" />
+            <text x="${x + 15}" y="${y + 5}" fill="#d4af37" font-size="10" font-family="JetBrains Mono" font-weight="bold">${nombre.toUpperCase()}</text>`;
     });
 
     container.innerHTML = svg + `</svg>`;
@@ -105,15 +131,18 @@ async function cargarReporte() {
             document.getElementById('reporte').style.display = 'block';
 
             if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
-                renderizarVectoresSVG(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
+                // Pequeño retardo para asegurar que el DOM esté listo
+                setTimeout(() => {
+                    renderizarVectoresSVG(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
+                }, 100);
             }
         }
     } catch (e) {
-        document.getElementById('loading').innerText = "ERROR DE SINCRONÍA CON EL NÚCLEO";
+        document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON EL NÚCLEO";
     }
 }
+
 window.onload = cargarReporte;
-        
-    </script>
+</script>
 </body>
 </html>
