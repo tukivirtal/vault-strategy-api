@@ -33,6 +33,22 @@
             position: relative; overflow: hidden;
         }
 
+        /* BUSCADOR DE HORIZONTE */
+        .horizon-picker {
+            background: rgba(212, 175, 55, 0.05); border: 1px solid var(--border);
+            padding: 15px; display: flex; gap: 10px; align-items: flex-end; margin-top: 10px;
+        }
+        .date-input-group { display: flex; flex-direction: column; gap: 5px; }
+        .date-input-group label { font-size: 0.6rem; color: var(--gold); letter-spacing: 0.1em; }
+
+        .btn-search {
+            background: var(--gold); color: #000; border: none; 
+            padding: 10px 20px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 0.7rem; height: 38px;
+            transition: 0.3s;
+        }
+        .btn-search:hover { background: #fff; }
+
         /* MATRIZ DE DECISIÓN */
         .decision-matrix {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px;
@@ -52,20 +68,9 @@
             border: 1px solid rgba(212, 175, 55, 0.1); border-left: 5px solid var(--gold);
         }
 
-        .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
-        .day-box { height: 45px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; }
-
-        .btn-nasa {
-            background: var(--gold); color: #000; border: 1px solid var(--gold);
-            outline: 1px solid var(--gold); outline-offset: 3px;
-            padding: 22px; font-weight: bold; letter-spacing: 0.3em;
-            cursor: pointer; transition: 0.3s; width: 100%; text-transform: uppercase;
-        }
-        .btn-nasa:hover { background: #fff; border-color: #fff; outline-color: #fff; transform: translateY(-2px); }
-
         input[type="date"] {
-            background: #111; color: #fff; border: 1px solid var(--gold); padding: 10px;
-            font-family: inherit; font-size: 1.1rem; outline: none; cursor: pointer;
+            background: #111; color: #fff; border: 1px solid #333; padding: 8px;
+            font-family: inherit; font-size: 0.85rem; outline: none;
         }
 
         @media (max-width: 1100px) { .dashboard-grid { grid-template-columns: 1fr; } }
@@ -92,43 +97,47 @@
                     <div id="chart-donut"></div>
                 </div>
             </div>
-
-            <div class="panel" style="margin-top: 20px;">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">FLUJO SEMANAL DE OPERACIONES</span>
-                <div class="heatmap-grid" id="heatmap-week">
-                    </div>
-                <p style="font-size: 0.6rem; color: #555; margin-top: 10px;">*Sincronía detectada: Evite firmas legales en periodos de tensión (Rojo).</p>
-            </div>
         </aside>
 
         <main class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
                 <div>
                     <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA EJECUTIVA</span>
                     <div id="foco-diario" style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;">
-                        MODO: <span class="gold" id="user-status">CÁLCULO EN PROCESO</span>
+                        MODO: <span class="gold" id="user-status">CARGANDO...</span>
                     </div>
                 </div>
-                <input type="date" id="sim-date" onchange="actualizarEstrategia()">
+                
+                <div class="horizon-picker">
+                    <div class="date-input-group">
+                        <label>INICIO (DESDE)</label>
+                        <input type="date" id="date-start">
+                    </div>
+                    <div class="date-input-group">
+                        <label>FIN (HASTA)</label>
+                        <input type="date" id="date-end">
+                    </div>
+                    <button class="btn-search" onclick="buscarHorizonte()">BUSCAR MOMENTO</button>
+                </div>
             </div>
             
             <div class="executive-summary">
                 <b style="font-size: 1.2rem; display: block; margin-bottom: 10px;" class="gold" id="welcome-msg">BIENVENIDA...</b>
                 <p id="exec-msg" style="font-size: 1.1rem; color: #eee; line-height: 1.6;">
-                    Sincronizando radar con el núcleo NASA JPL...
+                    Sincronizando su infraestructura personal con los tránsitos del JPL...
                 </p>
             </div>
 
             <div class="decision-matrix">
                 <div class="decision-card active">
-                    <h3 id="label-cap">CAPITAL</h3>
+                    <h3>CAPITAL</h3>
                     <div class="roi" id="roi-cap">+24.8%</div>
                     <span class="status" id="status-cap" style="background: var(--safe); color: #000;">ÓPTIMO</span>
                 </div>
                 <div class="decision-card">
                     <h3>NEGOCIACIÓN</h3>
                     <div class="roi" id="roi-neg">+12.2%</div>
-                    <span class="status" style="background: var(--gold); color: #000;">ESTABLE</span>
+                    <span class="status" id="status-neg" style="background: var(--gold); color: #000;">ESTABLE</span>
                 </div>
                 <div class="decision-card">
                     <h3>LANZAMIENTO</h3>
@@ -138,7 +147,7 @@
             </div>
 
             <div style="margin-top: 40px;">
-                <button class="btn-nasa" id="dossier-btn" onclick="transferData()">DESCARGAR DOSSIER DE INTELIGENCIA</button>
+                <button class="btn-nasa" id="dossier-btn" onclick="transferData()">GENERAR REPORTE DE HORIZONTE</button>
                 <div style="font-size: 0.6rem; color: #444; margin-top: 15px; text-align: center;">
                     SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT
                 </div>
@@ -147,22 +156,39 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURACIÓN DE USUARIO ---
+        // 1. CONFIGURACIÓN DINÁMICA DE USUARIO
         const urlParams = new URLSearchParams(window.location.search);
         const userName = urlParams.get('nombre') || "FATIMA"; 
-        const userEmail = urlParams.get('email') || "";
-
-        // --- 2. GRÁFICOS APEX ---
+        
         let roiChart, donutChart;
 
+        // 2. RELOJ Y FECHA LOCAL (CORRECCIÓN DÍA 22)
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString('es-ES', { 
+                day: '2-digit', month: 'short', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase().replace(',', ' //');
+            
+            const inputStart = document.getElementById('date-start');
+            if (!inputStart.value) {
+                const hoy = new Date();
+                const offset = hoy.getTimezoneOffset() * 60000;
+                const isoLocal = (new Date(hoy - offset)).toISOString().split('T')[0];
+                inputStart.value = isoLocal;
+                ejecutarInicio();
+            }
+        }
+
+        // 3. INICIALIZACIÓN DE GRÁFICOS
         function initCharts() {
             roiChart = new ApexCharts(document.querySelector("#chart-roi"), {
                 series: [{ name: 'HISTÓRICO', data: [15, 12, 18, 22, 19, 25, 23] }, 
                          { name: 'PROYECCIÓN', data: [23, 30, 45, 38, 52, 60, 68] }],
-                chart: { height: 260, type: 'area', toolbar: {show: false}, background: 'transparent' },
+                chart: { id: 'main-roi', height: 260, type: 'area', toolbar: {show: false}, background: 'transparent' },
                 colors: ['#444', '#d4af37'],
                 stroke: { curve: 'smooth', width: 3 },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
+                fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
                 legend: { show: true, fontSize: '14px', fontFamily: 'JetBrains Mono', labels: { colors: '#fff' }, position: 'top' },
                 xaxis: { categories: ['S-3','S-2','S-1','HOY','S+1','S+2','S+3'], labels: {style:{colors:'#555'}} },
                 yaxis: { show: false }, theme: { mode: 'dark' }
@@ -175,77 +201,64 @@
                 labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
                 colors: ['#d4af37', '#222', '#111'],
                 stroke: { show: false },
-                legend: { show: true, fontSize: '11px', labels: { colors: '#888' }, position: 'bottom' },
+                legend: { show: true, fontSize: '10px', labels: { colors: '#888' }, position: 'bottom' },
                 plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'FOCO', color: '#555', formatter: () => '60%' } } } } }
             });
             donutChart.render();
-            
-            // Heatmap inicial
-            const heat = document.getElementById('heatmap-week');
-            const days = ['L','M','M','J','V','S','D'];
-            const colors = ['var(--safe)','var(--safe)','var(--alert)','var(--gold)','var(--safe)','var(--gold)','var(--gold)'];
-            heat.innerHTML = days.map((d, i) => `<div class="day-box" style="background:${colors[i]}; color:#000;">${d}</div>`).join('');
         }
 
-        // --- 3. LÓGICA DE TIEMPO Y SINCRONÍA ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString('es-ES', { 
-                day: '2-digit', month: 'short', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            }).toUpperCase().replace(',', ' //');
-            
-            // Sincronizar fecha local al cargar (Evita el error del día 22)
-            const input = document.getElementById('sim-date');
-            if (!input.value) {
-                const hoy = new Date();
-                const offset = hoy.getTimezoneOffset() * 60000;
-                input.value = (new Date(hoy - offset)).toISOString().split('T')[0];
-                ejecutarBienvenida();
-            }
-        }
-
-        function ejecutarBienvenida() {
+        function ejecutarInicio() {
             document.getElementById('welcome-msg').innerText = `DIRECTIVA PARA: ${userName.toUpperCase()}`;
             document.getElementById('user-status').innerText = "EXPANSIÓN DE CAPITAL";
-            document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName}. Hoy su configuración natural <b>Sol-Marte</b> le otorga un 40% más de efectividad en decisiones de riesgo. <br><br><b>PROYECTO DEL DÍA:</b> No delegue el cierre de negociaciones hoy. Su autoridad está en fase de resonancia con el mercado temporal.`;
+            document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName}. Hoy su configuración natural indica un <b>Trígono Sol-Marte</b>: su capacidad de ejecución está un 40% por encima de su promedio diario. <br><br><b>ESTRATEGIA:</b> Use esta ventana para cerrar negociaciones de alto impacto. El mercado temporal está en resonancia con su voluntad.`;
             initCharts();
         }
 
-        // --- 4. DINAMISMO (¿QUÉ PASA EN JUNIO?) ---
-        function actualizarEstrategia() {
-            const date = new Date(document.getElementById('sim-date').value);
+        // 4. LÓGICA DE BÚSQUEDA DE HORIZONTE (NUEVO)
+        function buscarHorizonte() {
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
             const msg = document.getElementById('exec-msg');
             const status = document.getElementById('user-status');
-            const mes = date.getMonth() + 1;
+            
+            if(!start || !end) return alert("Por favor, defina el rango de misión.");
 
             msg.style.opacity = 0.3;
             
             setTimeout(() => {
-                if(mes === 6) { // SIMULACIÓN JUNIO
-                    status.innerText = "OPORTUNIDAD ALTA";
-                    msg.innerHTML = `<b>PROYECCIÓN PARA JUNIO:</b> Los vectores detectan un pico de liquidez inusual. La rentabilidad proyectada sube al 45%. <br><br><b>ESTRATEGIA:</b> Prepare lanzamientos masivos. Es su ventana de mayor ROI del año.`;
-                    roiChart.updateSeries([{ data: [10, 15, 20, 25, 45, 60, 75] }, { data: [25, 35, 40, 45, 55, 65, 80] }]);
-                    document.getElementById('roi-cap').innerText = "+45.2%";
-                    document.getElementById('roi-lau').innerText = "+38.1%";
-                    document.getElementById('status-lau').style.background = "var(--safe)";
-                    document.getElementById('status-lau').innerText = "ÓPTIMO";
+                const mesFin = new Date(end).getMonth() + 1;
+                
+                // Simulación para Septiembre - Noviembre (Tu ejemplo del terreno)
+                if (mesFin >= 9 && mesFin <= 11) {
+                    status.innerText = "ALTA RENTABILIDAD";
+                    msg.innerHTML = `<b>ANÁLISIS DE HORIZONTE (SEP-NOV):</b> Se detecta un pico de resonancia para adquisiciones de activos físicos. <br><br><b>RECOMENDACIÓN:</b> La ventana óptima para la firma de contratos de construcción es entre el 12 y el 25 de Octubre. El ROI proyectado para esta operación supera el 75%.`;
+                    
+                    // Actualizar gráfico sin perder las leyendas
+                    roiChart.updateSeries([
+                        { name: 'HISTÓRICO', data: [30, 35, 40, 45, 50, 55, 60] },
+                        { name: 'PROYECCIÓN', data: [60, 75, 85, 95, 110, 120, 140] }
+                    ]);
+                    
+                    document.getElementById('roi-cap').innerText = "+75.4%";
+                    document.getElementById('status-cap').innerText = "MÁXIMO";
                 } else {
-                    status.innerText = "EXPANSIÓN DE CAPITAL";
-                    msg.innerHTML = `<b>ANÁLISIS COMPLETADO:</b> Sincronía estable para esta fecha. Mantenga los protocolos de inversión vigentes.`;
-                    roiChart.updateSeries([{ data: [15, 12, 18, 22, 19, 25, 23] }, { data: [23, 30, 45, 38, 52, 60, 68] }]);
+                    status.innerText = "ESTADO ESTABLE";
+                    msg.innerHTML = `<b>ANÁLISIS PARA EL PERIODO:</b> Los vectores indican un flujo operativo constante. No se detectan anomalías críticas ni oportunidades de riesgo elevado. Mantenga el plan de capital vigente.`;
+                    
+                    roiChart.updateSeries([
+                        { name: 'HISTÓRICO', data: [15, 12, 18, 22, 19, 25, 23] },
+                        { name: 'PROYECCIÓN', data: [23, 30, 35, 38, 42, 45, 48] }
+                    ]);
                 }
                 msg.style.opacity = 1;
-            }, 800);
+            }, 1000);
         }
 
         function transferData() {
             const btn = document.getElementById('dossier-btn');
-            let p = 0; btn.disabled = true;
-            const int = setInterval(() => {
-                p += 5; btn.innerText = `ENCRIPTANDO... ${p}%`;
-                if(p >= 100) { clearInterval(int); window.location.href = 'dossier-final.html'; }
-            }, 80);
+            btn.innerText = "PROCESANDO HORIZONTE...";
+            btn.disabled = true;
+            setTimeout(() => { window.location.href = 'dossier-final.html'; }, 1500);
         }
 
         setInterval(updateClock, 1000);
