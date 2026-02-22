@@ -31,10 +31,12 @@
 
         h1 { letter-spacing: 0.6em; font-size: 1.1rem; text-align: center; margin-bottom: 50px; color: var(--gold); font-weight: 300; border-bottom: 1px solid #222; padding-bottom: 20px;}
         
+        /* DATA ROWS MEJORADOS */
         .data-row { margin: 40px 0; border-left: 4px solid var(--gold); padding-left: 35px; }
         .label { font-size: 0.85rem; color: #555; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; display: block; }
         .value { font-size: 2.6rem; color: #ffffff; font-weight: 600; letter-spacing: -1px; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
 
+        /* SECCIÓN GRÁFICA TÉCNICA */
         .wheel-section { display: flex; align-items: center; justify-content: space-around; gap: 20px; margin: 60px 0; }
         .side-metrics { width: 200px; display: flex; flex-direction: column; gap: 30px; }
         .metric-box { border-top: 1px solid #222; padding-top: 15px; }
@@ -157,7 +159,7 @@
         setTimeout(() => { window.location.href = 'suscripcion.html'; }, 1200);
     }
 
-    // MOTOR DE RENDERIZADO SVG (MÁXIMA COMPATIBILIDAD Y RENDIMIENTO)
+    // MOTOR DE RENDERIZADO SVG (MÁXIMA COMPATIBILIDAD)
     function renderizarVectoresSVG(vectores, aspectos) {
         const container = document.getElementById('canvas-container');
         const centro = 190; const radio = 145;
@@ -186,12 +188,12 @@
             });
         }
 
-        // Dibujar Nodos (Planetas)
+        // Dibujar Nodos (Planetas) con efecto de brillo
         Object.entries(vectores).forEach(([nombre, grado]) => {
             const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
             const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
             contenidoSVG += `
-                <circle cx="${x}" cy="${y}" r="4.5" fill="#fff" style="filter: drop-shadow(0 0 5px #fff);">
+                <circle cx="${x}" cy="${y}" r="${nombre === 'Sol' ? 6 : 4.5}" fill="#fff" style="filter: drop-shadow(0 0 5px #fff);">
                     <animate attributeName="opacity" values="1;0.5;1" dur="3s" repeatCount="indefinite" />
                 </circle>
                 <text x="${x + 15}" y="${y + 5}" fill="#d4af37" font-size="10" font-family="JetBrains Mono" font-weight="bold">${nombre.toUpperCase()}</text>`;
