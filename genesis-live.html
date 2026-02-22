@@ -25,7 +25,7 @@
         .telemetry { font-size: 0.65rem; color: #555; text-align: right; line-height: 1.4; }
 
         .dashboard-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;
         }
 
         .panel {
@@ -33,7 +33,7 @@
             position: relative; overflow: hidden;
         }
 
-        /* MATRIZ DE DECISIÓN TRIPARTITA */
+        /* MATRIZ DE DECISIÓN */
         .decision-matrix {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px;
         }
@@ -43,115 +43,167 @@
             background: rgba(0,0,0,0.5); transition: 0.3s;
         }
         .decision-card.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.1); }
-        .decision-card h3 { font-size: 0.6rem; color: var(--gold); margin: 0; letter-spacing: 0.2em; }
-        .decision-card .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
-        .decision-card .status { font-size: 0.55rem; font-weight: bold; padding: 3px 6px; border-radius: 2px; }
+        .decision-card h3 { font-size: 0.65rem; color: var(--gold); margin: 0; letter-spacing: 0.2em; text-transform: uppercase; }
+        .decision-card .roi { font-size: 2.2rem; font-weight: bold; margin: 10px 0; }
+        .decision-card .status { font-size: 0.6rem; font-weight: bold; padding: 4px 8px; border-radius: 2px; }
 
         .executive-summary {
-            font-size: 1.05rem; line-height: 1.8; color: #ccc;
-            border-left: 4px solid var(--gold); padding-left: 25px; margin: 30px 0;
+            font-size: 1.1rem; line-height: 1.8; color: #eee;
+            border-left: 5px solid var(--gold); padding-left: 25px; margin: 30px 0;
         }
+
+        /* HEATMAP INSTRUMENT */
+        .heatmap-container { margin-top: 30px; }
+        .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .day-box { height: 45px; border-radius: 2px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: rgba(255,255,255,0.3); }
 
         .btn-nasa {
             background: var(--gold); color: #000; border: 1px solid var(--gold);
             outline: 1px solid var(--gold); outline-offset: 3px;
-            padding: 20px; font-weight: bold; letter-spacing: 0.3em;
+            padding: 22px; font-weight: bold; letter-spacing: 0.3em;
             cursor: pointer; transition: 0.3s; width: 100%; text-transform: uppercase;
         }
-        .btn-nasa:hover { background: #fff; border-color: #fff; outline-color: #fff; }
-        .btn-nasa:disabled { background: #333; border-color: #333; outline: none; cursor: wait; color: #666; }
+        .btn-nasa:hover { background: #fff; border-color: #fff; outline-color: #fff; transform: translateY(-2px); }
+        .btn-nasa:disabled { background: #333; border-color: #333; outline: none; cursor: wait; }
 
-        @media (max-width: 768px) { .decision-matrix { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .decision-matrix { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-title">GÉNESIS // STRATEGIC TERMINAL</div>
+        <div class="header-title">GÉNESIS // STRATEGIC COMMAND</div>
         <div class="telemetry">
-            DATA: JPL/DE441 SYNC ACTIVE<br>
-            <span id="clock">FEB 21, 2026 // 20:15:00</span>
+            DATA: JPL/DE441 SYNC ACTIVE // J2000.0<br>
+            <span id="clock">CARGANDO TIEMPO UNIVERSAL...</span>
         </div>
     </header>
 
     <div class="dashboard-grid">
+        
         <aside class="panel">
-            <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ANÁLISIS DE RENTABILIDAD (PROYECTADO)</span>
+            <span style="font-size: 0.75rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">Análisis de Rentabilidad Proyectada</span>
             
             <div id="chart-roi" style="margin-top: 20px;"></div>
-            <div style="font-size: 0.6rem; color: #444; margin-top: 10px; text-align: justify;">
-                *El vector dorado representa la ventana de oportunidad escalable según el modelo Kepleriano J2000.0.
+            
+            <div class="heatmap-container">
+                <span style="font-size: 0.65rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase;">Ventana Semanal de Ejecución</span>
+                <div class="heatmap-grid">
+                    <div class="day-box" style="background: var(--safe); opacity: 0.9;">L</div>
+                    <div class="day-box" style="background: var(--safe); opacity: 0.6;">M</div>
+                    <div class="day-box" style="background: var(--alert); opacity: 0.8;">M</div>
+                    <div class="day-box" style="background: var(--gold); opacity: 0.7;">J</div>
+                    <div class="day-box" style="background: var(--safe); opacity: 1;">V</div>
+                    <div class="day-box" style="background: var(--gold); opacity: 0.4;">S</div>
+                    <div class="day-box" style="background: var(--gold); opacity: 0.3;">D</div>
+                </div>
+                <div style="font-size: 0.55rem; color: #444; margin-top: 10px; text-align: justify;">
+                    *Indicador de fricción temporal: Verde (Fluidez), Dorado (Estabilidad), Rojo (Tensión Crítica).
+                </div>
             </div>
         </aside>
 
         <main class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">WINDOW OF OPPORTUNITY</span>
-                <input type="date" id="sim-date" style="background: #111; color: #fff; border: 1px solid #333; padding: 8px; font-family: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 15px;">
+                <span style="font-size: 0.75rem; color: var(--gold); letter-spacing: 0.3em;">ESTRATEGIA TEMPORAL</span>
+                <input type="date" id="sim-date" style="background: #111; color: #fff; border: 1px solid #333; padding: 10px; font-family: inherit; font-size: 0.8rem;">
             </div>
             
             <div class="decision-matrix">
                 <div class="decision-card active">
-                    <h3>CAPITAL</h3>
-                    <div class="roi" id="roi-cap">+24.8%</div>
+                    <h3>Capital</h3>
+                    <div class="roi">+24.8%</div>
                     <span class="status" style="background: rgba(0,255,136,0.1); color: var(--safe);">ÓPTIMO</span>
                 </div>
                 <div class="decision-card">
-                    <h3>NEGOCIACIÓN</h3>
-                    <div class="roi" id="roi-neg">+12.2%</div>
+                    <h3>Negociación</h3>
+                    <div class="roi">+12.2%</div>
                     <span class="status" style="background: rgba(212,175,55,0.1); color: var(--gold);">ESTABLE</span>
                 </div>
                 <div class="decision-card">
-                    <h3>LANZAMIENTO</h3>
-                    <div class="roi" id="roi-lau">-18.5%</div>
+                    <h3>Lanzamiento</h3>
+                    <div class="roi">-18.5%</div>
                     <span class="status" style="background: rgba(255,77,77,0.1); color: var(--alert);">RIESGO</span>
                 </div>
             </div>
 
             <div class="executive-summary" id="exec-msg">
-                Sincronizando con base de datos JPL... Analizando vectores de liquidez para la fecha seleccionada.
+                Iniciando secuencia de análisis... Escaneando vectores de oportunidad para el periodo seleccionado.
             </div>
 
-            <button class="btn-nasa" id="dossier-btn" onclick="transferData()">GENERAR DOSSIER DE INTELIGENCIA</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div class="panel" style="padding: 15px; border-color: #111; background: rgba(0,0,0,0.2);">
+                    <span style="font-size: 0.6rem; color: #555; display: block; margin-bottom: 5px;">ASIGNACIÓN DE RECURSOS</span>
+                    <div id="chart-donut"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+                    <button class="btn-nasa" id="dossier-btn" onclick="transferData()">Dossier GX-2026</button>
+                    <div style="font-size: 0.55rem; color: #333; text-align: center;">ID: TX-992-ALPHA // NASA COMPLIANT</div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // GRÁFICO APEXCHARTS
-        var options = {
+        // GRÁFICO ROI (PASADO VS FUTURO)
+        var roiOptions = {
             series: [{ name: 'Histórico', data: [15, 12, 18, 22, 19, 25, 23] }, 
                      { name: 'Proyección', data: [23, 30, 45, 38, 52, 60, 68] }],
-            chart: { height: 280, type: 'area', toolbar: {show: false}, background: 'transparent' },
+            chart: { height: 260, type: 'area', toolbar: {show: false}, background: 'transparent' },
             colors: ['#333', '#d4af37'],
             stroke: { curve: 'smooth', width: 2 },
             fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
             dataLabels: { enabled: false },
             grid: { borderColor: '#111' },
-            xaxis: { categories: ['W1','W2','W3','W4','W5','W6','W7'], labels: {style:{colors:'#444'}} },
+            xaxis: { categories: ['W-3','W-2','W-1','HOY','W+1','W+2','W+3'], labels: {style:{colors:'#444'}} },
             yaxis: { show: false }, theme: { mode: 'dark' }
         };
-        new ApexCharts(document.querySelector("#chart-roi"), options).render();
+        new ApexCharts(document.querySelector("#chart-roi"), roiOptions).render();
 
-        // LOGICA DE CARGA INICIAL
+        // GRÁFICO DONUT (ASIGNACIÓN DE RECURSOS)
+        var donutOptions = {
+            series: [60, 25, 15],
+            chart: { type: 'donut', height: 160 },
+            labels: ['Estrategia', 'Operación', 'Recuperación'],
+            colors: ['#d4af37', '#222', '#111'],
+            stroke: { show: false },
+            legend: { show: false },
+            dataLabels: { enabled: false },
+            plotOptions: { pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'FOCO', color: '#555', formatter: () => 'LIDER' } } } } }
+        };
+        new ApexCharts(document.querySelector("#chart-donut"), donutOptions).render();
+
+        // LOGICA TEMPORAL Y CARGA
+        function updateClock() {
+            const now = new Date();
+            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('clock').innerText = now.toLocaleString('es-ES', options).toUpperCase().replace(',', ' //');
+        }
+        setInterval(updateClock, 1000);
+
         window.onload = function() {
-            document.getElementById('sim-date').value = "2026-02-21";
+            updateClock();
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('sim-date').value = hoy;
+            
             setTimeout(() => {
-                document.getElementById('exec-msg').innerHTML = "<b>DIRECTIVA:</b> Convergencia de liquidez detectada. Rentabilidad máxima en Despliegue de Capital. <span style='color:var(--safe)'>Luz verde para inversión.</span> Evitar comunicaciones externas masivas hoy.";
-            }, 1000);
+                document.getElementById('exec-msg').innerHTML = "<b>DIRECTIVA ACTUAL:</b> Convergencia de liquidez detectada. Rentabilidad proyectada en 'Despliegue de Capital' es un 18% superior al histórico. <span style='color:var(--safe)'>Luz verde para inversión.</span> Evitar lanzamientos de marketing debido a tensión Mercurio-Saturno.";
+            }, 1200);
         };
 
-        // TRANSFERENCIA AL DOSSIER
+        // TRANSFERENCIA CON EFECTO DE ENCRIPTACIÓN
         function transferData() {
             const btn = document.getElementById('dossier-btn');
             let p = 0;
             btn.disabled = true;
             const int = setInterval(() => {
-                p += 10; btn.innerText = `ENCRYPTING DATA... ${p}%`;
+                p += 5;
+                btn.innerText = `ENCRIPTANDO... ${p}%`;
                 if(p >= 100) {
                     clearInterval(int);
                     window.location.href = 'dossier-final.html';
                 }
-            }, 150);
+            }, 80);
         }
     </script>
 </body>
