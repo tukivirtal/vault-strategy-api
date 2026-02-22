@@ -106,14 +106,10 @@
         .stamp-nasa { border: 1px solid var(--gold); padding: 10px; font-size: 0.5rem; color: var(--gold); opacity: 0.5; }
 
         @media print {
-            .page { margin: 0; border: none; width: 100%; height: 100%; }
-            body { background: #fff; }
-            .page { background: #fff; color: #000; }
-            .content, h1, .section-title, .gold { color: #000 !important; }
-            .impact-matrix td, .impact-matrix th { border-color: #eee; color: #000 !important; }
-            .allocation-container { border-color: #eee; background: none; }
-            .executive-summary { border-top: 1px solid #eee !important; color: #444 !important; }
-            .confidential-stamp { border-color: #000; color: #000; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } /* FUERZA LOS COLORES EN EL PDF */
+            .page { margin: 0; border: none; width: 100%; height: 100%; background: #050505 !important; color: #fff !important; }
+            .gold { color: #d4af37 !important; }
+            .allocation-chart-mock { background: conic-gradient(#d4af37 0% 60%, #333 60% 85%, #1a1a1a 85% 100%) !important; }
         }
     </style>
 </head>
