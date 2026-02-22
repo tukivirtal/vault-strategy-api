@@ -42,78 +42,94 @@
     </div>
 
     <script>
-// MOTOR DE DIBUJO SVG - INGENIERÍA NASA
-function renderizarVectoresSVG(vectores, aspectos) {
-    const container = document.getElementById('canvas-container');
-    if (!container) return;
+// 1. MOTOR DE DIBUJO GEOMÉTRICO (SVG)
+function dibujarMapaSVG(vectores, aspectos) {
+    const contenedor = document.getElementById('canvas-container');
+    const centro = 190; // Centro del radar
+    const radio = 145;  // Radio del círculo principal
     
-    const centro = 190; const radio = 145;
-    
-    // Crear el encabezado del SVG
-    let svg = `<svg viewBox="0 0 380 380" style="width:100%; height:100%;">
-        <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <circle cx="${centro}" cy="${centro}" r="${radio}" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1" />
-        <circle cx="${centro}" cy="${centro}" r="${radio+10}" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />`;
+    if (!vectores) return;
 
-    // 1. Dibujar Líneas de Relación (Aspectos)
-    if (aspectos && aspectos.length > 0) {
+    // Iniciamos la construcción del SVG como una cadena de texto (más estable)
+    let cuerpoSVG = `<svg viewBox="0 0 380 380" style="width:100%; height:100%; filter: drop-shadow(0 0 10px rgba(212,175,55,0.1));">
+        <circle cx="${centro}" cy="${centro}" r="${radio}" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1.5" />
+        <circle cx="${centro}" cy="${centro}" r="${radio + 12}" fill="none" stroke="rgba(212,175,55,0.05)" stroke-width="1" />`;
+
+    // 2. DIBUJAR ASPECTOS (Líneas de relación entre puntos)
+    if (aspectos) {
         aspectos.forEach(asp => {
             const p1 = vectores[asp.puntos.split('-')[0]];
             const p2 = vectores[asp.puntos.split('-')[1]];
+            
             if (p1 !== undefined && p2 !== undefined) {
+                // Conversión de grados a coordenadas X,Y
                 const x1 = centro + radio * Math.cos((p1 - 90) * Math.PI / 180);
                 const y1 = centro + radio * Math.sin((p1 - 90) * Math.PI / 180);
                 const x2 = centro + radio * Math.cos((p2 - 90) * Math.PI / 180);
                 const y2 = centro + radio * Math.sin((p2 - 90) * Math.PI / 180);
                 
-                const color = (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA') ? '#ff4d4d' : '#00ff88';
-                const dash = (asp.tipo === 'OPOSICIÓN') ? '5,5' : '0';
-                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="${dash}" opacity="0.6" />`;
+                const esTension = (asp.tipo === 'OPOSICIÓN' || asp.tipo === 'CUADRATURA');
+                const color = esTension ? '#ff4d4d' : '#00ff88';
+                const estilo = esTension ? '5,5' : '0';
+                
+                cuerpoSVG += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.2" stroke-dasharray="${estilo}" opacity="0.4" />`;
             }
         });
-        document.getElementById('tension-count').innerText = aspectos.length + " VECTORES DETECTADOS";
+        document.getElementById('tension-count').innerText = `${aspectos.length} VECTORES ACTIVOS`;
     }
 
-    // 2. Dibujar los Nodos (Planetas)
+    // 3. DIBUJAR NODOS (Puntos de datos/Planetas)
     Object.entries(vectores).forEach(([nombre, grado]) => {
         const x = centro + radio * Math.cos((grado - 90) * Math.PI / 180);
         const y = centro + radio * Math.sin((grado - 90) * Math.PI / 180);
-        svg += `
-            <circle cx="${x}" cy="${y}" r="5" fill="#fff" filter="url(#glow)" />
-            <text x="${x + 15}" y="${y + 5}" fill="#d4af37" font-size="11" font-family="JetBrains Mono" font-weight="bold">${nombre.toUpperCase()}</text>`;
+        
+        cuerpoSVG += `
+            <circle cx="${x}" cy="${y}" r="5" fill="#fff" />
+            <text x="${x + 12}" y="${y + 4}" fill="#d4af37" font-size="10" font-family="JetBrains Mono" font-weight="bold">${nombre.toUpperCase()}</text>`;
     });
 
-    svg += `</svg>`;
-    container.innerHTML = svg;
+    cuerpoSVG += `</svg>`;
+    contenedor.innerHTML = cuerpoSVG;
 }
 
-async function cargarReporte() {
-    const email = new URLSearchParams(window.location.search).get('email');
-    if (!email) return;
+// 2. FUNCIÓN DE CARGA DE DATOS
+async function inicializarBoveda() {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    
+    if (!email) {
+        document.getElementById('loading').innerText = "ERROR: NO SE DETECTÓ CREDENCIAL (EMAIL)";
+        return;
+    }
 
     try {
         const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
-        const res = await response.json();
+        const result = await response.json();
 
-        if (res.status === "success") {
-            const d = res.data;
+        if (result.status === "success") {
+            const d = result.data;
+            
+            // Inyectar datos en el panel
             document.getElementById('nombre').innerText = d.nombre.toUpperCase();
             document.getElementById('directiva').innerText = d.directiva;
+            
+            // Cambiar estados visuales
             document.getElementById('loading').style.display = 'none';
             document.getElementById('reporte').style.display = 'block';
-
+            
+            // Renderizar el mapa geométrico
             if (d.mapatotal && d.mapatotal.vectores_eclipticos) {
-                // LLAMADA CLAVE: Usamos la nueva función SVG
-                renderizarVectoresSVG(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
+                dibujarMapaSVG(d.mapatotal.vectores_eclipticos, d.mapatotal.analisis_kepler || []);
             }
+        } else {
+            document.getElementById('loading').innerText = "ID NO ENCONTRADO EN LA BASE DE DATOS NASA";
         }
-    } catch (e) {
-        document.getElementById('loading').innerText = "ERROR DE CONEXIÓN CON EL NÚCLEO";
+    } catch (error) {
+        document.getElementById('loading').innerText = "FALLO DE CONEXIÓN CON EL SERVIDOR";
     }
 }
-window.onload = cargarReporte;
+
+window.onload = inicializarBoveda;
         
     </script>
 </body>
