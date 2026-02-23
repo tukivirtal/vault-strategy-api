@@ -1,75 +1,169 @@
-<div class="wheel-section">
-    <div id="radar-status" style="text-align: right; font-size: 0.7rem; color: #444;">
-        ESTADO DEL NÚCLEO<br><b id="sync-label" style="color:var(--gold)">BUSCANDO SEÑAL...</b>
-    </div>
-    
-    <div id="canvas-container">
-        <div class="radar-scan">
-            <svg viewBox="0 0 380 380" id="svg-boveda" style="width:100%; height:100%;">
-                <circle cx="190" cy="190" r="145" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1" />
-                <circle cx="190" cy="190" r="100" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />
-                <circle cx="190" cy="190" r="50" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />
-                <line x1="190" y1="45" x2="190" y2="335" stroke="rgba(212,175,55,0.1)" />
-                <line x1="45" y1="190" x2="335" y2="190" stroke="rgba(212,175,55,0.1)" />
-                <g id="capa-dinamica"></g>
-            </svg>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vault Logic | Executive Bóveda</title>
+    <style>
+        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --dark: #050505; }
+        body { 
+            background: radial-gradient(circle at center, #1a1a1a 0%, var(--dark) 100%); 
+            color: var(--gold); font-family: 'JetBrains Mono', monospace; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px;
+        }
+        .report-container { 
+            background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); 
+            padding: 50px; max-width: 900px; width: 100%; display: none; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+        }
+        h1 { letter-spacing: 0.6em; font-size: 1.1rem; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; font-weight: 300; }
+        .data-row { margin: 40px 0; border-left: 4px solid var(--gold); padding-left: 35px; }
+        .value { font-size: 2.6rem; color: #fff; font-weight: 600; text-transform: uppercase; }
+        
+        .wheel-section { display: flex; align-items: center; justify-content: space-around; margin: 60px 0; gap: 20px; }
+        
+        #canvas-container { 
+            width: 380px; height: 380px; 
+            display: flex; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.01); border-radius: 50%;
+            position: relative;
+        }
+
+        .directiva { 
+            background: rgba(212, 175, 55, 0.03); padding: 30px; 
+            border: 1px solid rgba(212, 175, 55, 0.1); border-left: 5px solid var(--gold); 
+            margin-top: 40px; color: #fff; line-height: 1.6;
+        }
+        .btn-nasa { 
+            background: var(--gold); color: #000; border: none; padding: 20px; 
+            width: 100%; font-weight: bold; letter-spacing: 0.3em; cursor: pointer; 
+            text-transform: uppercase; margin-top: 30px; outline: 1px solid var(--gold); outline-offset: 3px; 
+            transition: 0.3s;
+        }
+        .btn-nasa:hover { background: #fff; transform: translateY(-2px); }
+
+        .footer-tech { 
+            margin-top: 50px; padding-top: 25px; border-top: 1px solid #222; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .tech-info { font-size: 0.6rem; color: #444; line-height: 1.6; max-width: 70%; }
+        .stamp { border: 1px solid var(--gold); padding: 8px; font-size: 0.5rem; color: var(--gold); text-align: center; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div id="loading" style="letter-spacing: 0.3em;">ESTABLECIENDO CONEXIÓN CON EL NÚCLEO...</div>
+
+    <div class="report-container" id="reporte">
+        <h1>VAULT LOGIC // EXECUTIVE TERMINAL</h1>
+        
+        <div class="data-row">
+            <span style="font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 0.2em;">Sujeto de Análisis</span>
+            <div class="value" id="nombre">---</div>
+        </div>
+
+        <div class="wheel-section">
+            <div style="text-align: right; font-size: 0.7rem; color: #444;">
+                ESTADO DEL NÚCLEO<br><b id="sync-label" style="color:var(--gold)">BUSCANDO SEÑAL...</b>
+            </div>
+            
+            <div id="canvas-container">
+                </div>
+
+            <div style="text-align: left; font-size: 0.7rem; color: #444;">
+                VECTORES ACTIVOS<br><b id="tension-count" style="color:var(--safe)">10/10 SECURE</b>
+            </div>
+        </div>
+
+        <div class="directiva">
+            <span style="font-size: 0.7rem; color: var(--gold); display: block; margin-bottom: 10px; letter-spacing: 0.2em;">DIRECTIVA DE SINCRONÍA:</span>
+            <div id="directiva" style="font-weight: 300;">---</div>
+        </div>
+
+        <button class="btn-nasa" onclick="irASuscripcion()">ACTIVAR CENTRO DE COMANDO GÉNESIS</button>
+
+        <div class="footer-tech">
+            <div class="tech-info">
+                <strong>PROTOCOL ID:</strong> GX-992-B // <strong>DATA SOURCE:</strong> NASA JPL DE441 // <strong>PRECISION:</strong> ±0.0001°<br>
+                Cálculo de geometría de precisión basado en tránsitos de Kepler aplicados a la raíz del sujeto.
+            </div>
+            <div class="stamp">NASA DATA COMPLIANT<br>JPL SOURCE SYNC</div>
         </div>
     </div>
 
-    <div style="text-align: left; font-size: 0.7rem; color: #444;">
-        VECTORES DE IMPACTO<br><b id="tension-count" style="color:var(--safe)">SINCRO OK</b>
-    </div>
-</div>
-
 <script>
-// ESTRATEGIA DE REINTENTO (Polling)
-async function cargarConReintento() {
-    const email = new URLSearchParams(window.location.search).get('email');
-    let intentos = 0;
-    
-    const ejecutar = async () => {
-        try {
-            const r = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
-            const res = await r.json();
-            
-            if (res.status === "success" && res.data.mapatotal) {
-                document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
-                document.getElementById('directiva').innerText = res.data.directiva;
-                document.getElementById('sync-label').innerText = "10/10 SECURE";
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('reporte').style.display = 'block';
-                
-                renderizarRadar(res.data.mapatotal.vectores_eclipticos);
-            } else {
-                throw new Error("Aún no hay datos");
-            }
-        } catch (e) {
-            intentos++;
-            if (intentos < 5) { // Reintenta cada 2 segundos por 10 segundos total
-                console.log("Esperando a Supabase... reintento " + intentos);
-                setTimeout(ejecutar, 2000);
-            } else {
-                document.getElementById('loading').innerText = "ERROR: TIEMPO DE ESPERA AGOTADO";
-            }
-        }
-    };
-    ejecutar();
-}
+    function irASuscripcion() {
+        const email = new URLSearchParams(window.location.search).get('email');
+        window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`;
+    }
 
-function renderizarRadar(vectores) {
-    const capa = document.getElementById('capa-dinamica');
-    const centro = 190; const radio = 145;
-    let html = "";
-    
-    Object.entries(vectores).forEach(([nom, grad]) => {
-        const x = centro + radio * Math.cos((grad - 90) * Math.PI / 180);
-        const y = centro + radio * Math.sin((grad - 90) * Math.PI / 180);
-        html += `
-            <line x1="190" y1="190" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.3)" stroke-width="0.5" />
-            <circle cx="${x}" cy="${y}" r="5" fill="#fff" />
-            <text x="${x + 10}" y="${y}" fill="#d4af37" font-size="9" font-weight="bold">${nom.toUpperCase()}</text>`;
-    });
-    capa.innerHTML = html;
-}
-window.onload = cargarConReintento;
+    // MOTOR RADAR SVG RESILIENTE (Polling)
+    async function cargarConReintento() {
+        const email = new URLSearchParams(window.location.search).get('email');
+        if (!email) return;
+
+        let intentos = 0;
+        const ejecutar = async () => {
+            try {
+                const r = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+                const res = await r.json();
+                
+                if (res.status === "success" && res.data.mapatotal) {
+                    // 1. Inyectar Textos
+                    document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
+                    document.getElementById('directiva').innerText = res.data.directiva;
+                    document.getElementById('sync-label').innerText = "LINK ESTABLECIDO";
+                    
+                    // 2. Mostrar Contenedor
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('reporte').style.display = 'block';
+                    
+                    // 3. Dibujar Radar
+                    renderizarRadar(res.data.mapatotal.vectores_eclipticos);
+                } else {
+                    throw new Error("Datos pendientes");
+                }
+            } catch (e) {
+                intentos++;
+                if (intentos < 6) { 
+                    console.log("Sincronizando con base de datos... intento " + intentos);
+                    setTimeout(ejecutar, 2000); 
+                } else {
+                    document.getElementById('loading').innerText = "ERROR CRÍTICO DE SINCRONIZACIÓN";
+                }
+            }
+        };
+        ejecutar();
+    }
+
+    function renderizarRadar(vectores) {
+        const container = document.getElementById('canvas-container');
+        const centro = 190; const radio = 145;
+        
+        let svg = `<svg viewBox="0 0 380 380" style="width:100%; height:100%;">
+            <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <circle cx="190" cy="190" r="145" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="1" />
+            <circle cx="190" cy="190" r="100" fill="none" stroke="rgba(212,175,55,0.08)" stroke-width="1" />
+            <circle cx="190" cy="190" r="50" fill="none" stroke="rgba(212,175,55,0.05)" stroke-width="1" />
+            <line x1="190" y1="45" x2="190" y2="335" stroke="rgba(212,175,55,0.05)" />
+            <line x1="45" y1="190" x2="335" y2="190" stroke="rgba(212,175,55,0.05)" />`;
+
+        Object.entries(vectores).forEach(([nom, grad]) => {
+            const x = centro + radio * Math.cos((grad - 90) * Math.PI / 180);
+            const y = centro + radio * Math.sin((grad - 90) * Math.PI / 180);
+            svg += `
+                <line x1="190" y1="190" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.2)" stroke-width="0.5" />
+                <circle cx="${x}" cy="${y}" r="4.5" fill="#fff" filter="url(#glow)" />
+                <text x="${x + 12}" y="${y + 4}" fill="#d4af37" font-size="10" font-weight="bold" font-family="JetBrains Mono">${nom.toUpperCase()}</text>`;
+        });
+
+        svg += `</svg>`;
+        container.innerHTML = svg;
+    }
+
+    window.onload = cargarConReintento;
 </script>
+</body>
+</html>
