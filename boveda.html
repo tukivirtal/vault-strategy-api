@@ -10,7 +10,7 @@
         .report-container { background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); padding: 50px; max-width: 900px; width: 100%; display: none; }
         .value { font-size: 2.6rem; color: #fff; font-weight: 600; text-transform: uppercase; }
         #canvas-container { width: 380px; height: 380px; border: 1px solid #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 20px auto; background: rgba(212,175,55,0.02); }
-        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 30px; outline: 1px solid var(--gold); outline-offset: 3px; }
+        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; letter-spacing: 0.3em; cursor: pointer; text-transform: uppercase; margin-top: 30px; outline: 1px solid var(--gold); outline-offset: 3px; }
         .loader-bar { width: 200px; height: 2px; background: #111; margin: 20px auto; position: relative; overflow: hidden; }
         .loader-bar::after { content: ""; position: absolute; width: 50px; height: 100%; background: var(--gold); animation: slide 1.5s infinite linear; }
         @keyframes slide { from { left: -50px; } to { left: 200px; } }
@@ -57,23 +57,26 @@ async function conectarNucleo() {
 
         const res = await response.json();
 
-      // Reemplaza la lógica de respuesta en boveda.html
-            if (res.status === "success" && res.data) {
-                // Si faltan los vectores, lo indicamos para no quedar en bucle infinito
-                if (!res.data.mapatotal) {
-                    status.innerText = "ERROR TÉCNICO: EL NÚCLEO NO GENERÓ MAPATOTAL.";
-                    debug.innerText = "JSON recibido sin vectores eclípticos.";
-                    return; 
-                }
-                
-                document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
-                document.getElementById('directiva').innerText = res.data.directiva;
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('reporte').style.display = 'block';
-                
+        if (res.status === "success" && res.data) {
+            // Seteamos la información básica que SIEMPRE viene
+            document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
+            document.getElementById('directiva').innerText = res.data.directiva;
+            
+            // Lógica de dibujo con Bypass si mapatotal no existe aún
+            if (res.data.mapatotal && res.data.mapatotal.vectores_eclipticos) {
                 dibujarRadar(res.data.mapatotal.vectores_eclipticos);
+            } else {
+                console.warn("Mapatotal ausente. Aplicando visualización de respaldo.");
+                // Dibujamos un radar vacío o con puntos de prueba para no bloquear la UI
+                dibujarRadar({"NÚCLEO": 0, "DATOS": 120, "SYNC": 240});
+                debug.innerText = "Nota: Visualización en modo preventivo (esperando vectores).";
             }
 
+            // Liberamos la pantalla
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('reporte').style.display = 'block';
+
+            // Configuramos el botón de salida
             document.getElementById('btn-next').onclick = () => {
                 window.location.href = `genesis.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(res.data.nombre)}`;
             };
