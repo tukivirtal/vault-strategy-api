@@ -25,28 +25,44 @@
         .status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 2px; }
         .executive-summary { background: rgba(212, 175, 55, 0.03); padding: 25px; margin: 30px 0; border-left: 5px solid var(--gold); line-height: 1.6; }
         
-       /* Reemplaza en los estilos de genesis.html */
-        .telemetry { 
-            font-size: 0.95rem !important; 
-            color: #d4af37 !important; /* Dorado brillante */
-            text-shadow: 0 0 10px rgba(212,175,55,0.4);
-            font-weight: bold;
-        }
-        
-        .compliance-note {
-            font-size: 0.85rem !important; 
-            color: #ffffff !important; /* Blanco para máxima lectura */
-            opacity: 0.8;
-            margin-top: 40px;
-            text-align: center;
-        }
-        
-        .date-input-group label {
-            font-size: 0.75rem !important;
-            color: #fff !important;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+      /* Telemetría Superior Derecha - Ahora en Dorado Brillante */
+    .telemetry { 
+        font-size: 0.95rem !important; 
+        color: #d4af37 !important; 
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(212,175,55,0.4);
+    }
+
+    /* Etiquetas de Fecha - Contraste Máximo */
+    .date-input-group label {
+        font-size: 0.75rem !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* Nota de Cumplimiento (Centro Inferior) */
+    .compliance-note {
+        font-size: 0.85rem !important; 
+        color: #ffffff !important; 
+        opacity: 0.8;
+        margin-top: 40px;
+        text-align: center;
+    }
+
+    /* Botón Dossier GX-2026 */
+    .btn-nasa {
+        background: var(--gold);
+        color: #000;
+        font-weight: bold;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+    }
+    .btn-nasa:hover { background: #fff; }
     </style>
 </head>
 <body>
@@ -114,10 +130,14 @@
                 </div>
             </div>
 
-            <div style="margin-top: 40px; border-top: 1px solid #222; padding-top: 20px;">
-                <button class="btn-nasa" id="dossier-btn" onclick="transferData()">DESCARGAR DOSSIER ESTRATÉGICO GX-2026</button>
-                <div class="compliance-note">SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT</div>
-            </div>
+           <div style="margin-top: 40px; border-top: 1px solid #222; padding-top: 20px; text-align: center;">
+            <button class="btn-nasa" id="dossier-btn" onclick="transferData()">
+                DESCARGAR DOSSIER ESTRATÉGICO GX-2026
+            </button>
+            <div class="compliance-note">
+                SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT // ID: GX-992
+        </div>
+    </div>
         </main>
     </div>
 
