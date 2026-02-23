@@ -67,7 +67,30 @@
             background: rgba(212, 175, 55, 0.03); padding: 25px; margin: 30px 0;
             border: 1px solid rgba(212, 175, 55, 0.1); border-left: 5px solid var(--gold);
         }
-
+        /* Datos de Telemetría (Superior Derecho) */
+        .telemetry { 
+            font-size: 0.85rem !important; /* Más grande */
+            color: var(--gold) !important; /* Dorado para que se lea */
+            text-align: right; 
+            line-height: 1.4; 
+            opacity: 0.9;
+        }
+        
+        /* Nota de cumplimiento (Centro Inferior) */
+        .compliance-note {
+            font-size: 0.75rem !important; 
+            color: #888 !important; /* Gris claro, no oscuro */
+            margin-top: 20px; 
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+        
+        /* Etiquetas de los inputs de fecha */
+        .date-input-group label {
+            font-size: 0.75rem !important; 
+            color: #fff !important; /* Blanco para que resalte del fondo */
+            font-weight: bold;
+        }
         input[type="date"] {
             background: #111; color: #fff; border: 1px solid #333; padding: 8px;
             font-family: inherit; font-size: 0.85rem; outline: none;
