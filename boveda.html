@@ -57,13 +57,22 @@ async function conectarNucleo() {
 
         const res = await response.json();
 
-        if (res.status === "success" && res.data && res.data.mapatotal) {
-            document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
-            document.getElementById('directiva').innerText = res.data.directiva;
-            document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('reporte').style.display = 'block';
-            
-            dibujarRadar(res.data.mapatotal.vectores_eclipticos);
+      // Reemplaza la lógica de respuesta en boveda.html
+            if (res.status === "success" && res.data) {
+                // Si faltan los vectores, lo indicamos para no quedar en bucle infinito
+                if (!res.data.mapatotal) {
+                    status.innerText = "ERROR TÉCNICO: EL NÚCLEO NO GENERÓ MAPATOTAL.";
+                    debug.innerText = "JSON recibido sin vectores eclípticos.";
+                    return; 
+                }
+                
+                document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
+                document.getElementById('directiva').innerText = res.data.directiva;
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('reporte').style.display = 'block';
+                
+                dibujarRadar(res.data.mapatotal.vectores_eclipticos);
+            }
 
             document.getElementById('btn-next').onclick = () => {
                 window.location.href = `genesis.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(res.data.nombre)}`;
