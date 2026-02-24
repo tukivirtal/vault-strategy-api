@@ -43,41 +43,38 @@ const MAX_INTENTOS = 5; // Intentará 5 veces (aprox 10-15 seg)
 async function conectarNucleo() {
     const urlParams = new URLSearchParams(window.location.search);
     let email = urlParams.get('email');
-    if (email) email = email.replace('%40', '@');
     
+    // LIMPIEZA CRÍTICA: Decodifica y limpia espacios
+    if (email) email = decodeURIComponent(email).trim();
+
     const status = document.getElementById('status-msg');
 
     try {
         const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
         const res = await response.json();
 
-        // Si tenemos éxito total
         if (res.status === "success" && res.data && res.data.mapatotal) {
-            mostrarReporte(res.data, email);
-        } 
-        // Si el servidor responde pero el mapa no está listo, o falla la red
-        else {
-            intentos++;
-            if (intentos >= MAX_INTENTOS) {
-                console.warn("Tiempo límite excedido. Cargando modo persistencia.");
-                // Forzamos la carga con datos de respaldo si el servidor no entrega el mapa
-                const backupData = res.data || { nombre: "USUARIO EXECUTIVO", directiva: "PROTOCOLO DE RESPALDO ACTIVADO" };
-                mostrarReporte(backupData, email, true);
-            } else {
-                status.innerText = `NÚCLEO EN PROCESO... REINTENTO ${intentos}/${MAX_INTENTOS}`;
-                setTimeout(conectarNucleo, 3000);
-            }
+            // MOSTRAR DATOS REALES
+            document.getElementById('nombre').innerText = res.data.nombre.toUpperCase();
+            document.getElementById('directiva').innerText = res.data.directiva;
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('reporte').style.display = 'block';
+            
+            dibujarRadar(res.data.mapatotal.vectores_eclipticos);
+            
+            // ACTUALIZACIÓN: Apunta a genesis-live.html
+            document.getElementById('btn-next').onclick = () => {
+                window.location.href = `genesis-live.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(res.data.nombre)}`;
+            };
+        } else {
+            status.innerText = "ESPERANDO CÁLCULO DE VECTORES...";
+            setTimeout(conectarNucleo, 3000); // Reintenta hasta que el mapa esté listo
         }
     } catch (e) {
-        intentos++;
-        if (intentos >= MAX_INTENTOS) {
-            mostrarReporte({ nombre: "ERROR DE VÍNCULO", directiva: "Sincronía Manual requerida." }, email, true);
-        } else {
-            setTimeout(conectarNucleo, 3000);
-        }
+        status.innerText = "RECONECTANDO...";
+        setTimeout(conectarNucleo, 4000);
     }
 }
-
 function mostrarReporte(data, email, isBackup = false) {
     document.getElementById('nombre').innerText = data.nombre.toUpperCase();
     document.getElementById('directiva').innerText = data.directiva;
