@@ -63,6 +63,8 @@
 
 <script>
 async function conectarNucleo() {
+    // Fuerza la limpieza del email antes de pedir los datos
+    email = email.replace('%40', '@');
     const urlParams = new URLSearchParams(window.location.search);
     let email = urlParams.get('email');
     const status = document.getElementById('status-msg');
