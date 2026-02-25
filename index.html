@@ -11,6 +11,7 @@
             background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            -webkit-text-fill-color: transparent;
         }
         .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
@@ -35,7 +36,7 @@
             padding: 12px;
             cursor: pointer;
             font-size: 11px;
-            color: #888;
+            color: #ccc; /* Subido el contraste del gris */
             border-bottom: 1px solid #222;
             font-family: 'JetBrains Mono', monospace;
         }
@@ -48,26 +49,26 @@
 <body class="p-4 md:p-10 text-white">
     <header class="flex justify-between items-center mb-16">
         <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
-        <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-500">
-            <span class="cursor-default">Análisis</span>
-            <span class="cursor-default">Pricing</span>
-            <span class="text-yellow-600 font-bold">Acceso VIP</span>
+        <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-400">
+            <span class="cursor-pointer hover:text-white transition">Análisis</span>
+            <span class="cursor-pointer hover:text-white transition">Pricing</span>
+            <a href="#acceso-boveda" class="text-yellow-600 font-bold hover:text-yellow-500 transition">Acceso VIP</a>
         </nav>
     </header>
 
 <main class="flex-grow flex flex-col items-center justify-center">
     <div class="text-center mb-10 px-4">
         <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
-        <p class="text-gray-500 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-widest">
+        <p class="text-gray-400 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-widest">
             Inteligencia estratégica basada en ciclos planetarios de precisión.
         </p>
     </div>
 
-    <div class="card p-8 w-full max-w-md">
+    <div id="acceso-boveda" class="card p-8 w-full max-w-md">
         <h3 class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Acceso a la Bóveda</h3>
         <div class="space-y-4" id="form-boveda">
-            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
-            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
 
             <div class="grid grid-cols-2 gap-4">
                 <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
@@ -75,7 +76,7 @@
             </div>
             
             <div class="relative">
-                <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono">
+                <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
                 <div id="lugar-list" class="autocomplete-items hidden"></div>
             </div>
 
@@ -102,7 +103,7 @@
 </footer>
 
 <script>
-// --- MOTOR DE AUTOCOMPLETADO ---
+// --- MOTOR DE AUTOCOMPLETADO (photon.komoot.io) ---
 const lugarInput = document.getElementById('lugar');
 const lugarList = document.getElementById('lugar-list');
 
@@ -137,7 +138,7 @@ lugarInput.addEventListener('input', async (e) => {
 
 document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
 
-// --- LÓGICA DE ENVÍO ---
+// --- EFECTO DE ESCRITURA ---
 async function escribirEfecto(elemento, texto, velocidad = 20) {
     if (!texto) return;
     elemento.innerHTML = "";
@@ -147,12 +148,14 @@ async function escribirEfecto(elemento, texto, velocidad = 20) {
     }
 }
 
+// Forzar mayúsculas en tiempo real excepto email
 document.addEventListener('input', (e) => {
     if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
         e.target.value = e.target.value.toUpperCase();
     }
 });
 
+// --- ENVÍO A API DE RENDER ---
 async function consultar() {
     const resContainer = document.getElementById('resultado');
     const resTitulo = document.getElementById('res-titulo');
@@ -161,7 +164,7 @@ async function consultar() {
     
     const payload = {
         nombre: document.getElementById('nombre').value.trim(),
-        email: document.getElementById('email').value.trim(),
+        email: document.getElementById('email').value.trim().toLowerCase(), // Asegurar minúsculas
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
         lugar: document.getElementById('lugar').value.trim(),
@@ -189,13 +192,13 @@ async function consultar() {
             body: JSON.stringify(payload)
         });
 
-        if (!respuesta.ok) throw new Error("Status " + respuesta.status);
         const data = await respuesta.json();
         
         if (data.status === "success" || data.status === "exists") {
             await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
             await escribirEfecto(resCuerpo, "Geometría verificada. Abriendo Bóveda...");
             setTimeout(() => {
+                // Redirección limpia
                 window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
             }, 1500);
         } else {
