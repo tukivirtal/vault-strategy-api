@@ -18,6 +18,7 @@
         .mono { font-family: 'JetBrains Mono', monospace; }
         input:focus { border-color: #d4af37 !important; }
 
+        /* Estilos Autocompletado */
         .autocomplete-items {
             position: absolute;
             border: 1px solid #333;
@@ -28,7 +29,6 @@
             right: 0;
             max-height: 200px;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         .autocomplete-item {
             padding: 12px;
@@ -38,10 +38,7 @@
             border-bottom: 1px solid #222;
             font-family: 'JetBrains Mono', monospace;
         }
-        .autocomplete-item:hover {
-            background-color: #1a1a1a;
-            color: #d4af37;
-        }
+        .autocomplete-item:hover { background-color: #1a1a1a; color: #d4af37; }
     </style>
 </head>
 <body class="p-4 md:p-10 text-white">
@@ -66,16 +63,18 @@
         <h3 id="form-title" class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Registro de Nueva Terminal</h3>
         
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 lowercase">
             
+            <input type="password" id="password" placeholder="CONTRASEÑA ESTRATÉGICA" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+
             <div id="campos-registro" class="space-y-4">
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 uppercase">
                 <div class="grid grid-cols-2 gap-4">
                     <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
                     <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
                 </div>
                 <div class="relative">
-                    <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+                    <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 uppercase">
                     <div id="lugar-list" class="autocomplete-items hidden"></div>
                 </div>
             </div>
@@ -101,10 +100,6 @@
     </div>
 </main>
 
-<footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
-    © 2026 VAULT LOGIC - Executive Intelligence Suite
-</footer>
-
 <script>
 let modoVIP = false;
 
@@ -124,7 +119,6 @@ function toggleModo(forzarVIP = false) {
         btn.innerText = "Vincular con el Núcleo";
         text.innerText = "¿NUEVA TERMINAL?";
         link.innerText = "Registrarse";
-        document.getElementById('acceso-boveda').scrollIntoView({ behavior: 'smooth' });
     } else {
         campos.classList.remove('hidden');
         titulo.innerText = "Registro de Nueva Terminal";
@@ -134,10 +128,85 @@ function toggleModo(forzarVIP = false) {
     }
 }
 
-// --- MOTOR DE AUTOCOMPLETADO ---
+// Validación de Email real
+function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function consultar() {
+    const resContainer = document.getElementById('resultado');
+    const resTitulo = document.getElementById('res-titulo');
+    const resCuerpo = document.getElementById('res-cuerpo');
+    const btn = document.getElementById('btn-submit');
+    const emailInput = document.getElementById('email').value.trim().toLowerCase();
+    const passInput = document.getElementById('password').value.trim();
+
+    // Bloqueo de seguridad: Validar email y contraseña
+    if (!validarEmail(emailInput)) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "ERROR DE IDENTIDAD:";
+        resCuerpo.innerText = "Ingrese un formato de email válido.";
+        return;
+    }
+    if (passInput.length < 4) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
+        resCuerpo.innerText = "La contraseña debe tener al menos 4 caracteres.";
+        return;
+    }
+
+    const payload = modoVIP ? { email: emailInput, password: passInput, login_only: true } : {
+        nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+        email: emailInput,
+        password: passInput,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+        lat: document.getElementById('lat').value,
+        lon: document.getElementById('lon').value
+    };
+
+    if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "DATOS INCOMPLETOS:";
+        resCuerpo.innerText = "Complete la geolocalización de nacimiento.";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "AUTENTICANDO...";
+    resContainer.classList.remove('hidden');
+
+    try {
+        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+
+        const data = await respuesta.json();
+        
+        if (data.status === "success" || data.status === "exists") {
+            resTitulo.innerHTML = "ACCESO AUTORIZADO";
+            resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
+            setTimeout(() => {
+                window.location.href = `boveda.html?email=${encodeURIComponent(emailInput)}`;
+            }, 1200);
+        } else {
+            btn.disabled = false;
+            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
+            resTitulo.innerHTML = "ACCESO DENEGADO";
+            resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
+        }
+    } catch (error) {
+        btn.disabled = false;
+        resCuerpo.innerHTML = "Fallo de conexión con el servidor.";
+    }
+}
+
+// Autocompletado (Mantiene tu lógica)
 const lugarInput = document.getElementById('lugar');
 const lugarList = document.getElementById('lugar-list');
-
 lugarInput.addEventListener('input', async (e) => {
     const val = e.target.value;
     if (val.length < 3) { lugarList.classList.add('hidden'); return; }
@@ -160,85 +229,8 @@ lugarInput.addEventListener('input', async (e) => {
             };
             lugarList.appendChild(item);
         });
-    } catch (err) { console.error("Error GPS:", err); }
+    } catch (err) { console.error(err); }
 });
-
-document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
-
-async function escribirEfecto(elemento, texto, velocidad = 20) {
-    if (!texto) return;
-    elemento.innerHTML = "";
-    for (let i = 0; i < texto.length; i++) {
-        elemento.innerHTML += texto.charAt(i);
-        await new Promise(r => setTimeout(r, velocidad));
-    }
-}
-
-document.addEventListener('input', (e) => {
-    if (e.target.tagName === 'INPUT' && e.target.id !== 'email') {
-        e.target.value = e.target.value.toUpperCase();
-    }
-});
-
-// --- LÓGICA DE ENVÍO ---
-async function consultar() {
-    const resContainer = document.getElementById('resultado');
-    const resTitulo = document.getElementById('res-titulo');
-    const resCuerpo = document.getElementById('res-cuerpo');
-    const btn = document.getElementById('btn-submit');
-    
-    const emailValue = document.getElementById('email').value.trim().toLowerCase();
-
-    const payload = modoVIP ? { email: emailValue, login_only: true } : {
-        nombre: document.getElementById('nombre').value.trim(),
-        email: emailValue,
-        fecha: document.getElementById('fecha').value,
-        hora: document.getElementById('hora').value,
-        lugar: document.getElementById('lugar').value.trim(),
-        lat: document.getElementById('lat').value,
-        lon: document.getElementById('lon').value
-    };
-
-    if (!payload.email || (!modoVIP && (!payload.fecha || !payload.lugar))) {
-        resContainer.classList.remove('hidden');
-        resTitulo.innerHTML = "ERROR DE ENTRADA:";
-        resCuerpo.innerHTML = "Complete los campos requeridos para proceder.";
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = modoVIP ? "VERIFICANDO CREDENCIALES..." : "PROCESANDO VECTORES...";
-    resContainer.classList.remove('hidden');
-    resTitulo.innerHTML = "SISTEMA:";
-    resCuerpo.innerHTML = "Conectando con el Núcleo Estratégico...";
-
-    try {
-        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-
-        const data = await respuesta.json();
-        
-        if (data.status === "success" || data.status === "exists") {
-            await escribirEfecto(resTitulo, "ACCESO AUTORIZADO");
-            await escribirEfecto(resCuerpo, "Vínculo establecido. Abriendo Bóveda...");
-            setTimeout(() => {
-                window.location.href = `boveda.html?email=${encodeURIComponent(payload.email)}`;
-            }, 1200);
-        } else {
-            btn.disabled = false;
-            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-            await escribirEfecto(resTitulo, "ACCESO DENEGADO");
-            await escribirEfecto(resCuerpo, data.analisis_ejecutivo || "Credencial no encontrada en el sistema.");
-        }
-    } catch (error) {
-        btn.disabled = false;
-        btn.innerText = "Reintentar Secuencia";
-        resCuerpo.innerHTML = "ERROR: FALLO EN EL ENLACE. Verifique su conexión.";
-    }
-}
 </script>
 </body>
 </html>
