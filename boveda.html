@@ -110,9 +110,16 @@ async function conectarNucleo() {
             dibujarRadar(vectores);
             llenarSideData(vectores);
 
+            //document.getElementById('btn-next').onclick = () => {
+            //    window.location.href = `genesis-live.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(res.data.nombre)}`;
+            // Busca donde dice window.location.href en boveda.html
             document.getElementById('btn-next').onclick = () => {
-                window.location.href = `genesis-live.html?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(res.data.nombre)}`;
+                // Enviamos a suscripción, pasando el email para no perder el rastro del usuario
+                window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`;
             };
+
+// Y cambia el texto del botón en el HTML de boveda:
+// <button class="btn-nasa" id="btn-next">UPGRADE: DESBLOQUEAR GÉNESIS-LIVE</button>
         } else {
             statusMsg.innerText = "CÁLCULO EN PROCESO... REINTENTANDO.";
             setTimeout(conectarNucleo, 3000);
