@@ -1,5 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Astro Logic | Strategic Timing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+        .gold-gradient {
+            background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
+        .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        input:focus { border-color: #d4af37 !important; }
 
+        /* Estilos Autocompletado */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #333;
+            background-color: #111;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
             overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         .autocomplete-item {
             padding: 12px;
@@ -9,15 +39,18 @@
             border-bottom: 1px solid #222;
             font-family: 'JetBrains Mono', monospace;
         }
-        .autocomplete-item:hover { background-color: #1a1a1a; color: #d4af37; }
+        .autocomplete-item:hover {
+            background-color: #1a1a1a;
+            color: #d4af37;
+        }
     </style>
 </head>
 <body class="p-4 md:p-10 text-white">
     <header class="flex justify-between items-center mb-16">
         <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
         <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-400">
-            <span class="cursor-pointer hover:text-white transition">Análisis</span>
-            <span class="cursor-pointer hover:text-white transition">Pricing</span>
+            <span class="cursor-default">Análisis</span>
+            <span class="cursor-default">Pricing</span>
             <button onclick="toggleModo(true)" class="text-yellow-600 font-bold hover:text-yellow-500 transition">Acceso VIP</button>
         </nav>
     </header>
@@ -34,18 +67,17 @@
         <h3 id="form-title" class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Registro de Nueva Terminal</h3>
         
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 lowercase">
-            
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono lowercase placeholder-gray-600">
             <input type="password" id="password" placeholder="CONTRASEÑA ESTRATÉGICA" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
-
+            
             <div id="campos-registro" class="space-y-4">
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 uppercase">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono uppercase placeholder-gray-600">
                 <div class="grid grid-cols-2 gap-4">
                     <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
                     <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
                 </div>
                 <div class="relative">
-                    <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600 uppercase">
+                    <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono uppercase placeholder-gray-600">
                     <div id="lugar-list" class="autocomplete-items hidden"></div>
                 </div>
             </div>
@@ -70,6 +102,10 @@
         </div>
     </div>
 </main>
+
+<footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
+    © 2026 VAULT LOGIC - Executive Intelligence Suite
+</footer>
 
 <script>
 let modoVIP = false;
@@ -99,7 +135,6 @@ function toggleModo(forzarVIP = false) {
     }
 }
 
-// Validación de Email real
 function validarEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -109,10 +144,11 @@ async function consultar() {
     const resTitulo = document.getElementById('res-titulo');
     const resCuerpo = document.getElementById('res-cuerpo');
     const btn = document.getElementById('btn-submit');
+    
     const emailInput = document.getElementById('email').value.trim().toLowerCase();
     const passInput = document.getElementById('password').value.trim();
 
-    // Bloqueo de seguridad: Validar email y contraseña
+    // Validaciones de seguridad
     if (!validarEmail(emailInput)) {
         resContainer.classList.remove('hidden');
         resTitulo.innerText = "ERROR DE IDENTIDAD:";
@@ -122,11 +158,15 @@ async function consultar() {
     if (passInput.length < 4) {
         resContainer.classList.remove('hidden');
         resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
-        resCuerpo.innerText = "La contraseña debe tener al menos 4 caracteres.";
+        resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
         return;
     }
 
-    const payload = modoVIP ? { email: emailInput, password: passInput, login_only: true } : {
+    const payload = modoVIP ? { 
+        email: emailInput, 
+        password: passInput, 
+        login_only: true 
+    } : {
         nombre: document.getElementById('nombre').value.trim().toUpperCase(),
         email: emailInput,
         password: passInput,
@@ -140,7 +180,7 @@ async function consultar() {
     if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
         resContainer.classList.remove('hidden');
         resTitulo.innerText = "DATOS INCOMPLETOS:";
-        resCuerpo.innerText = "Complete la geolocalización de nacimiento.";
+        resCuerpo.innerText = "Complete los parámetros de nacimiento.";
         return;
     }
 
@@ -175,9 +215,10 @@ async function consultar() {
     }
 }
 
-// Autocompletado (Mantiene tu lógica)
+// Lógica de Autocompletado Photon
 const lugarInput = document.getElementById('lugar');
 const lugarList = document.getElementById('lugar-list');
+
 lugarInput.addEventListener('input', async (e) => {
     const val = e.target.value;
     if (val.length < 3) { lugarList.classList.add('hidden'); return; }
@@ -202,6 +243,8 @@ lugarInput.addEventListener('input', async (e) => {
         });
     } catch (err) { console.error(err); }
 });
+
+document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
 </script>
 </body>
 </html>
