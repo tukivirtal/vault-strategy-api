@@ -1,1 +1,1 @@
-
+win.loadFile('boveda.html');
