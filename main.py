@@ -2,115 +2,50 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
-from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
+from typing import Optional
 import os
 import uvicorn
 import httpx
+import swisseph as swe
 
 app = FastAPI()
 
-# Configuración de CORS
+# --- CONFIGURACIÓN DE CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://vault-strategy-api.vercel.app", # Tu nuevo dominio de Vercel
-        "http://localhost:3000",
-        "*" # Permitir todos temporalmente para pruebas
-    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Credenciales de Entorno
+
+# --- CREDENCIALES ---
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-MAILERLITE_API_KEY = os.environ.get("MAILERLITE_API_KEY")
-
-# Inicialización de Supabase
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# --- MODELO DE DATOS (PYDANTIC) ---
+# Este es el "recepcionista" que valida que los datos traigan password
+class UserData(BaseModel):
+    nombre: Optional[str] = None
+    email: str
+    password: str  # Campo obligatorio ahora
+    fecha: Optional[str] = None
+    hora: Optional[str] = None
+    lugar: Optional[str] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    login_only: Optional[bool] = False
 
-def obtener_gps(lugar):
-    # Diccionario de respaldo rápido para evitar consultar internet
-    respaldos = {
-        "SAN FRANCISCO": {"lat": 37.7749, "lon": -122.4194},
-        "BARRANQUILLA": {"lat": 10.9685, "lon": -74.7813},
-        "NEW YORK": {"lat": 40.7128, "lon": -74.0060},
-        "CARMELO": {"lat": -34.0000, "lon": -58.2833}
-    }
-
-    # 1. Verificar si es una ciudad conocida en nuestra base local
-    lugar_clean = lugar.upper()
-    for ciudad, coords in respaldos.items():
-        if ciudad in lugar_clean:
-            return coords
-
-    # 2. Si no es conocida, intentar búsqueda rápida con timeout agresivo
-    geolocator = Nominatim(user_agent="vault_logic_v1")
-    try:
-        # Solo esperamos 3 segundos. Si no responde, saltamos al default.
-        location = geolocator.geocode(lugar, timeout=3)
-        if location:
-            return {"lat": location.latitude, "lon": location.longitude}
-    except:
-        pass
-
-    # 3. RESPALDO TOTAL: Si todo falla, devolvemos una coordenada neutra 
-    # para que el sistema de vectores PUEDA CALCULAR y no dé error de enlace.
-    return {"lat": 0.0, "lon": 0.0, "nota": "fallback_active"}
-async def sincronizar_mailerlite(email, nombre, directiva, coords):
-    """Sincronización en dos pasos: Datos -> Grupo"""
-    if not MAILERLITE_API_KEY:
-        return
-
-    email_limpio = email.strip().lower()
-    headers = {
-        "Authorization": f"Bearer {MAILERLITE_API_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-
-    url_sub = "https://connect.mailerlite.com/api/subscribers"
-    payload_sub = {
-        "email": email_limpio,
-        "fields": {
-            "name": nombre,
-            "vl_nombre": nombre,
-            "vl_directiva": directiva,
-            "vl_geo_ref": f"{coords['lat']}, {coords['lon']}"
-        }
-    }
-
-    async with httpx.AsyncClient() as client:
-        try:
-            res_sub = await client.post(url_sub, headers=headers, json=payload_sub, timeout=15.0)
-            if res_sub.status_code in [200, 201, 204]:
-                grupo_id = 17952042256303511 
-                url_grupo = f"https://connect.mailerlite.com/api/groups/{grupo_id}/subscribers"
-                await client.post(url_grupo, headers=headers, json={"email": email_limpio}, timeout=15.0)
-        except Exception as e:
-            print(f"Error MailerLite: {e}")
-import swisseph as swe
-from datetime import datetime
-
+# --- MOTOR DE CÁLCULO ---
 def calcular_vectores_natales(fecha_str, hora_str, coords):
     try:
-        # 1. Parsing de Fecha y Hora
         año, mes, día = map(int, fecha_str.split('-'))
         hora, minuto = map(int, hora_str.split(':'))
-        
-        # 2. Conversión a Julian Day
         hora_decimal = hora + (minuto / 60.0)
         jd = swe.julday(año, mes, día, hora_decimal)
 
-        # 3. Puntos de Datos
         puntos = {
             "SOL": swe.SUN, "LUNA": swe.MOON, "MERCURIO": swe.MERCURY, 
             "VENUS": swe.VENUS, "MARTE": swe.MARS, "JUPITER": swe.JUPITER, 
@@ -119,160 +54,117 @@ def calcular_vectores_natales(fecha_str, hora_str, coords):
 
         vectores = {}
         for nombre, codigo in puntos.items():
-            # Llamada a la librería
             resultado = swe.calc_ut(jd, codigo)
-            
-            # EXTRACCIÓN RADICAL:
-            # Si es una tupla (o tupla de tuplas), entramos hasta encontrar el primer número
             while isinstance(resultado, (tuple, list)):
                 resultado = resultado[0]
-            
-            # Ahora 'resultado' es garantizadamente un número (float)
             vectores[nombre] = round(float(resultado), 4)
-
         return vectores
-
     except Exception as e:
-        print(f"DEBUG FINAL: {e}")
-        return {"status": "error_extraccion_bruta", "detalle": str(e)}
+        return {"error": str(e)}
 
 def analizar_geometria_kepler(vectores):
-    aspectos_encontrados = []
+    aspectos = []
     nombres = list(vectores.keys())
-    
-    # Ángulos de interés (Kepler/Addey) y sus significados lógicos
     definiciones = {
-        0: {"tipo": "CONJUNCIÓN", "label": "Singularidad de Energía"},
-        60: {"tipo": "SEXTIL", "label": "Oportunidad Operativa"},
-        90: {"tipo": "CUADRATURA", "label": "Tensión Estructural"},
-        120: {"tipo": "TRÍGONO", "label": "Fluidez de Expansión"},
-        180: {"tipo": "OPOSICIÓN", "label": "Punto de Contraste"}
+        0: {"tipo": "CONJUNCIÓN", "label": "Singularidad"},
+        60: {"tipo": "SEXTIL", "label": "Oportunidad"},
+        90: {"tipo": "CUADRATURA", "label": "Tensión"},
+        120: {"tipo": "TRÍGONO", "label": "Fluidez"},
+        180: {"tipo": "OPOSICIÓN", "label": "Contraste"}
     }
-    
-    orbe_maximo = 5.0 # Margen de error de 5 grados
-
     for i in range(len(nombres)):
         for j in range(i + 1, len(nombres)):
             p1, p2 = nombres[i], nombres[j]
             v1, v2 = vectores[p1], vectores[p2]
-            
-            # Calcular distancia angular mínima en un círculo
-            distancia = abs(v1 - v2)
-            if distancia > 180: distancia = 360 - distancia
-            
-            # Verificar si encaja en algún ángulo de Kepler
-            for angulo_base, info in definiciones.items():
-                if abs(distancia - angulo_base) <= orbe_maximo:
-                    aspectos_encontrados.append({
-                        "puntos": f"{p1}-{p2}",
-                        "distancia": round(distancia, 2),
-                        "tipo": info["tipo"],
-                        "descripcion": info["label"]
-                    })
-    
-    return aspectos_encontrados
+            dist = abs(v1 - v2)
+            if dist > 180: dist = 360 - dist
+            for ang, info in definiciones.items():
+                if abs(dist - ang) <= 5.0:
+                    aspectos.append({"puntos": f"{p1}-{p2}", "tipo": info["tipo"], "descripcion": info["label"]})
+    return aspectos
 
+# --- ENDPOINT PRINCIPAL: CONSULTAR / REGISTRAR ---
 @app.post("/consultar")
-async def consultar(datos: dict):
-    # 1. Extracción de datos del payload
-    email = datos.get('email', '').strip().lower()
-    nombre = datos.get('nombre', 'VIP MEMBER').strip().upper()
-    lugar = datos.get('lugar', '').strip().upper()
-    fecha = datos.get('fecha', '1980-01-01')
-    hora = datos.get('hora', '12:00')
+async def consultar(user: UserData):
+    email_clean = user.email.strip().lower()
     
-    # 2. CAPTURA DE COORDENADAS DIRECTAS (NUEVO)
-    # Si el frontend envía lat/lon, las usamos. Si no, usamos un default.
-    lat = datos.get('lat')
-    lon = datos.get('lon')
+    # 1. Verificar si el usuario ya existe en Supabase
+    check = supabase.table("clientes_vip").select("*").eq("email", email_clean).execute()
     
-    if lat and lon:
-        coords = {"lat": float(lat), "lon": float(lon)}
-    else:
-        # Respaldo por si algo falla en el frontend (Carmelo por defecto)
-        coords = {"lat": -33.9968, "lon": -58.2836}
-
-    # 3. Verificar duplicado
-    try:
-        check_user = supabase.table("clientes_vip").select("email").eq("email", email).execute()
-        if check_user.data:
+    if check.data:
+        # LÓGICA DE LOGIN (ACCESO VIP)
+        db_user = check.data[0]
+        # Verificamos si la contraseña coincide
+        if db_user.get("password") == user.password:
             return {
                 "status": "exists",
-                "titulo": "ACCESO PREVIAMENTE REGISTRADO",
-                "analisis_ejecutivo": "Tu firma ya se encuentra en la Bóveda Estratégica.",
-                "firma": "VAULT LOGIC SECURITY"
+                "titulo": "ACCESO AUTORIZADO",
+                "analisis_ejecutivo": f"Bienvenido de nuevo, {db_user['nombre']}. Terminal vinculada.",
+                "email": email_clean
             }
-    except Exception as e:
-        print(f"Error Check: {e}")
+        else:
+            return {
+                "status": "error",
+                "analisis_ejecutivo": "CREDENTIAL_ERROR: Contraseña incorrecta para esta terminal."
+            }
 
-    # 4. EJECUCIÓN DEL MOTOR DE PRECISIÓN
-    # Al tener las coords, este proceso es instantáneo
-    try:
-        vectores = calcular_vectores_natales(fecha, hora, coords)
-        geometria_hits = analizar_geometria_kepler(vectores) # Asegúrate de que el nombre coincida con tu función
-    except Exception as e:
-        print(f"Error en Motor: {e}")
-        vectores = {"status": "error"}
-        geometria_hits = []
+    # 2. Si no existe y es login_only, error
+    if user.login_only:
+        return {
+            "status": "error",
+            "analisis_ejecutivo": "USER_NOT_FOUND: Este email no tiene una terminal registrada."
+        }
 
-    # 5. Lógica de Directiva Dinámica
-    if geometria_hits:
-        hit = geometria_hits[0]
-        directiva = f"PROTOCOLO {hit['tipo']} DETECTADO: {hit['descripcion']} entre {hit['puntos']}."
-    else:
-        directiva = "NODO DE EXPANSIÓN ACTIVO: Estructura en equilibrio armónico."
+    # 3. PROCESO DE REGISTRO NUEVO
+    lat = user.lat if user.lat is not None else -33.9968
+    lon = user.lon if user.lon is not None else -58.2836
+    coords = {"lat": lat, "lon": lon}
 
-    # 6. Guardado en Supabase
-    try:
-        supabase.table("clientes_vip").upsert({
-            "email": email,
-            "nombre": nombre,
-            "datos_natales": {
-                "lugar_original": lugar,
-                "hora_nacimiento": hora,
-                "fecha": fecha
-            },
-            "mapatotal": {
-                "geo": coords, 
-                "vectores_eclipticos": vectores,
-                "analisis_kepler": geometria_hits,
-                "directive": directiva, 
-                "auth": "VERIFIED_VAULT"
-            },
-            "nivel_suscripcion": "free"
-        }, on_conflict="email").execute()
-    except Exception as e:
-        print(f"Error Supabase: {e}")
+    vectores = calcular_vectores_natales(user.fecha, user.hora, coords)
+    geometria = analizar_geometria_kepler(vectores)
+    
+    directiva = f"PROTOCOLO {geometria[0]['tipo']} ACTIVO" if geometria else "ESTABILIDAD ARMÓNICA"
 
-    return {
-        "status": "success",
-        "titulo": "DIRECTIVA ESTRATÉGICA GENERADA",
-        "analisis_ejecutivo": directiva,
-        "coordinadas": f"GEO-REF: {coords['lat']}, {coords['lon']}",
-        "firma": "VAULT LOGIC EXECUTIVE"
+    payload_db = {
+        "email": email_clean,
+        "nombre": user.nombre.upper() if user.nombre else "VIP MEMBER",
+        "password": user.password, # Guardamos la clave
+        "datos_natales": {"lugar_original": user.lugar, "hora_nacimiento": user.hora, "fecha": user.fecha},
+        "mapatotal": {
+            "geo": coords,
+            "vectores_eclipticos": vectores,
+            "analisis_kepler": geometria,
+            "directive": directiva,
+            "auth": "VERIFIED_VAULT"
+        }
     }
 
+    try:
+        supabase.table("clientes_vip").insert(payload_db).execute()
+        return {
+            "status": "success",
+            "analisis_ejecutivo": "TERMINAL VINCULADA CON ÉXITO.",
+            "email": email_clean
+        }
+    except Exception as e:
+        return {"status": "error", "analisis_ejecutivo": f"DB_ERROR: {str(e)}"}
+
+# --- ENDPOINT PARA LA BÓVEDA ---
 @app.get("/obtener_reporte/{email}")
 async def obtener_reporte(email: str):
-    """Endpoint para la Bóveda dinámica"""
     try:
-        email_limpio = email.strip().lower()
-        resultado = supabase.table("clientes_vip").select("*").eq("email", email_limpio).execute()
+        res = supabase.table("clientes_vip").select("*").eq("email", email.strip().lower()).execute()
+        if not res.data:
+            return {"status": "error", "message": "Firma no detectada."}
         
-        if not resultado.data:
-            return {"status": "error", "message": "Firma no encontrada."}
-            
-        user = resultado.data[0]
+        user = res.data[0]
         return {
             "status": "success",
             "data": {
                 "nombre": user['nombre'],
                 "directiva": user['mapatotal']['directive'],
-                "geo_ref": f"LAT: {user['mapatotal']['geo']['lat']} | LON: {user['mapatotal']['geo']['lon']}",
-                "fecha": user['datos_natales']['fecha'],
-                "hora": user['datos_natales']['hora_nacimiento'],
-                "lugar": user['datos_natales']['lugar_original'],
-                "auth_code": user['mapatotal']['auth']
+                "mapatotal": user['mapatotal'], # Aquí enviamos los vectores para el radar
+                "geo_ref": f"LAT: {user['mapatotal']['geo']['lat']}"
             }
         }
     except Exception as e:
