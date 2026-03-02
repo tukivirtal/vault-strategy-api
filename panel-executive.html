@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXECUTIVE | Strategic Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
+        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 400px 1fr; gap: 20px; }
+        .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 25px; position: relative; }
+
+        .horizon-picker { background: rgba(212,175,55,0.1); padding: 15px; display: flex; gap: 10px; margin-bottom: 20px; border: 1px solid var(--gold); overflow-x: auto; }
+        .month-btn { background: transparent; border: 1px solid #444; color: #888; padding: 8px 15px; cursor: pointer; font-size: 0.7rem; }
+        .month-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+
+        .status-badge { font-size: 0.7rem; letter-spacing: 2px; color: var(--gold); border: 1px solid var(--gold); padding: 4px 10px; margin-bottom: 15px; display: inline-block; }
+        
+        #radar-svg { width: 100%; height: auto; max-width: 320px; margin: auto; display: block; }
+        
+        .premium-lock-banner { background: linear-gradient(90deg, #1a1a1a, #000); border: 1px solid #333; padding: 15px; margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-genesis { background: #fff; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; font-size: 0.7rem; letter-spacing: 1px; }
+
+        .data-value { font-size: 1.8rem; font-weight: bold; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <div style="font-size: 0.6rem; color: var(--gold); letter-spacing: 3px;">ESTRATEGIA ACTIVA</div>
+        <div style="font-size: 1.2rem; font-weight: bold; letter-spacing: 5px;">EXECUTIVE TERMINAL</div>
+    </div>
+    <div style="text-align: right;">
+        <div id="user-display" style="font-size: 0.8rem; color: var(--gold);">AUTENTICADO</div>
+        <div style="font-size: 0.5rem; color: #555;">LICENSE: RECURRING_EXECUTIVE</div>
+    </div>
+</header>
+
+<div class="horizon-picker">
+    <button class="month-btn active">MARZO 2026</button>
+    <button class="month-btn">ABRIL 2026</button>
+    <button class="month-btn">MAYO 2026</button>
+    <button class="month-btn">JUNIO 2026</button>
+    <button class="month-btn">JULIO 2026</button>
+</div>
+
+<div class="dashboard-grid">
+    <div class="panel">
+        <div class="status-badge">VECTORES NATALES</div>
+        <svg id="radar-svg" viewBox="0 0 380 380">
+            <circle cx="190" cy="190" r="140" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1" />
+            <g id="planetas-g"></g>
+        </svg>
+        <div id="msg-ia" style="font-size: 0.8rem; line-height: 1.6; margin-top: 20px; color: #ccc; border-top: 1px solid #222; padding-top: 15px;">
+            Sincronizando directivas de comando...
+        </div>
+    </div>
+
+    <div class="panel">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="status-badge">PROYECCIÓN DE RENDIMIENTO</div>
+            <div class="data-value" id="roi-val">+00.0%</div>
+        </div>
+        <div id="roi-chart" style="min-height: 300px;"></div>
+
+        <div class="premium-lock-banner">
+            <div>
+                <div style="font-size: 0.7rem; color: #fff;">DESBLOQUEAR GÉNESIS</div>
+                <div style="font-size: 0.5rem; color: #666;">Descarga de Dossier GX-2026 e Instalador Desktop .EXE</div>
+            </div>
+            <button class="btn-genesis" onclick="location.href='suscripcion.html'">HACER UPGRADE</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let roiChart;
+
+function initChart() {
+    const options = {
+        chart: { type: 'area', height: 300, toolbar: {show: false}, background: 'transparent' },
+        series: [{ name: 'MÉTRICA ESTRATÉGICA', data: [31, 40, 28, 51, 42, 109, 100] }],
+        colors: ['#d4af37'],
+        stroke: { curve: 'smooth', width: 2 },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 } },
+        theme: { mode: 'dark' },
+        xaxis: { categories: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'], labels: {style: {colors: '#444'}}}
+    };
+    roiChart = new ApexCharts(document.querySelector("#roi-chart"), options);
+    roiChart.render();
+}
+
+async function cargarExecutive() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email') || "test@test.com";
+    
+    try {
+        const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+        const res = await response.json();
+
+        if (res.status === "success") {
+            // Radar
+            const g = document.getElementById('planetas-g');
+            const vectores = res.data.mapatotal.vectores_eclipticos;
+            Object.entries(vectores).forEach(([nom, grad]) => {
+                const rad = (grad - 90) * Math.PI / 180;
+                const x = 190 + 140 * Math.cos(rad);
+                const y = 190 + 140 * Math.sin(rad);
+                g.innerHTML += `<circle cx="${x}" cy="${y}" r="4" fill="#fff" /><text x="${x+10}" y="${y+5}" fill="var(--gold)" font-size="8">${nom}</text>`;
+            });
+
+            // IA y ROI
+            document.getElementById('msg-ia').innerHTML = `<b>ANÁLISIS DE MARZO:</b> ${res.data.directiva}`;
+            document.getElementById('roi-val').innerText = "+34.2%";
+            roiChart.updateSeries([{ name: 'MÉTRICA ESTRATÉGICA', data: [20, 35, 45, 30, 55, 70, 85] }]);
+        }
+    } catch (e) {
+        console.error("Error cargando terminal");
+    }
+}
+
+window.onload = () => {
+    initChart();
+    cargarExecutive();
+};
+</script>
+</body>
+</html>
