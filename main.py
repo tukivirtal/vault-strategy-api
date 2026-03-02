@@ -14,7 +14,7 @@ app = FastAPI()
 # --- CONFIGURACIÓN DE CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Esto permite que tu .exe local se conecte sin problemas
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
