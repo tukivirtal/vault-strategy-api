@@ -156,11 +156,11 @@ async function conectarNucleo(email) {
             const userData = res.data;
             document.getElementById('nombre').innerText = userData.nombre.toUpperCase();
             
-            // Telemetría de Origen
+            // 1. Mostrar Telemetría de Origen (Fecha, Hora, Lugar)
             const fechaNorm = new Date(userData.fecha_nacimiento).toLocaleDateString('es-ES');
             document.getElementById('datos-origen').innerText = `${fechaNorm} // ${userData.hora_nacimiento} // ${userData.lugar_nacimiento.toUpperCase()}`;
 
-            // Lógica de Enganche Alineada con Análisis Kepler
+            // 2. Lógica de Enganche Alineada con Análisis Kepler (Dibujo)
             let sugerenciaIA = `<b>DIRECTIVA DE COMANDO:</b> ${userData.directiva}`;
             if (userData.analisis_kepler && userData.analisis_kepler.length > 0) {
                 const aspecto = userData.analisis_kepler[0];
