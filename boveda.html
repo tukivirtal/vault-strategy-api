@@ -5,10 +5,10 @@
     <title>Vault Logic | Executive Bóveda</title>
     <style>
         :root { --gold: #d4af37; --dark: #050505; --gray: #444; }
-        body { background: var(--dark); color: var(--gold); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
+        body { background: var(--dark); color: var(--gold); font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
         
         #loading-screen { text-align: center; }
-        .report-container { background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); padding: 40px; max-width: 1000px; width: 95%; display: none; box-shadow: 0 0 100px #000; position: relative; }
+        .report-container { background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(212, 175, 55, 0.2); padding: 40px; max-width: 1000px; width: 95%; display: none; box-shadow: 0 0 100px #000; position: relative; margin-bottom: 40px; }
         
         h1 { letter-spacing: 0.6em; font-size: 1rem; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; color: var(--gold); opacity: 0.8; }
         
@@ -18,25 +18,31 @@
         .tech-sidebar b { color: #fff; }
         .status-dot { width: 6px; height: 6px; background: var(--gold); display: inline-block; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px var(--gold); }
 
-        .value { font-size: 2.2rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: -1px; }
+        .value { font-size: 2.2rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: -1px; line-height: 1; }
         
         #canvas-container { width: 380px; height: 380px; border: 1px solid #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); }
         
         #canvas-container::after { content: ""; position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 2px solid rgba(212,175,55,0.2); animation: rotate 4s linear infinite; pointer-events: none; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .directiva { background: rgba(212,175,55,0.03); padding: 20px; border-left: 4px solid var(--gold); color: #fff; font-size: 1rem; line-height: 1.6; margin-top: 20px; font-style: italic; }
+        .directiva { background: rgba(212,175,55,0.03); padding: 25px; border-left: 4px solid var(--gold); color: #fff; font-size: 1rem; line-height: 1.6; margin-top: 20px; }
+        .directiva b { color: var(--gold); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
 
         .btn-nasa { background: var(--gold); color: #000; border: none; padding: 22px; width: 100%; font-weight: bold; letter-spacing: 0.4em; cursor: pointer; text-transform: uppercase; margin-top: 30px; transition: 0.4s; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
-        .btn-nasa:hover { background: #fff; box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); transform: scale(1.01); }
+        .btn-nasa:hover { background: #fff; transform: scale(1.01); }
 
         .loader-bar { width: 200px; height: 2px; background: #111; margin: 20px auto; position: relative; overflow: hidden; }
         .loader-bar::after { content: ""; position: absolute; width: 50px; height: 100%; background: var(--gold); animation: slide 1.5s infinite linear; }
         @keyframes slide { from { left: -50px; } to { left: 200px; } }
 
-        /* Estilo para el prompt de activación */
         #activation-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         .activation-input { background: transparent; border: 1px solid var(--gold); color: #fff; padding: 15px; width: 300px; text-align: center; font-family: inherit; margin-bottom: 20px; outline: none; }
+
+        /* Footer Mejorado */
+        footer { width: 100%; max-width: 1000px; border-top: 1px solid rgba(212,175,55,0.1); padding: 30px 0; text-align: center; background: #000; z-index: 10; }
+        .footer-links a { color: var(--gold); text-decoration: none; font-size: 0.8rem; opacity: 0.5; margin: 0 20px; letter-spacing: 2px; transition: 0.3s; }
+        .footer-links a:hover { opacity: 1; }
+        .footer-tag { font-size: 0.6rem; color: #333; letter-spacing: 5px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -59,6 +65,9 @@
     <div style="margin-top: 30px; border-left: 4px solid var(--gold); padding-left: 20px;">
         <span style="font-size: 0.7rem; color: #555; letter-spacing: 0.3em;">SUJETO DE ANÁLISIS</span>
         <div class="value" id="nombre">---</div>
+        <div id="datos-origen" style="font-size: 0.7rem; color: var(--gold); opacity: 0.5; letter-spacing: 0.2em; margin-top: 8px;">
+            CARGANDO COORDENADAS NATALES...
+        </div>
     </div>
 
     <div class="vault-layout">
@@ -81,13 +90,17 @@
     </div>
 
     <div class="directiva" id="directiva">---</div>
-    
-    <button class="btn-nasa" id="btn-next">INICIAR SECUENCIA</button>
 
-    <div style="text-align: center; margin-top: 25px; font-size: 0.5rem; color: #333; letter-spacing: 0.5em;">
-        CLASSIFIED INFORMATION - EYES ONLY
-    </div>
+    <button class="btn-nasa" id="btn-next">INICIAR SECUENCIA</button>
 </div>
+
+<footer>
+    <div class="footer-links">
+        <a href="privacidad.html">PRIVACIDAD</a>
+        <a href="terminos.html">TÉRMINOS DE OPERACIÓN</a>
+    </div>
+    <div class="footer-tag">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
+</footer>
 
 <script>
 let globalUserEmail = "";
@@ -98,23 +111,19 @@ async function inicializarApp() {
     let email = urlParams.get('email');
 
     if (isElectron) {
-        // En PC, intentamos recuperar el email de la memoria local
         const savedEmail = localStorage.getItem('vault_user_email');
         if (savedEmail) {
             globalUserEmail = savedEmail;
             conectarNucleo(savedEmail);
         } else if (email) {
-            // Si viene por URL la primera vez (ej. redirección post-pago)
             localStorage.setItem('vault_user_email', email);
             globalUserEmail = email;
             conectarNucleo(email);
         } else {
-            // No hay email en memoria ni URL: Pedir activación
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('activation-overlay').style.display = 'flex';
         }
     } else {
-        // En WEB, flujo normal por URL
         if (email) {
             globalUserEmail = email;
             conectarNucleo(email);
@@ -143,7 +152,14 @@ async function conectarNucleo(email) {
         if (res.status === "success" && res.data) {
             const userData = res.data;
             document.getElementById('nombre').innerText = userData.nombre.toUpperCase();
-            document.getElementById('directiva').innerText = userData.directiva;
+            
+            // Mostrar datos de origen formateados
+            const fecha = new Date(userData.fecha_nacimiento).toLocaleDateString('es-ES');
+            document.getElementById('datos-origen').innerText = `${fecha} // ${userData.hora_nacimiento} // ${userData.lugar_nacimiento.toUpperCase()}`;
+            
+            // Enganche dinámico en la directiva
+            document.getElementById('directiva').innerHTML = `<b>DIRECTIVA DE COMANDO:</b> Los ángulos indican que hoy es un día clave para ${userData.directiva.toLowerCase()}`;
+            
             document.getElementById('geo-display').innerText = userData.geo_ref.split('|')[0].replace('LAT:', '');
             document.getElementById('auth-status').innerText = "VERIFIED";
             
@@ -155,10 +171,7 @@ async function conectarNucleo(email) {
             dibujarRadar(vectores);
             llenarSideData(vectores);
 
-            // LÓGICA DE SALTO DE SUSCRIPCIÓN
             const btn = document.getElementById('btn-next');
-            
-            // Si es versión PC O si el usuario ya es GENESIS en la DB
             if (isElectron || userData.nivel_suscripcion === 'genesis') {
                 btn.innerText = "ACCEDER AL CENTRO DE COMANDO";
                 btn.onclick = () => {
@@ -170,7 +183,6 @@ async function conectarNucleo(email) {
                     window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`;
                 };
             }
-
         } else {
             statusMsg.innerText = "CÁLCULO EN PROCESO... REINTENTANDO.";
             setTimeout(() => conectarNucleo(email), 3000);
