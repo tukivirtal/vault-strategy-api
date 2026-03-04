@@ -24,7 +24,8 @@
         #canvas-container { width: 380px; height: 380px; border-radius: 50%; border: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; position: relative; }
         .directiva { background: rgba(212,175,55,0.05); padding: 25px; border-left: 4px solid var(--gold); color: #fff; margin-top: 20px; }
         
-        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 22px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 30px; letter-spacing: 3px; text-transform: uppercase; }
+        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 22px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 30px; letter-spacing: 3px; text-transform: uppercase; transition: 0.3s; }
+        .btn-nasa:hover { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
         footer { width: 100%; padding: 40px 0; background: #000; border-top: 1px solid #222; text-align: center; margin-top: auto; display: none; }
         footer a { color: var(--gold); text-decoration: none; margin: 0 15px; font-size: 0.85rem; font-weight: bold; }
@@ -55,14 +56,14 @@
             <span style="color:var(--gold)">●</span> SISTEMA STATUS<br>
             <div style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
                 CONEXIÓN: <b>ESTABLE</b><br>
-                AUTH: <b id="auth-status">---</b><br>
-                GEO: <b id="geo-display">---</b>
+                AUTH: <b id="auth-status" style="color:#fff">---</b><br>
+                GEO: <b id="geo-display" style="color:#fff">---</b>
             </div>
         </div>
     </div>
 
     <div class="directiva" id="directiva">---</div>
-    <button class="btn-nasa" id="btn-action">INICIAR SECUENCIA</button>
+    <button class="btn-nasa" id="btn-action">UPGRADE: ACCEDER A SUSCRIPCIÓN</button>
 </div>
 
 <footer id="main-footer">
@@ -73,7 +74,7 @@
 <script>
 async function conectar() {
     const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email') || "testing@gmail.com";
+    const email = urlParams.get('email') || "marcoaurelio@gmail.com";
     
     try {
         const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
@@ -81,38 +82,54 @@ async function conectar() {
 
         if (res.status === "success" && res.data) {
             const d = res.data;
-            document.getElementById('nombre').innerText = (d.nombre || "Usuario").toUpperCase();
+            document.getElementById('nombre').innerText = (d.nombre || "MARCO AURELIO").toUpperCase();
             
-            // Reparación de fecha y telemetría
-            const fecha = d.fecha_nacimiento ? new Date(d.fecha_nacimiento).toLocaleDateString('es-ES') : "31/12/2025";
-            const hora = d.hora_nacimiento || "00:00";
-            const lugar = (d.lugar_nacimiento || "Sincronizando...").toUpperCase();
+            // Reparación de Telemetría: Datos Reales
+            // Usamos datos de respaldo si los campos específicos de fecha vienen vacíos
+            const fecha = d.fecha_nacimiento ? new Date(d.fecha_nacimiento).toLocaleDateString('es-ES') : "03/03/2026";
+            const hora = d.hora_nacimiento || "21:56";
+            const lugar = (d.lugar_nacimiento || "Sincronización Completa").toUpperCase();
             document.getElementById('datos-origen').innerText = `${fecha} // ${hora} // ${lugar}`;
 
             // Datos Laterales
-            document.getElementById('auth-status').innerText = d.auth || "VERIFIED";
-            document.getElementById('geo-display').innerText = d.geo ? `LAT: ${d.geo.lat}` : "LAT: -36.37";
+            document.getElementById('auth-status').innerText = d.auth || "VERIFIED_VAULT";
+            document.getElementById('geo-display').innerText = d.geo ? `LAT: ${d.geo.lat.toFixed(2)}` : "LAT: 43.45";
 
-            // IA y Directiva
-            document.getElementById('directiva').innerHTML = `<b>DIRECTIVA IA:</b> ${d.directive || d.directiva || "Protocolo Estable."}`;
+            // IA y Directiva Dinámica basada en Análisis Kepler
+            let msgIA = d.directive || "PROTOCOLO ESTABLE ACTIVO";
+            if (d.analisis_kepler && d.analisis_kepler.length > 0) {
+                const tipo = d.analisis_kepler[0].tipo; // Ej: SEXTIL
+                const interpretaciones = {
+                    "SEXTIL": "Los ángulos indican una oportunidad fluida: ventana abierta para negociaciones de alto nivel.",
+                    "OPOSICIÓN": "Contraste crítico detectado: equilibre sus activos y pasivos hoy.",
+                    "CONJUNCIÓN": "Singularidad energética: momento óptimo para nuevas firmas y lanzamientos."
+                };
+                msgIA = `<b>DIRECTIVA IA:</b> ${interpretaciones[tipo] || msgIA}`;
+            }
+            document.getElementById('directiva').innerHTML = msgIA;
 
-            // Configuración del Botón Amarillo
+            // ACTIVACIÓN DEL BOTÓN DE SUSCRIPCIÓN
             const btn = document.getElementById('btn-action');
-            btn.innerText = "UPGRADE: ACCEDER A SUSCRIPCIÓN";
-            btn.onclick = () => { window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`; };
+            btn.onclick = () => { 
+                window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`; 
+            };
 
-            // Mostrar Interfaz
+            // Mostrar Interfaz y Footer
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('reporte').style.display = 'block';
             document.getElementById('main-footer').style.display = 'block';
             
+            // Cargar Vectores y Radar
             const vectores = d.vectores_eclipticos || (d.mapatotal ? d.mapatotal.vectores_eclipticos : null);
             if (vectores) {
                 dibujar(vectores);
                 llenarListado(vectores);
             }
         }
-    } catch (e) { console.log("Fallo de enlace"); }
+    } catch (e) { 
+        console.error("Fallo de enlace"); 
+        document.getElementById('loading-screen').innerText = "ERROR DE CONEXIÓN AL NÚCLEO";
+    }
 }
 
 function llenarListado(vectores) {
@@ -128,7 +145,7 @@ function dibujar(vectores) {
     Object.entries(vectores).forEach(([nom, grad]) => {
         const rad = (grad - 90) * Math.PI / 180;
         const x = 190 + 145 * Math.cos(rad); const y = 190 + 145 * Math.sin(rad);
-        svg += `<line x1="190" y1="190" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.2)" /><circle cx="${x}" cy="${y}" r="4" fill="#fff" /><text x="${x+8}" y="${y+4}" fill="#d4af37" font-size="9" font-weight="bold">${nom}</text>`;
+        svg += `<line x1="190" y1="190" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.2)" stroke-width="0.5" /><circle cx="${x}" cy="${y}" r="4" fill="#fff" /><text x="${x+8}" y="${y+4}" fill="#d4af37" font-size="9" font-weight="bold">${nom}</text>`;
     });
     document.getElementById('canvas-container').innerHTML = svg + `</svg>`;
 }
