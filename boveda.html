@@ -17,14 +17,14 @@
         .value { font-size: 2.2rem; color: #fff; font-weight: 600; text-transform: uppercase; }
         #datos-origen { font-size: 0.9rem; color: var(--gold); font-weight: bold; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; letter-spacing: 2px; }
         
-        /* Layout para recuperar los laterales */
         .vault-layout { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; width: 100%; gap: 20px; }
         .sidebar { width: 180px; font-size: 0.7rem; color: #666; text-transform: uppercase; line-height: 2; }
         .sidebar b { color: #fff; }
         
         #canvas-container { width: 380px; height: 380px; border-radius: 50%; border: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; position: relative; }
         .directiva { background: rgba(212,175,55,0.05); padding: 25px; border-left: 4px solid var(--gold); color: #fff; margin-top: 20px; }
-        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 22px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 30px; letter-spacing: 3px; }
+        
+        .btn-nasa { background: var(--gold); color: #000; border: none; padding: 22px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 30px; letter-spacing: 3px; text-transform: uppercase; }
 
         footer { width: 100%; padding: 40px 0; background: #000; border-top: 1px solid #222; text-align: center; margin-top: auto; display: none; }
         footer a { color: var(--gold); text-decoration: none; margin: 0 15px; font-size: 0.85rem; font-weight: bold; }
@@ -62,7 +62,7 @@
     </div>
 
     <div class="directiva" id="directiva">---</div>
-    <button class="btn-nasa" id="btn-next">INICIAR SECUENCIA</button>
+    <button class="btn-nasa" id="btn-action">INICIAR SECUENCIA</button>
 </div>
 
 <footer id="main-footer">
@@ -81,37 +81,38 @@ async function conectar() {
 
         if (res.status === "success" && res.data) {
             const d = res.data;
-            document.getElementById('nombre').innerText = d.nombre.toUpperCase();
+            document.getElementById('nombre').innerText = (d.nombre || "Usuario").toUpperCase();
             
-            // Corrección de Fecha (Evita el "Invalid Date")
-            const fechaRaw = d.fecha_nacimiento || d.fecha || "2026-01-01";
-            const fecha = new Date(fechaRaw).toLocaleDateString('es-ES');
-            const hora = d.hora_nacimiento || d.hora || "00:00";
-            const lugar = (d.lugar_nacimiento || d.lugar || "Sincronizando...").toUpperCase();
+            // Reparación de fecha y telemetría
+            const fecha = d.fecha_nacimiento ? new Date(d.fecha_nacimiento).toLocaleDateString('es-ES') : "31/12/2025";
+            const hora = d.hora_nacimiento || "00:00";
+            const lugar = (d.lugar_nacimiento || "Sincronizando...").toUpperCase();
             document.getElementById('datos-origen').innerText = `${fecha} // ${hora} // ${lugar}`;
 
             // Datos Laterales
             document.getElementById('auth-status').innerText = d.auth || "VERIFIED";
             document.getElementById('geo-display').innerText = d.geo ? `LAT: ${d.geo.lat}` : "LAT: -36.37";
 
-            // Sugerencia IA
-            let msgIA = d.directive || d.directiva;
-            if (d.analisis_kepler && d.analisis_kepler.length > 0) {
-                const tipo = d.analisis_kepler[0].tipo;
-                const mapa = { "OPOSICIÓN": "Contraste crítico: equilibre sus activos hoy.", "CONJUNCIÓN": "Singularidad: momento de firmas.", "SEXTIL": "Flujo favorable: ventana para negociar." };
-                msgIA = `<b>DIRECTIVA IA:</b> ${mapa[tipo] || msgIA}`;
-            }
-            document.getElementById('directiva').innerHTML = msgIA;
+            // IA y Directiva
+            document.getElementById('directiva').innerHTML = `<b>DIRECTIVA IA:</b> ${d.directive || d.directiva || "Protocolo Estable."}`;
+
+            // Configuración del Botón Amarillo
+            const btn = document.getElementById('btn-action');
+            btn.innerText = "UPGRADE: ACCEDER A SUSCRIPCIÓN";
+            btn.onclick = () => { window.location.href = `suscripcion.html?email=${encodeURIComponent(email)}`; };
 
             // Mostrar Interfaz
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('reporte').style.display = 'block';
             document.getElementById('main-footer').style.display = 'block';
             
-            dibujar(d.vectores_eclipticos || d.mapatotal.vectores_eclipticos);
-            llenarListado(d.vectores_eclipticos || d.mapatotal.vectores_eclipticos);
+            const vectores = d.vectores_eclipticos || (d.mapatotal ? d.mapatotal.vectores_eclipticos : null);
+            if (vectores) {
+                dibujar(vectores);
+                llenarListado(vectores);
+            }
         }
-    } catch (e) { console.log("Error de enlace"); }
+    } catch (e) { console.log("Fallo de enlace"); }
 }
 
 function llenarListado(vectores) {
