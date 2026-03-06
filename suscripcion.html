@@ -240,7 +240,7 @@
         paypal.Buttons({
             style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
             createSubscription: function(data, actions) {
-                const planIds = { 'sentinel': 'P-REEMPLAZAR_POR_ID_PLAN_SENTINEL', 'executive': 'P-REEMPLAZAR_POR_ID_PLAN_EXECUTIVE' };
+                const planIds = { 'sentinel': 'P-9GM793332C077920BNGVDIFQ', 'executive': 'P-8DS69566RH0969611NGVDROQ' };
                 return actions.subscription.create({ 'plan_id': planIds[plan], 'subscriber': { 'email_address': userEmail } });
             },
             onApprove: function(data, actions) {
