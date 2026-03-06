@@ -252,25 +252,28 @@
     });
 
     // 2. Renderizar Botón PayPal (Pago Único: GENESIS)
-    paypal.Buttons({
-        style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'checkout' },
-        createOrder: function(data, actions) {
-            return actions.order.create({
-                purchase_units: [{
-                    amount: { currency_code: 'USD', value: '150.00', breakdown: { item_total: { currency_code: 'USD', value: '150.00' } } },
-                    items: [{ name: 'NIVEL GÉNESIS (Vault Logic Origin)', unit_amount: { currency_code: 'USD', value: '150.00' }, quantity: '1' }],
-                    custom_id: userEmail // ID personalizado para el Webhook
-                }]
-            });
-        },
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(function(orderData) {
-                console.log('Pago Génesis Único Capturado:', orderData.id);
-                // Redirigir a Génesis-Live con estado de éxito
-                window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=GENESIS_ACTIVE`;
-            });
-        }
-    }).render('#paypal-button-genesis');
+   // Este es el botón para Génesis (Pago Único)
+paypal.Buttons({
+    style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'buynow' },
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                description: "NIVEL GÉNESIS - ACCESO VITALICIO",
+                amount: { 
+                    currency_code: 'USD',
+                    value: '150.00' // Aquí defines el monto exacto
+                },
+                custom_id: emailUsuario // Importante para tu Webhook
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+            // Lógica tras el pago exitoso
+            window.location.href = "genesis-live.html?auth=success";
+        });
+    }
+}).render('#paypal-button-genesis');
 </script>
 
 </body>
