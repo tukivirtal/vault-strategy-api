@@ -5,67 +5,48 @@
     <title>Vault Logic | Centro de Soporte</title>
     <style>
         :root { --gold: #d4af37; --bg: #050505; --white: #ffffff; }
-        body { 
-            background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; 
-            margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; 
-        }
+        body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .support-container { max-width: 600px; width: 100%; background: rgba(10,10,10,0.9); border: 1px solid #1a1a1a; padding: 40px; }
         h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); }
         .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; }
-        .info-box b { color: var(--gold); text-transform: uppercase; }
-        
         form { display: flex; flex-direction: column; gap: 20px; }
-        label { font-size: 0.6rem; letter-spacing: 2px; color: #555; }
-        input, textarea, select { 
-            background: transparent; border: 1px solid #333; color: #fff; padding: 12px; 
-            font-family: inherit; font-size: 0.8rem; outline: none;
-        }
+        label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; }
+        input, textarea, select { background: #111; border: 1px solid #333; color: #fff; padding: 12px; font-family: inherit; font-size: 0.9rem; outline: none; }
         input:focus, textarea:focus { border-color: var(--gold); }
-        .btn-send { 
-            background: var(--gold); color: #000; border: none; padding: 15px; 
-            font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px;
-        }
+        .btn-send { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; }
         .btn-send:hover { background: #fff; }
-        .back-link { margin-top: 30px; font-size: 0.7rem; color: #444; text-decoration: none; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <div class="support-container">
-    <h1>CENTRO DE SOPORTE GXP</h1>
-    
+    <h1>SOPORTE TÉCNICO GXP</h1>
     <div class="info-box">
-        <b>Estado del Enlace:</b> OPERATIVO<br>
-        <b>Tiempo de Respuesta:</b> < 12 HORAS<br>
-        Si presenta problemas con la sincronización de su nivel de acceso (Sentinel/Executive/Génesis), envíe este formulario con su ID de transacción.
+        <b>ESTADO DEL SISTEMA:</b> OPERATIVO<br>
+        <b>CANAL DE ENLACE:</b> CIFRADO AES-256<br>
+        Reporte cualquier anomalía en su nivel de acceso. El tiempo estimado de respuesta es de 12 horas.
     </div>
 
     <form action="https://formspree.io/f/TU_ID_AQUI" method="POST">
-        <div>
-            <label>ID DE USUARIO (EMAIL)</label><br>
-            <input type="email" name="email" required placeholder="admin@ejemplo.com">
-        </div>
+        <label>ID DE USUARIO (EMAIL)</label>
+        <input type="email" name="email" required placeholder="admin@vaultlogic.com">
         
-        <div>
-            <label>NIVEL DE PROTOCOLO</label><br>
-            <select name="tier">
-                <option value="sentinel">SENTINEL</option>
-                <option value="executive">EXECUTIVE</option>
-                <option value="genesis">GÉNESIS</option>
-                <option value="tecnico">FALLO TÉCNICO GENERAL</option>
-            </select>
-        </div>
+        <label>NIVEL AFECTADO</label>
+        <select name="tier">
+            <option value="sentinel">SENTINEL ($15)</option>
+            <option value="executive">EXECUTIVE ($45)</option>
+            <option value="genesis">GÉNESIS ($150)</option>
+            <option value="tecnico">ERROR DE CARGA / OTROS</option>
+        </select>
 
-        <div>
-            <label>MENSAJE / CÓDIGO DE ERROR</label><br>
-            <textarea name="message" rows="5" required placeholder="Describa la anomalía detectada..."></textarea>
-        </div>
+        <label>DESCRIPCIÓN DEL INCIDENTE</label>
+        <textarea name="message" rows="5" required placeholder="Describa el error detectado..."></textarea>
 
         <button type="submit" class="btn-send">ENVIAR INFORME</button>
     </form>
 </div>
 
-<a href="suscripcion.html" class="back-link">← REGRESAR A MATRIZ</a>
+<a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
 
 </body>
 </html>
