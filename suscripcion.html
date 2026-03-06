@@ -3,157 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Vault Logic | Protocolos de Acceso</title>
-    <script src="https://www.paypal.com/sdk/js?AVthOo0n0mjF-ybIK2xRmxKAMNLPumDRYXxeQPgd0S13K5eXNCgc458zjvhdArzFFgjmGMcD5QxwV6XC&currency=USD&components=buttons"></script>
+    <script>
+        // Ofuscación del SDK de PayPal
+        (function() {
+            const _c = "QVZ0aE9vMG4wbWpGLXliSUsyeFJteEtBTU5MUHVtRFJZWHhlUVBnZDBTMTNLNWVYTkNnYzQ1OHpqdmhkQXJ6RkZnam1HTWNENVF4d1Y2WEM=";
+            const s = document.createElement('script');
+            s.src = `https://www.paypal.com/sdk/js?client-id=${atob(_c)}&currency=USD&components=buttons&vault=true`;
+            document.head.appendChild(s);
+        })();
+    </script>
     
     <style>
-        :root {
-            --gold: #d4af37;
-            --dark-bg: #050505;
-            --mate-card: rgba(12, 12, 12, 0.99);
-            --white-text: #ffffff;
-            --gold-glow: rgba(212, 175, 55, 0.15);
-        }
-
-        body {
-            background: radial-gradient(circle at center, #111 0%, var(--dark-bg) 100%);
-            color: var(--gold);
-            font-family: 'JetBrains Mono', monospace;
-            margin: 0;
-            padding: 60px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* Barra de Seguridad Superior */
-        .security-bar {
-            font-size: 0.7rem; /* Agrandado */
-            color: var(--white-text); /* Texto en Blanco para contraste total */
-            letter-spacing: 0.4em;
-            margin-bottom: 50px;
-            border: 1px solid var(--gold); /* Borde dorado */
-            padding: 12px 35px;
-            border-radius: 50px;
-            background: rgba(0,0,0,0.8);
-        }
-
+        :root { --gold: #d4af37; --dark-bg: #050505; --mate-card: rgba(12, 12, 12, 0.99); --white-text: #ffffff; }
+        body { background: radial-gradient(circle at center, #111 0%, var(--dark-bg) 100%); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .security-bar { font-size: 0.7rem; color: var(--white-text); letter-spacing: 0.4em; margin-bottom: 50px; border: 1px solid var(--gold); padding: 12px 35px; border-radius: 50px; background: rgba(0,0,0,0.8); }
         header { text-align: center; margin-bottom: 70px; }
         header h1 { letter-spacing: 0.8em; font-size: 1.6rem; font-weight: 300; margin-bottom: 15px; }
-        header p { color: #fff; font-size: 0.8rem; letter-spacing: 0.3em; font-weight: bold; } /* Agrandado y Blanco */
-
-        .subscription-container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .tier-card {
-            background: var(--mate-card);
-            border: 1px solid #222; /* Borde más visible */
-            padding: 45px;
-            display: grid;
-            grid-template-columns: 1fr 220px; /* Ancho para botones PayPal */
-            gap: 35px;
-            transition: 0.4s;
-            position: relative;
-        }
-
+        header p { color: #fff; font-size: 0.8rem; letter-spacing: 0.3em; font-weight: bold; }
+        .subscription-container { display: flex; flex-direction: column; gap: 25px; width: 100%; max-width: 800px; }
+        .tier-card { background: var(--mate-card); border: 1px solid #222; padding: 45px; display: grid; grid-template-columns: 1fr 220px; gap: 35px; transition: 0.4s; position: relative; }
         .tier-card:hover { border-color: var(--gold); transform: translateY(-3px); }
-
-        /* Estilo Destacado Génesis */
-        .tier-card.genesis {
-            border: 2px solid var(--gold); /* Borde más grueso */
-            background: linear-gradient(150deg, #0a0a0a 0%, #1a180a 100%);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-        }
-
-        .badge-vitalicio {
-            position: absolute;
-            top: -14px;
-            right: 45px;
-            background: var(--gold);
-            color: #000;
-            font-size: 0.7rem; /* Agrandado */
-            font-weight: bold;
-            padding: 5px 20px;
-            letter-spacing: 2px;
-        }
-
+        .tier-card.genesis { border: 2px solid var(--gold); background: linear-gradient(150deg, #0a0a0a 0%, #1a180a 100%); box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
+        .badge-vitalicio { position: absolute; top: -14px; right: 45px; background: var(--gold); color: #000; font-size: 0.7rem; font-weight: bold; padding: 5px 20px; letter-spacing: 2px; }
         .tier-info h3 { margin: 0 0 15px 0; letter-spacing: 0.4em; font-size: 1.25rem; color: var(--white-text); }
-        
-        /* CORRECCIÓN DE LEGIBILIDAD: Descripción */
-        .tier-description { 
-            font-size: 0.9rem; /* Agrandado agresivamente */
-            color: #ccc; /* Gris mucho más claro, casi blanco */
-            line-height: 1.8; 
-            margin-bottom: 30px; 
-            font-weight: 300; 
-            text-align: justify;
-        }
-
+        .tier-description { font-size: 0.9rem; color: #ccc; line-height: 1.8; margin-bottom: 30px; text-align: justify; }
         .tier-features { list-style: none; padding: 0; margin: 0; }
-        .tier-features li {
-            font-size: 0.85rem; /* Agrandado */
-            margin-bottom: 12px;
-            color: #fff; /* Texto en Blanco */
-            display: flex;
-            align-items: center;
-        }
-        .tier-features li::before {
-            content: "●";
-            color: var(--gold);
-            margin-right: 15px;
-            font-size: 0.7rem;
-        }
-
-        .price-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-left: 1px solid #222;
-            padding-left: 35px;
-        }
-
+        .tier-features li { font-size: 0.85rem; margin-bottom: 12px; color: #fff; display: flex; align-items: center; }
+        .tier-features li::before { content: "●"; color: var(--gold); margin-right: 15px; font-size: 0.7rem; }
+        .price-section { display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 1px solid #222; padding-left: 35px; }
         .price { font-size: 2.6rem; color: var(--white-text); font-weight: 200; }
-        .period { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-top: 8px; font-weight: bold; } /* Más claro y grande */
-
-        /* Contenedor para el Botón Inteligente de PayPal */
-        .paypal-button-container {
-            margin-top: 30px;
-            width: 100%;
-            min-height: 45px;
-        }
-
-        footer {
-            margin-top: 120px;
-            padding: 50px;
-            border-top: 1px solid #111;
-            width: 100%;
-            text-align: center;
-            background: #000;
-        }
-
-        .footer-links a {
-            color: #fff; /* En Blanco */
-            text-decoration: none;
-            font-size: 0.8rem; /* Agrandado */
-            margin: 0 25px;
-            letter-spacing: 2px;
-            transition: 0.3s;
-            font-weight: bold;
-        }
-        .footer-links a:hover { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+        .period { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-top: 8px; font-weight: bold; }
+        .paypal-button-container { margin-top: 30px; width: 100%; min-height: 45px; }
+        footer { margin-top: 120px; padding: 50px; border-top: 1px solid #111; width: 100%; text-align: center; background: #000; }
+        .footer-links a { color: #fff; text-decoration: none; font-size: 0.8rem; margin: 0 25px; letter-spacing: 2px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="security-bar">
-    AES-256 ENCRYPTED // END-TO-END CHECKOUT ACTIVE
-</div>
+<div class="security-bar">AES-256 ENCRYPTED // END-TO-END CHECKOUT ACTIVE</div>
 
 <header>
     <h1>MATRIZ DE ACCESO</h1>
@@ -161,7 +48,6 @@
 </header>
 
 <div class="subscription-container">
-
     <div class="tier-card">
         <div class="tier-info">
             <h3>SENTINEL</h3>
@@ -182,9 +68,9 @@
     <div class="tier-card">
         <div class="tier-info">
             <h3>EXECUTIVE</h3>
-            <p class="tier-description">Inteligencia avanzada de tránsitos. Diseñado para optimizar flujos de capital Executive mediante geometría predictiva y simulaciones de mercado.</p>
+            <p class="tier-description">Inteligencia avanzada de tránsitos. Diseñado para optimizar flujos de capital mediante geometría predictiva y simulaciones.</p>
             <ul class="tier-features">
-                <li>Dashboard de Vectores Activos (Génesis Core)</li>
+                <li>Dashboard de Vectores Activos</li>
                 <li>Notificaciones de Oportunidad GXP</li>
                 <li>Análisis de Tendencias a 30 días</li>
             </ul>
@@ -200,11 +86,11 @@
         <div class="badge-vitalicio">ORIGEN VITALICIO</div>
         <div class="tier-info">
             <h3>GENESIS</h3>
-            <p class="tier-description">Arquitectura de Origen. Desbloqueo total del motor de simulación histórico, proyecciones a 10 años y Dossier GX-2026 Descargable.</p>
+            <p class="tier-description">Arquitectura de Origen. Desbloqueo total del motor de simulación histórico y proyecciones a 10 años.</p>
             <ul class="tier-features">
                 <li>Simulador de Destino Total (10 Años)</li>
-                <li>Mapa de Geometría Sagrada Descargable</li>
-                <li>Formatos de Datos PDF/JSON Classified</li>
+                <li>Mapa de Geometría Sagrada</li>
+                <li>Dossier GX-2026 Descargable</li>
             </ul>
         </div>
         <div class="price-section">
@@ -213,7 +99,6 @@
             <div id="paypal-button-genesis" class="paypal-button-container"></div>
         </div>
     </div>
-
 </div>
 
 <a href="index.html" style="margin-top: 50px; color: #666; font-size: 0.7rem; text-decoration: none; letter-spacing: 2px; font-weight: bold;">← REGRESAR AL NÚCLEO CENTRAL</a>
@@ -224,57 +109,52 @@
         <a href="terminos.html">TÉRMINOS</a>
         <a href="soporte.html">SOPORTE</a>
     </div>
-    <div style="color: #444; font-size: 0.65rem; margin-top: 25px; letter-spacing: 5px; font-weight: bold;">
-        VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026
-    </div>
+    <div style="color: #444; font-size: 0.65rem; margin-top: 25px; letter-spacing: 5px; font-weight: bold;">VAULT LOGIC SYSTEMS // 2026</div>
 </footer>
 
 <script>
-    // Configuración Lógica de Pasarela
+    const _d = (s) => atob(s);
     const userEmail = new URLSearchParams(window.location.search).get('email') || "test_user@gmail.com";
+    
+    // IDs de Planes Ofuscados
+    const _p = {
+        'sentinel': _d('UC05R003OTMzMzJDMDc3OTIwQk5HVkRJRlE='),
+        'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
+    };
 
-    // 1. Renderizar Botones PayPal (Suscripciones Mensuales)
-    // Debes tener creados los Planes en tu panel de PayPal
     const suscripciones = ['sentinel', 'executive'];
     suscripciones.forEach(plan => {
         paypal.Buttons({
             style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
             createSubscription: function(data, actions) {
-                const planIds = { 'sentinel': 'P-9GM793332C077920BNGVDIFQ', 'executive': 'P-8DS69566RH0969611NGVDROQ' };
-                return actions.subscription.create({ 'plan_id': planIds[plan], 'subscriber': { 'email_address': userEmail } });
+                return actions.subscription.create({
+                    'plan_id': _p[plan],
+                    'subscriber': { 'email_address': userEmail }
+                });
             },
             onApprove: function(data, actions) {
-                console.log(`Pago aprobado para ${plan}:`, data.subscriptionID);
-                // El Webhook se encargará de activar la cuenta en Render.
                 window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
             }
         }).render(`#paypal-button-${plan}`);
     });
 
-    // 2. Renderizar Botón PayPal (Pago Único: GENESIS)
-   // Este es el botón para Génesis (Pago Único)
-paypal.Buttons({
-    style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'buynow' },
-    createOrder: function(data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                description: "NIVEL GÉNESIS - ACCESO VITALICIO",
-                amount: { 
-                    currency_code: 'USD',
-                    value: '150.00' // Aquí defines el monto exacto
-                },
-                custom_id: emailUsuario // Importante para tu Webhook
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-            // Lógica tras el pago exitoso
-            window.location.href = "genesis-live.html?auth=success";
-        });
-    }
-}).render('#paypal-button-genesis');
+    paypal.Buttons({
+        style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'buynow' },
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    description: _d('TklWRUwgR8NOMUVTSVMgLSBBQ0NFU08gVklUQUxJQ0lP'),
+                    amount: { currency_code: 'USD', value: '150.00' },
+                    custom_id: userEmail
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(() => {
+                window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=GENESIS_ACTIVE`;
+            });
+        }
+    }).render('#paypal-button-genesis');
 </script>
-
 </body>
 </html>
