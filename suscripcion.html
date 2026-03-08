@@ -23,7 +23,6 @@
         
         .subscription-container { display: flex; flex-direction: column; gap: 25px; width: 100%; max-width: 800px; }
         
-        /* Efecto de Iluminación corregido */
         .tier-card { 
             background: var(--mate-card); border: 1px solid #222; padding: 45px; 
             display: grid; grid-template-columns: 1fr 220px; gap: 35px; 
@@ -42,8 +41,11 @@
         .price { font-size: 2.6rem; color: var(--white-text); font-weight: 200; }
         .paypal-button-container { margin-top: 20px; width: 100%; min-height: 150px; z-index: 100; }
         
-        footer { margin-top: 100px; padding: 40px; text-align: center; }
-        .footer-links a { color: #fff; text-decoration: none; margin: 0 15px; font-size: 0.8rem; letter-spacing: 2px; }
+        footer { margin-top: 100px; padding: 40px; text-align: center; border-top: 1px solid #222; width: 100%; max-width: 800px; }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .footer-links a { color: #fff; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
+        .footer-links a:hover { color: var(--gold); }
+        .copyright { color: #444; font-size: 0.6rem; letter-spacing: 4px; }
     </style>
 </head>
 <body>
@@ -92,8 +94,11 @@
 
 <footer>
     <div class="footer-links">
+        <a href="privacidad.html">PRIVACIDAD</a>
+        <a href="terminos.html">TÉRMINOS</a>
         <a href="soporte.html">SOPORTE</a>
     </div>
+    <div class="copyright">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
 </footer>
 
 <script>
@@ -114,23 +119,35 @@
                 'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
             };
 
-            // Suscripciones
-            ['sentinel', 'executive'].forEach(plan => {
-                paypal.Buttons({
-                    style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
-                    createSubscription: function(data, actions) {
-                        return actions.subscription.create({
-                            'plan_id': _p[plan],
-                            'subscriber': { 'email_address': userEmail }
-                        });
-                    },
-                    onApprove: function(data, actions) {
-                        window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
-                    }
-                }).render(`#paypal-button-${plan}`);
-            });
+            // SENTINEL
+            paypal.Buttons({
+                style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': _p['sentinel'],
+                        'subscriber': { 'email_address': userEmail }
+                    });
+                },
+                onApprove: function(data, actions) {
+                    window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
+                }
+            }).render('#paypal-button-sentinel');
 
-            // Pago Único Génesis ($150)
+            // EXECUTIVE - CORREGIDO
+            paypal.Buttons({
+                style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': _p['executive'],
+                        'subscriber': { 'email_address': userEmail }
+                    });
+                },
+                onApprove: function(data, actions) {
+                    window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
+                }
+            }).render('#paypal-button-executive');
+
+            // GENESIS
             paypal.Buttons({
                 style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'buynow' },
                 createOrder: function(data, actions) {
@@ -148,8 +165,8 @@
                     });
                 }
             }).render('#paypal-button-genesis');
-        } // Cierre de renderButtons
-    }; // Cierre de window.onload
+        }
+    };
 </script>
 </body>
 </html>
