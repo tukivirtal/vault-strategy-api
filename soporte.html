@@ -27,14 +27,22 @@
     </div>
 
     <form action="https://formspree.io/f/mkoqgznz" method="POST">
-        <label>TU EMAIL:</label>
-        <input type="email" name="email" required placeholder="tu-correo@ejemplo.com">
+        <label>ID DE USUARIO (EMAIL)</label>
+        <input type="email" name="email" required placeholder="contact@emotionalvaults.com">
         
-        <label>TU MENSAJE:</label>
-        <textarea name="message" rows="5" required placeholder="Describe el inconveniente..."></textarea>
-
-        <button type="submit" class="btn-send">ENVIAR REPORTE</button>
-    </form>
+        <label>NIVEL DE ACCESO</label>
+        <select name="plan_level" style="background:#111; color:#fff; border:1px solid #333; padding:10px; width:100%; margin-bottom:20px;">
+            <option value="General">Error General</option>
+            <option value="Sentinel">Sentinel ($15)</option>
+            <option value="Executive">Executive ($45)</option>
+            <option value="Genesis">Génesis ($150)</option>
+        </select>
+    
+        <label>DESCRIPCIÓN DEL INCIDENTE</label>
+        <textarea name="message" required placeholder="Describa el error detectado..."></textarea>
+    
+        <button type="submit" class="btn-send">ENVIAR INFORME</button>    
+</form>
 </div>
 
 <a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
