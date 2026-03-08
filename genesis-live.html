@@ -150,6 +150,19 @@
     </div>
 
 <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authStatus = urlParams.get('auth');
+            const userEmail = urlParams.get('email');
+        
+            if (authStatus === 'GENESIS_ACTIVE' || authStatus === 'SUCCESS') {
+                console.log("ACCESO TOTAL ACTIVADO");
+                ejecutarInicio(); // Esta función carga las gráficas
+            } else {
+                // Opcional: Redirigir si alguien intenta entrar sin pagar
+                // window.location.href = "suscripcion.html";
+            }
+        };
     const urlParams = new URLSearchParams(window.location.search);
     const userName = urlParams.get('nombre') || "LÍDER GÉNESIS";
 
