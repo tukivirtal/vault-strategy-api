@@ -11,44 +11,33 @@
         .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; }
         form { display: flex; flex-direction: column; gap: 20px; }
         label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; }
-        input, textarea, select { background: #111; border: 1px solid #333; color: #fff; padding: 12px; font-family: inherit; font-size: 0.9rem; outline: none; }
+        input, textarea { background: #111; border: 1px solid #333; color: #fff; padding: 12px; font-family: inherit; font-size: 0.9rem; outline: none; }
         input:focus, textarea:focus { border-color: var(--gold); }
-        .btn-send { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; }
+        .btn-send { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; transition: 0.3s; }
         .btn-send:hover { background: #fff; }
-        .back-link { margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <div class="support-container">
     <h1>SOPORTE TÉCNICO GXP</h1>
-    
     <div class="info-box">
-        <b>ESTADO DEL SISTEMA:</b> OPERATIVO<br>
-        <b>CANAL DE ENLACE:</b> CIFRADO AES-256<br><br>
-        Reporte cualquier anomalía en su nivel de acceso. El tiempo estimado de respuesta es de 12 horas.
+        <b>CANAL DE ENLACE:</b> contact@emotionalvaults.com<br>
+        Reporte cualquier anomalía en su nivel de acceso. Recibirá una respuesta en su Gmail.
     </div>
 
     <form action="https://formspree.io/f/TU_ID_AQUI" method="POST">
-        <label>ID DE USUARIO (EMAIL)</label>
-        <input type="email" name="email" required placeholder="contact@emotionalvaults.com">
+        <label>TU EMAIL:</label>
+        <input type="email" name="email" required placeholder="tu-correo@ejemplo.com">
         
-        <label>NIVEL AFECTADO</label>
-        <select name="tier">
-            <option value="sentinel">SENTINEL ($15)</option>
-            <option value="executive">EXECUTIVE ($45)</option>
-            <option value="genesis">GÉNESIS ($150)</option>
-            <option value="tecnico">ERROR DE CARGA / OTROS</option>
-        </select>
+        <label>TU MENSAJE:</label>
+        <textarea name="message" rows="5" required placeholder="Describe el inconveniente..."></textarea>
 
-        <label>DESCRIPCIÓN DEL INCIDENTE</label>
-        <textarea name="message" rows="5" required placeholder="Describa el error detectado..."></textarea>
-
-        <button type="submit" class="btn-send">ENVIAR INFORME</button>
+        <button type="submit" class="btn-send">ENVIAR REPORTE</button>
     </form>
 </div>
 
-<a href="suscripcion.html" class="back-link">← REGRESAR A MATRIZ</a>
+<a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
 
 </body>
 </html>
