@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Vault Logic | Protocolos de Acceso</title>
     <script>
-        // Ofuscación del SDK de PayPal
+        // Ofuscación del SDK de PayPal y Carga Segura
         (function() {
             const _c = "QVZ0aE9vMG4wbWpGLXliSUsyeFJteEtBTU5MUHVtRFJZWHhlUVBnZDBTMTNLNWVYTkNnYzQ1OHpqdmhkQXJ6RkZnam1HTWNENVF4d1Y2WEM=";
             const s = document.createElement('script');
             s.src = `https://www.paypal.com/sdk/js?client-id=${atob(_c)}&currency=USD&components=buttons&vault=true`;
+            s.async = true;
             document.head.appendChild(s);
         })();
     </script>
@@ -33,7 +34,7 @@
         .price-section { display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 1px solid #222; padding-left: 35px; }
         .price { font-size: 2.6rem; color: var(--white-text); font-weight: 200; }
         .period { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-top: 8px; font-weight: bold; }
-        .paypal-button-container { margin-top: 30px; width: 100%; min-height: 45px; }
+        .paypal-button-container { margin-top: 30px; width: 100%; min-height: 45px; z-index: 10; }
         footer { margin-top: 120px; padding: 50px; border-top: 1px solid #111; width: 100%; text-align: center; background: #000; }
         .footer-links a { color: #fff; text-decoration: none; font-size: 0.8rem; margin: 0 25px; letter-spacing: 2px; font-weight: bold; }
     </style>
@@ -113,48 +114,61 @@
 </footer>
 
 <script>
-    const _d = (s) => atob(s);
-    const userEmail = new URLSearchParams(window.location.search).get('email') || "test_user@gmail.com";
-    
-    // IDs de Planes Ofuscados
-    const _p = {
-        'sentinel': _d('UC05R003OTMzMzJDMDc3OTIwQk5HVkRJRlE='),
-        'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
-    };
-
-    const suscripciones = ['sentinel', 'executive'];
-    suscripciones.forEach(plan => {
-        paypal.Buttons({
-            style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
-            createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                    'plan_id': _p[plan],
-                    'subscriber': { 'email_address': userEmail }
-                });
-            },
-            onApprove: function(data, actions) {
-                window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
+    window.onload = function() {
+        const _d = (s) => atob(s);
+        const userEmail = new URLSearchParams(window.location.search).get('email') || "test_user@gmail.com";
+        
+        // Esperar a que el SDK cargue antes de renderizar
+        const checkPayPal = setInterval(() => {
+            if (typeof paypal !== 'undefined') {
+                clearInterval(checkPayPal);
+                renderButtons();
             }
-        }).render(`#paypal-button-${plan}`);
-    });
+        }, 500);
 
-    paypal.Buttons({
-        style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'buynow' },
-        createOrder: function(data, actions) {
-            return actions.order.create({
-                purchase_units: [{
-                    description: _d('TklWRUwgR8NOMUVTSVMgLSBBQ0NFU08gVklUQUxJQ0lP'),
-                    amount: { currency_code: 'USD', value: '150.00' },
-                    custom_id: userEmail
-                }]
+        function renderButtons() {
+            // IDs de Planes Ofuscados
+            const _p = {
+                'sentinel': _d('UC05R003OTMzMzJDMDc3OTIwQk5HVkRJRlE='),
+                'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
+            };
+
+            // Renderizado Suscripciones
+            ['sentinel', 'executive'].forEach(plan => {
+                paypal.Buttons({
+                    style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+                    createSubscription: function(data, actions) {
+                        return actions.subscription.create({
+                            'plan_id': _p[plan],
+                            'subscriber': { 'email_address': userEmail }
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
+                    }
+                }).render(`#paypal-button-${plan}`);
             });
-        },
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(() => {
-                window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=GENESIS_ACTIVE`;
-            });
+
+            // Renderizado Pago Único Génesis
+            paypal.Buttons({
+                style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'buynow' },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: _d('TklWRUwgR8NOMUVTSVMgLSBBQ0NFU08gVklUQUxJQ0lP'),
+                            amount: { currency_code: 'USD', value: '150.00' },
+                            custom_id: userEmail 
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(() => {
+                        window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=GENESIS_ACTIVE`;
+                    });
+                }
+            }).render('#paypal-button-genesis');
         }
-    }).render('#paypal-button-genesis');
+    };
 </script>
 </body>
 </html>
