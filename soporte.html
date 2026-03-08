@@ -15,21 +15,23 @@
         input:focus, textarea:focus { border-color: var(--gold); }
         .btn-send { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; }
         .btn-send:hover { background: #fff; }
+        .back-link { margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <div class="support-container">
     <h1>SOPORTE TÉCNICO GXP</h1>
+    
     <div class="info-box">
         <b>ESTADO DEL SISTEMA:</b> OPERATIVO<br>
-        <b>CANAL DE ENLACE:</b> CIFRADO AES-256<br>
+        <b>CANAL DE ENLACE:</b> CIFRADO AES-256<br><br>
         Reporte cualquier anomalía en su nivel de acceso. El tiempo estimado de respuesta es de 12 horas.
     </div>
 
     <form action="https://formspree.io/f/TU_ID_AQUI" method="POST">
         <label>ID DE USUARIO (EMAIL)</label>
-        <input type="email" name="email" required placeholder="admin@vaultlogic.com">
+        <input type="email" name="email" required placeholder="contact@emotionalvaults.com">
         
         <label>NIVEL AFECTADO</label>
         <select name="tier">
@@ -46,7 +48,7 @@
     </form>
 </div>
 
-<a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
+<a href="suscripcion.html" class="back-link">← REGRESAR A MATRIZ</a>
 
 </body>
 </html>
