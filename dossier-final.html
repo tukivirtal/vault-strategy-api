@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>GÉNESIS | Dossier de Inteligencia Estratégica GX-2026</title>
     <style>
-        @media print { .no-print { display: none; } }
         :root {
             --gold: #d4af37;
             --alert: #ff4d4d;
@@ -18,205 +17,163 @@
             color: #fff; 
             font-family: 'JetBrains Mono', monospace; 
             margin: 0; padding: 0; 
+            -webkit-print-color-adjust: exact;
         }
 
         .page { 
             width: 210mm; 
             min-height: 297mm; 
-            padding: 25mm 30mm; 
+            padding: 20mm 25mm; 
             margin: 20px auto; 
             background: var(--dark); 
             border: 1px solid #111; 
             position: relative; 
             box-sizing: border-box; 
-            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
-        .gold { color: var(--gold); }
-        
         .confidential-stamp { 
-            position: absolute; top: 20mm; right: 20mm; 
+            position: absolute; top: 15mm; right: 15mm; 
             border: 2px solid var(--alert); color: var(--alert); 
-            padding: 5px 15px; font-size: 0.65rem; font-weight: bold; 
-            transform: rotate(10deg); letter-spacing: 0.1em;
+            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
+            transform: rotate(5deg); letter-spacing: 0.2em;
             background: rgba(255, 77, 77, 0.05);
         }
 
         h1 { 
-            font-size: 1.4rem; letter-spacing: 0.6em; 
-            border-bottom: 1px solid var(--gray); padding-bottom: 25px; 
-            font-weight: 300; margin-bottom: 40px;
-            text-transform: uppercase;
+            font-size: 1.2rem; letter-spacing: 0.5em; 
+            border-bottom: 1px solid var(--gray); padding-bottom: 20px; 
+            font-weight: bold; text-transform: uppercase; color: var(--gold);
         }
 
         .section-title { 
-            font-size: 0.75rem; color: #555; 
-            letter-spacing: 0.3em; margin-top: 45px; 
-            margin-bottom: 20px; border-left: 3px solid var(--gold);
+            font-size: 0.7rem; color: #777; 
+            letter-spacing: 0.3em; margin-top: 40px; 
+            margin-bottom: 15px; border-left: 3px solid var(--gold);
             padding-left: 15px; text-transform: uppercase;
         }
 
-        .content { font-size: 0.85rem; line-height: 1.8; text-align: justify; color: #ccc; }
+        .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
 
-        /* MATRIZ DE IMPACTO ROI */
         .impact-matrix { 
             width: 100%; border-collapse: collapse; margin-top: 25px; 
-            background: rgba(255,255,255,0.01);
         }
         .impact-matrix th { 
-            text-align: left; font-size: 0.6rem; color: #666; 
-            padding: 12px; border-bottom: 2px solid var(--gray); text-transform: uppercase;
+            text-align: left; font-size: 0.6rem; color: #555; 
+            padding: 10px; border-bottom: 1px solid var(--gray);
         }
         .impact-matrix td { 
-            padding: 18px 12px; font-size: 0.75rem; border-bottom: 1px solid #111; 
+            padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; 
         }
 
-        /* ASIGNACIÓN DE RECURSOS */
         .allocation-container {
-            display: flex; align-items: center; gap: 40px; margin-top: 30px;
-            padding: 30px; border: 1px solid var(--gray); background: rgba(212, 175, 55, 0.02);
+            display: flex; align-items: center; gap: 30px; margin-top: 30px;
+            padding: 20px; border: 1px solid var(--gray);
         }
 
         .allocation-chart-mock {
-            width: 140px; height: 140px; border-radius: 50%;
-            border: 8px solid #111;
+            width: 100px; height: 100px; border-radius: 50%;
             background: conic-gradient(var(--gold) 0% 60%, #333 60% 85%, #1a1a1a 85% 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-size: 0.55rem; text-align: center; color: var(--gold);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 0.8rem; font-weight: bold; color: #fff;
         }
 
-       .footer-tech { 
-            margin-top: 100px !important; /* Más espacio para que no se pise */
-            border-top: 1px solid rgba(212, 175, 55, 0.3);
-            padding-top: 25px;
-        }
+        .signature-block { margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
         
-        .signature-block {
-            margin-top: 40px;
+        .footer-tech { 
+            margin-top: 50px; border-top: 1px solid #222; padding-top: 20px;
+            font-size: 0.6rem; color: #444; line-height: 1.5;
         }
 
-        .btn-print { 
+        .no-print {
             position: fixed; bottom: 30px; right: 30px; 
             background: var(--gold); color: #000; border: none; 
-            padding: 15px 35px; font-family: inherit; font-weight: bold; 
-            cursor: pointer; letter-spacing: 0.2em; transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            padding: 15px 30px; font-weight: bold; cursor: pointer;
+            z-index: 100;
         }
-        .btn-print:hover { background: #fff; transform: translateY(-2px); }
-
-        .signature-block { margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .stamp-nasa { border: 1px solid var(--gold); padding: 10px; font-size: 0.5rem; color: var(--gold); opacity: 0.5; }
 
         @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } /* FUERZA LOS COLORES EN EL PDF */
-            .page { margin: 0; border: none; width: 100%; height: 100%; background: #050505 !important; color: #fff !important; }
-            .gold { color: #d4af37 !important; }
-            .allocation-chart-mock { background: conic-gradient(#d4af37 0% 60%, #333 60% 85%, #1a1a1a 85% 100%) !important; }
-        }
-        .footer-tech { 
-            margin-top: 80px; /* Dale espacio a la firma */
-            border-top: 1px solid rgba(212, 175, 55, 0.3);
-            padding-top: 20px;
+            .no-print { display: none; }
+            body { background: #000 !important; }
+            .page { margin: 0; border: none; box-shadow: none; }
         }
     </style>
 </head>
 <body>
 
+<button class="no-print" onclick="window.print()">GUARDAR COMO PDF</button>
+
 <div class="page">
-    <div class="confidential-stamp">EYES ONLY // SUBJECT: FATIMA CIPPOLLINI</div>
-    <h1 class="gold">Dossier de Inteligencia Estratégica</h1>
+    <div class="confidential-stamp">TOP SECRET // CLASSIFIED</div>
+    <h1>Dossier de Inteligencia</h1>
     
-    <div class="section-title">Análisis de Transmisión Directa</div>
+    <div class="section-title">Análisis de Sujeto</div>
     <div class="content">
-        Estimada <span class="gold">Fatima Cippollini</span>,<br><br>
-        Este documento constituye un activo de inteligencia de alto valor, diseñado para eliminar la incertidumbre en su toma de decisiones. Los datos procesados bajo el protocolo <strong>NASA JPL DE441</strong> confirman que su infraestructura personal se encuentra en una fase de <strong>Resonancia de Orden Superior</strong>.<br><br>
-        Usted posee una configuración que favorece la ejecución masiva; sin embargo, operar fuera de las ventanas de sincronía detectadas aumenta su costo operativo en un 40%. Este manual es su hoja de ruta para la optimización de capital y la mitigación de riesgos estructurales.
+        USUARIO: <span style="color:var(--gold)" id="display-name">...</span><br>
+        ESTADO: RESONANCIA ACTIVA (DE441 SYNC)<br><br>
+        Este documento es un activo de inteligencia de alto nivel. Los datos confirman una fase de sincronía superior. Operar fuera de estas ventanas implica un aumento del riesgo estructural en un 40%.
     </div>
 
-    <div class="section-title">Matriz de Impacto y Optimización de ROI</div>
-    
-    
-
+    <div class="section-title">Matriz de Impacto ROI 2026</div>
     <table class="impact-matrix">
         <thead>
             <tr>
                 <th>VENTANA</th>
                 <th>INDICADOR</th>
                 <th>ROI EST.</th>
-                <th>ESTRATEGIA DE CAPITAL</th>
-                <th>MITIGACIÓN</th>
+                <th>ESTRATEGIA</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Q1 2026</td>
-                <td class="gold">Oportunidad Alta</td>
+                <td style="color:var(--gold)">OPORTUNIDAD ALTA</td>
                 <td>+24.8%</td>
-                <td><strong>Inversión Agresiva:</strong> Despliegue en activos de escala.</td>
-                <td>Mantener pasivos al mínimo.</td>
+                <td>Inversión Agresiva</td>
             </tr>
             <tr>
                 <td>Q2 2026</td>
-                <td style="color: var(--alert);">Riesgo Estructural</td>
+                <td style="color:var(--alert)">RIESGO ESTRUCTURAL</td>
                 <td>-12.0%</td>
-                <td><strong>Defensivo:</strong> Reasignar a estabilidad/auditoría.</td>
-                <td>Revisión de contratos legales.</td>
+                <td>Posición Defensiva</td>
             </tr>
             <tr>
                 <td>Q3 2026</td>
-                <td style="color: var(--safe);">Sincronía Óptima</td>
+                <td style="color:var(--safe)">SINCRONÍA ÓPTIMA</td>
                 <td>+18.5%</td>
-                <td><strong>Escalabilidad:</strong> Enfoque en marketing y marca.</td>
-                <td>Optimizar sistemas de venta.</td>
+                <td>Escalabilidad</td>
             </tr>
         </tbody>
     </table>
 
-    <div class="executive-summary" style="margin-top: 25px; font-size: 0.8rem; color: #888; border-top: 1px solid #222; padding-top: 20px; line-height: 1.6;">
-        <strong>AUDITORÍA:</strong> Su configuración revela que su mayor rentabilidad se obtiene al operar en ventanas de <i class="gold">Sincronía Óptima</i>. Intentar forzar resultados durante periodos de <i>Riesgo Estructural</i> genera un agotamiento innecesario de sus recursos críticos.
-    </div>
-
-    <div class="section-title">Asignación de Recursos y Enfoque (Q1)</div>
+    <div class="section-title">Asignación de Foco GXP</div>
     <div class="allocation-container">
-        <div class="allocation-chart-mock">
-            <span style="font-size: 1.2rem; font-weight: bold;">60%</span>
-            <span>STRATEGY</span>
-        </div>
-        <div class="content" style="font-size: 0.75rem; flex: 1;">
-            <p><strong class="gold">ESTRATEGIA (60%):</strong> Priorice el diseño de ofertas y alianzas de alto nivel. Su cerebro reacciona mejor a estímulos de planificación hoy.</p>
-            <p><strong>OPERACIÓN (25%):</strong> Ejecución técnica y administración. Se recomienda la delegación sistemática de estos vectores.</p>
-            <p><strong>RECUPERACIÓN (15%):</strong> Ventana obligatoria de desconexión para preservar la agudeza en la toma de decisiones.</p>
+        <div class="allocation-chart-mock">60%</div>
+        <div class="content" style="font-size: 0.75rem;">
+            <p><strong>ESTRATEGIA (60%):</strong> Priorice el diseño de ofertas. Su infraestructura cerebral está en fase de planificación.</p>
+            <p><strong>OPERACIÓN (25%):</strong> Ejecución técnica. Se recomienda delegar tareas de bajo impacto.</p>
         </div>
     </div>
 
     <div class="signature-block">
-        <div class="stamp-nasa">
-            NASA DATA COMPLIANT<br>
-            JPL/DE441 SOURCE SYNC
+        <div style="border: 1px solid var(--gold); padding: 10px; font-size: 0.5rem; color: var(--gold);">
+            NASA DATA COMPLIANT<br>JPL SOURCE SYNC
         </div>
         <div style="text-align: right;">
-            <p class="gold" style="font-size: 0.7rem; margin-bottom: 5px;">FIRMA DIGITAL AUTORIZADA</p>
-            <p style="font-size: 0.6rem; color: #444;">VAULT LOGIC SYSTEMS CORE</p>
+            <p style="color:var(--gold); font-size: 0.7rem; margin-bottom: 5px;">FIRMA DIGITAL AUTORIZADA</p>
+            <p style="font-size: 0.5rem; color: #333;">VAULT LOGIC CORE SYSTEMS</p>
         </div>
     </div>
 
-   <div class="footer-tech" style="position: relative; margin-top: 60px; padding-top: 20px; border-top: 1px solid #222;">
-       
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-size: 0.6rem; color: #444; max-width: 70%;">
-            <strong>CERTIFICACIÓN TÉCNICA:</strong> PROCESADO MEDIANTE NÚCLEO SWISS EPHEMERIS V2.10 // 
-            EFEMÉRIDES NASA JPL DE441 // PRECISIÓN ±0.0001° // COORDINADAS GEOCÉNTRICAS J2000.0
-        </div>
-        <div style="border: 1px solid #d4af37; padding: 10px; font-size: 0.5rem; color: #d4af37; text-align: center;">
-            NASA DATA COMPLIANT<br>JPL SOURCE SYNC
-        </div>
+    <div class="footer-tech">
+        CERTIFICACIÓN: PROCESADO POR NÚCLEO SWISS EPHEMERIS V2.10 // EFEMÉRIDES NASA JPL DE441 // PRECISIÓN ±0.0001°<br>
+        <i>"El conocimiento de los ciclos es la base del control ejecutivo."</i>
     </div>
-    <p style="font-style: italic; color: #333; font-size: 0.6rem; margin-top: 15px;">
-        "El conocimiento de los ciclos es la base del control ejecutivo. Use este mapa con la discreción que su cargo requiere."
-    </p>
 </div>
-<button class="btn-print no-print" onclick="window.print()">DESCARGAR DOSSIER PDF</button>
+
+<script>
+    const name = new URLSearchParams(window.location.search).get('nombre') || "USUARIO GÉNESIS";
+    document.getElementById('display-name').innerText = name.toUpperCase();
+</script>
 
 </body>
 </html>
