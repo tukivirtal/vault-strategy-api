@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
-        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; }
+        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
         
         header { 
             display: flex; justify-content: space-between; align-items: center; 
@@ -17,55 +17,41 @@
         .dashboard-grid { display: grid; grid-template-columns: 400px 1fr; gap: 20px; }
         .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
         
-        /* FILTRO DE RANGO - MEJORADO */
-        .horizon-picker { background: rgba(212,175,55,0.05); padding: 15px; display: flex; gap: 10px; align-items: flex-end; border: 1px solid #333; }
-        .date-input-group label { display: block; font-size: 0.75rem; color: #FFFFFF !important; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-        input[type="date"] { background: #111; color: #fff; border: 1px solid var(--gold); padding: 8px; font-family: inherit; }
+        .horizon-picker { background: rgba(212,175,55,0.05); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #333; }
+        .date-input-group label { display: block; font-size: 0.7rem; color: #fff; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        input[type="date"] { 
+            background: #000; color: #fff; border: 1px solid var(--gold); padding: 8px; 
+            font-family: inherit; color-scheme: dark; 
+        }
         
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; }
+        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
+        .btn-search:hover { background: #fff; }
         
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.5); }
         .roi { font-size: 2.2rem; font-weight: bold; margin: 10px 0; }
-        .status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 2px; }
+        .status { font-size: 0.7rem; font-weight: bold; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; }
         
         .executive-summary { background: rgba(212, 175, 55, 0.03); padding: 25px; margin: 30px 0; border-left: 5px solid var(--gold); line-height: 1.6; }
         
-        /* Telemetría Superior Derecha */
         .telemetry { 
-            font-size: 0.95rem !important; 
-            color: #d4af37 !important; 
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(212,175,55,0.4);
-            text-align: right;
+            font-size: 0.85rem; color: var(--gold); font-weight: bold;
+            text-shadow: 0 0 10px rgba(212,175,55,0.4); text-align: right;
         }
 
-        /* PIEZA CENTRAL: GRÁFICA DE GRADIENTES */
         #genesis-simulator-core { 
-            background: #000; padding: 20px; border: 1px solid rgba(212,175,55,0.3); 
+            background: #000; padding: 10px; border: 1px solid rgba(212,175,55,0.1); 
             margin-top: 20px; box-shadow: 0 0 30px rgba(0,0,0,1);
         }
 
         .compliance-note {
-            font-size: 0.85rem !important; 
-            color: #ffffff !important; 
-            opacity: 0.8;
-            margin-top: 40px;
-            text-align: center;
-            letter-spacing: 2px;
+            font-size: 0.7rem; color: #555; margin-top: 40px; text-align: center; letter-spacing: 2px;
         }
 
         .btn-nasa {
-            background: var(--gold);
-            color: #000;
-            font-weight: bold;
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            width: 100%;
+            background: var(--gold); color: #000; font-weight: bold; padding: 18px;
+            border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+            letter-spacing: 0.2em; width: 100%; margin-top: 20px;
         }
         .btn-nasa:hover { background: #fff; box-shadow: 0 0 20px var(--gold); }
     </style>
@@ -73,23 +59,23 @@
 <body>
 
     <header>
-        <div style="letter-spacing: 0.6em; font-size: 1.2rem; color: var(--gold);">GÉNESIS // STRATEGIC COMMAND</div>
+        <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // STRATEGIC COMMAND</div>
         <div class="telemetry">
             DATA: JPL/DE441 SYNC ACTIVE<br>
-            <span id="clock">Sincronizando...</span>
+            <span id="clock">CARGANDO TELEMETRÍA...</span>
         </div>
     </header>
 
     <div class="dashboard-grid">
         <aside>
             <div class="panel">
-                <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;">Simulador Decenal (2026-2036)</span>
+                <span style="font-size: 0.75rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; display: block; border-bottom: 1px solid #222; padding-bottom: 10px;">Simulador Decenal (2026-2036)</span>
                 <div id="genesis-simulator-core">
                     <div id="chart-timeline"></div>
                 </div>
 
-                <div style="margin-top: 30px;">
-                    <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;">ASIGNACIÓN DE FOCO GXP</span>
+                <div style="margin-top: 40px;">
+                    <span style="font-size: 0.75rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; display: block; border-bottom: 1px solid #222; padding-bottom: 10px;">Distribución de Foco GXP</span>
                     <div id="chart-donut"></div>
                 </div>
             </div>
@@ -99,110 +85,80 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
                 <div>
                     <span style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em;">DIRECTIVA DE CONTROL</span>
-                    <div style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;">MODO: <span id="user-status" style="color: var(--gold);">EXPANSIÓN</span></div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;">MODO: <span id="user-status" style="color: var(--gold);">ANÁLISIS</span></div>
                 </div>
                 
                 <div class="horizon-picker">
                     <div class="date-input-group">
-                        <label>INICIO (DESDE)</label>
+                        <label>INICIO</label>
                         <input type="date" id="date-start">
                     </div>
                     <div class="date-input-group">
-                        <label>FIN (HASTA)</label>
+                        <label>HORIZONTE</label>
                         <input type="date" id="date-end">
                     </div>
-                    <button class="btn-search" onclick="buscarHorizonte()">BUSCAR MOMENTO</button>
+                    <button class="btn-search" onclick="buscarHorizonte()">CALCULAR</button>
                 </div>
             </div>
             
             <div class="executive-summary" id="exec-box">
-                <b style="font-size: 1.2rem; display: block; margin-bottom: 10px; color: var(--gold);" id="welcome-msg">BIENVENIDA...</b>
-                <p id="exec-msg" style="font-size: 1.1rem; color: #eee;">Analizando su infraestructura personal con los tránsitos del JPL...</p>
+                <b style="font-size: 1.1rem; display: block; margin-bottom: 10px; color: var(--gold);" id="welcome-msg">INICIALIZANDO...</b>
+                <p id="exec-msg" style="font-size: 1rem; color: #ccc;">Validando credenciales de acceso vitalicio y sincronizando con efemérides JPL...</p>
             </div>
 
             <div class="decision-matrix">
-                <div class="decision-card" style="border-color: var(--gold);">
-                    <h3 style="font-size: 0.8rem; color: var(--gold);">CAPITAL</h3>
-                    <div class="roi" id="roi-cap">+24.8%</div>
+                <div class="decision-card" style="border-left: 4px solid var(--safe);">
+                    <h3 style="font-size: 0.7rem; color: #555; letter-spacing: 2px;">CAPITAL</h3>
+                    <div class="roi" id="roi-cap" class="gold">+24.8%</div>
                     <span class="status" style="background: var(--safe); color: #000;">ÓPTIMO</span>
                 </div>
-                <div class="decision-card">
-                    <h3 style="font-size: 0.8rem; color: var(--gold);">NEGOCIACIÓN</h3>
+                <div class="decision-card" style="border-left: 4px solid var(--gold);">
+                    <h3 style="font-size: 0.7rem; color: #555; letter-spacing: 2px;">NEGOCIACIÓN</h3>
                     <div class="roi" id="roi-neg">+12.2%</div>
                     <span class="status" style="background: var(--gold); color: #000;">ESTABLE</span>
                 </div>
-                <div class="decision-card">
-                    <h3 style="font-size: 0.8rem; color: var(--gold);">LANZAMIENTO</h3>
+                <div class="decision-card" style="border-left: 4px solid var(--alert);">
+                    <h3 style="font-size: 0.7rem; color: #555; letter-spacing: 2px;">LANZAMIENTO</h3>
                     <div class="roi" id="roi-lau">-18.5%</div>
                     <span class="status" id="status-lau" style="background: var(--alert); color: #fff;">RIESGO</span>
                 </div>
             </div>
 
-           <div style="margin-top: 40px; border-top: 1px solid #222; padding-top: 20px; text-align: center;">
+           <div style="margin-top: 40px; border-top: 1px solid #222; padding-top: 20px;">
                 <button class="btn-nasa" id="dossier-btn" onclick="transferData()">
-                    DESCARGAR DOSSIER ESTRATÉGICO GX-2026 (PDF/JSON)
+                    GENERAR DOSSIER ESTRATÉGICO GX-2026 (ENCRYPTED PDF)
                 </button>
                 <div class="compliance-note">
-                    SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT // ID: GX-992
+                    NASA JPL DE441 COMPLIANT // ENCRYPTION: AES-256 // TERMINAL ID: GX-992
                 </div>
             </div>
         </main>
     </div>
 
 <script>
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const authStatus = urlParams.get('auth');
-            const userEmail = urlParams.get('email');
-        
-            if (authStatus === 'GENESIS_ACTIVE' || authStatus === 'SUCCESS') {
-                console.log("ACCESO TOTAL ACTIVADO");
-                ejecutarInicio(); // Esta función carga las gráficas
-            } else {
-                // Opcional: Redirigir si alguien intenta entrar sin pagar
-                // window.location.href = "suscripcion.html";
-            }
-        };
     const urlParams = new URLSearchParams(window.location.search);
     const userName = urlParams.get('nombre') || "LÍDER GÉNESIS";
+    const authStatus = urlParams.get('auth');
 
     function updateClock() {
         const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).toUpperCase().replace(',', ' //');
-        
-        if (!document.getElementById('date-start').value) {
-            const offset = now.getTimezoneOffset() * 60000;
-            document.getElementById('date-start').value = (new Date(now - offset)).toISOString().split('T')[0];
-            ejecutarInicio();
-        }
+        document.getElementById('clock').innerText = now.toLocaleString('es-ES', { 
+            day: '2-digit', month: 'short', year: 'numeric', 
+            hour: '2-digit', minute: '2-digit', second: '2-digit' 
+        }).toUpperCase().replace(',', ' //');
     }
 
     function initCharts() {
-        // GRÁFICA DE GRADIENTES - SIMULADOR 10 AÑOS
+        // GRÁFICA DE GRADIENTES
         new ApexCharts(document.querySelector("#chart-timeline"), {
-            series: [{
-                name: 'Sincronía GXP',
-                data: [35, 42, 38, 95, 55, 65, 80, 110, 145, 125, 180] // Datos 2026-2036
-            }],
-            chart: {
-                type: 'area', height: 300, toolbar: { show: false }, background: 'transparent',
-                animations: { enabled: true, speed: 2000 }
-            },
+            series: [{ name: 'Sincronía GXP', data: [35, 42, 38, 95, 55, 65, 80, 110, 145, 125, 180] }],
+            chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
             colors: ['#d4af37'],
-            stroke: { curve: 'smooth', width: 3 },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1, opacityFrom: 0.8, opacityTo: 0.1, stops: [0, 90, 100],
-                    colorStops: [
-                        { offset: 0, color: "#d4af37", opacity: 0.8 },
-                        { offset: 100, color: "#000", opacity: 0.05 }
-                    ]
-                }
-            },
-            xaxis: {
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05, stops: [0, 90, 100] } },
+            xaxis: { 
                 categories: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'],
-                labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } }
+                labels: { style: { colors: '#444', fontFamily: 'JetBrains Mono' } }
             },
             yaxis: { show: false },
             grid: { borderColor: '#111', strokeDashArray: 4 },
@@ -212,47 +168,56 @@
         // DONUT DE ENFOQUE
         new ApexCharts(document.querySelector("#chart-donut"), {
             series: [60, 25, 15],
-            chart: { type: 'donut', height: 200 },
+            chart: { type: 'donut', height: 220 },
             labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
             colors: ['#d4af37', '#222', '#111'],
             stroke: { show: false },
-            legend: { show: true, fontSize: '10px', labels: { colors: '#888' }, position: 'bottom' },
+            legend: { position: 'bottom', labels: { colors: '#666' }, fontFamily: 'JetBrains Mono' },
             plotOptions: { pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'FOCO', color: '#d4af37' } } } } }
         }).render();
     }
 
     function ejecutarInicio() {
+        document.getElementById('user-status').innerText = "EXPANSIÓN";
         document.getElementById('welcome-msg').innerText = `DIRECTIVA GÉNESIS PARA: ${userName.toUpperCase()}`;
-        document.getElementById('exec-msg').innerHTML = `Bienvenida, ${userName}. Su acceso <b>GÉNESIS VITALICIO</b> ha desbloqueado la proyección decenal. <br><b>FOCO ACTUAL:</b> El simulador indica un pico de rentabilidad en 2029 y 2034.`;
+        document.getElementById('exec-msg').innerHTML = `Protocolo validado. Su acceso <b>GÉNESIS VITALICIO</b> ha desbloqueado la proyección decenal. <br><b>ALERTA:</b> Se detecta un pico de rentabilidad estructural para los periodos 2029 y 2034.`;
         initCharts();
     }
 
     function buscarHorizonte() {
         const msg = document.getElementById('exec-msg');
-        msg.style.opacity = 0.3;
+        msg.style.opacity = 0.5;
         setTimeout(() => {
-            msg.innerHTML = `<b>BÚSQUEDA DE HORIZONTE COMPLETADA:</b> Sincronizando vectores temporales para el rango seleccionado. Los datos del Dossier han sido actualizados.`;
+            msg.innerHTML = `<b>HORIZONTE CALCULADO:</b> Vectores sincronizados para el rango seleccionado. Revise la matriz de impacto para ajustes de ROI.`;
             msg.style.opacity = 1;
-        }, 1000);
+        }, 800);
     }
 
     function transferData() {
         const btn = document.getElementById('dossier-btn');
-        btn.innerText = "GENERANDO DOSSIER CLASSIFIED...";
-        setTimeout(() => { alert("Descargando Dossier GX-2026..."); btn.innerText = "DESCARGAR DOSSIER ESTRATÉGICO GX-2026"; }, 2000);
+        btn.innerText = "COMPILANDO ACTIVOS...";
+        btn.style.opacity = "0.5";
+        setTimeout(() => { 
+            window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}`;
+        }, 1500);
     }
 
-    setInterval(updateClock, 1000);
-    window.onload = updateClock;
+    // Lógica de arranque
+    window.onload = function() {
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Sincronizar fecha inicial
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000;
+        document.getElementById('date-start').value = (new Date(now - offset)).toISOString().split('T')[0];
+
+        if (authStatus === 'GENESIS_ACTIVE' || authStatus === 'SUCCESS') {
+            ejecutarInicio();
+        } else {
+            document.getElementById('exec-msg').innerHTML = "<span style='color:var(--alert)'>ERROR: ACCESO NO AUTORIZADO. SE REQUIERE LICENCIA VITALICIA.</span>";
+        }
+    };
 </script>
-
-<footer style="margin-top: 50px; border-top: 1px solid #222; padding: 30px; width: 100%; text-align: center;">
-    <div style="font-size: 0.7rem; letter-spacing: 3px;">
-        <a href="privacidad.html" style="color: #fff; text-decoration: none; margin: 0 20px; font-weight: bold;">PROTOCOLO PRIVACIDAD</a>
-        <a href="terminos.html" style="color: #fff; text-decoration: none; margin: 0 20px; font-weight: bold;">TÉRMINOS OPERATIVOS</a>
-        <div style="color: #333; margin-top: 20px;">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
-    </div>
-</footer>
-
 </body>
 </html>
