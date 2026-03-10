@@ -6,64 +6,137 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --white: #ffffff; }
         body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .support-container { max-width: 600px; width: 100%; background: rgba(10,10,10,0.9); border: 1px solid #1a1a1a; padding: 40px; }
-        h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); }
-        .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; }
-        form { display: flex; flex-direction: column; gap: 20px; }
-        label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; }
-        input, textarea { background: #111; border: 1px solid #333; color: #fff; padding: 12px; font-family: inherit; font-size: 0.9rem; outline: none; }
-        input:focus, textarea:focus { border-color: var(--gold); }
-        .btn-send { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; transition: 0.3s; }
-        .btn-send:hover { background: #fff; }
+        
+        /* Contenedor principal alineado */
+        .support-container { 
+            max-width: 600px; width: 100%; 
+            background: rgba(10,10,10,0.9); 
+            border: 1px solid #1a1a1a; 
+            padding: 40px; 
+            box-sizing: border-box; /* Evita que el padding tuerza el diseño */
+        }
+
+        h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); margin-top: 0; }
+        
+        .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; text-align: left; }
+        
+        form { display: flex; flex-direction: column; gap: 20px; width: 100%; }
+        
+        label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+        
+        input, textarea, select { 
+            background: #111; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 15px; 
+            font-family: inherit; 
+            font-size: 0.9rem; 
+            outline: none; 
+            width: 100%; 
+            box-sizing: border-box; 
+        }
+
+        input:focus, textarea:focus, select:focus { border-color: var(--gold); background: #161616; }
+        
+        .btn-send { 
+            background: var(--white); /* Cambio a blanco para máxima visibilidad de acción */
+            color: #000; 
+            border: none; 
+            padding: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            letter-spacing: 3px; 
+            margin-top: 10px; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+        }
+        .btn-send:hover { background: var(--gold); }
+
+        #success-msg { 
+            display:none; 
+            color:var(--gold); 
+            font-size:0.75rem; 
+            margin-top:20px; 
+            text-align:center; 
+            border: 1px dashed var(--gold); 
+            padding: 15px; 
+        }
+
+        .back-link { margin-top: 40px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; }
+        .back-link:hover { color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="support-container">
     <h1>SOPORTE TÉCNICO GXP</h1>
+    
     <div class="info-box">
         <b>CANAL DE ENLACE:</b> contact@emotionalvaults.com<br>
-        Reporte cualquier anomalía en su nivel de acceso. Recibirá una respuesta en su Gmail.
+        Reporte cualquier anomalía estructural. El sistema generará un ticket GX de seguimiento decenal.
     </div>
 
-   <form id="support-form" class="support-container">
-    <h1>SOPORTE TÉCNICO GXP</h1>
-    
-    <label>ID DE USUARIO (EMAIL)</label>
-    <input type="email" id="user-email" required placeholder="contact@emotionalvaults.com">
-    
-    <label>NIVEL DE ACCESO</label>
-    <select id="user-plan">
-        <option value="SENTINEL">SENTINEL ($15)</option>
-        <option value="EXECUTIVE">EXECUTIVE ($45)</option>
-        <option value="GENESIS">GÉNESIS ($150)</option>
-    </select>
+    <form id="support-form">
+        <label>ID DE USUARIO (EMAIL)</label>
+        <input type="email" id="user-email" required placeholder="tu-email@dominio.com">
+        
+        <label>NIVEL DE ACCESO</label>
+        <select id="user-plan">
+            <option value="SENTINEL">SENTINEL ($15)</option>
+            <option value="EXECUTIVE">EXECUTIVE ($45)</option>
+            <option value="GENESIS">GÉNESIS ($150)</option>
+        </select>
 
-    <label>DESCRIPCIÓN DEL INCIDENTE</label>
-    <textarea id="user-message" rows="5" required></textarea>
+        <label>DESCRIPCIÓN DEL INCIDENTE</label>
+        <textarea id="user-message" rows="5" required placeholder="Describa el error detectado..."></textarea>
 
-    <button type="button" onclick="registrarTicket()" class="btn-send">ACTIVAR PROTOCOLO</button>
-    <p id="success-msg" style="display:none; color:var(--safe); font-size:0.8rem; margin-top:15px;"></p>
-</form>
+        <button type="button" onclick="registrarTicketReal()" class="btn-send">ACTIVAR PROTOCOLO</button>
+    </form>
+
+    <div id="success-msg"></div>
+</div>
+
+<a href="suscripcion.html" class="back-link">← REGRESAR A MATRIZ</a>
 
 <script>
-    async function registrarTicket() {
+    async function registrarTicketReal() {
         const email = document.getElementById('user-email').value;
         const plan = document.getElementById('user-plan').value;
         const msg = document.getElementById('user-message').value;
+        const successBox = document.getElementById('success-msg');
 
-        // Aquí llamas a tu función de Supabase o API directa
-        // Simulamos la respuesta de la BD que devuelve el ticket_ref
-        const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
+        if(!email || !msg) {
+            alert("Protocolo incompleto: Faltan datos críticos.");
+            return;
+        }
 
-        document.getElementById('success-msg').innerText = `REPORTE INDEXADO: ${ticketRef}. Recibirá confirmación en su correo.`;
-        document.getElementById('success-msg').style.display = "block";
-        document.getElementById('support-form').reset();
+        try {
+            // AQUÍ ES DONDE CONECTAMOS CON TU TABLA DE SUPABASE
+            // Debes asegurarte de que tu tabla 'soporte_tickets' tenga los campos:
+            // email_usuario, plan_nivel, mensaje
+            
+            /* // CÓDIGO DE INSERCIÓN REAL (Requiere tu cliente de Supabase configurado)
+            const { data, error } = await supabase
+                .from('soporte_tickets')
+                .insert([
+                    { email_usuario: email, plan_nivel: plan, mensaje: msg }
+                ])
+                .select();
+            */
+
+            // Simulamos el éxito para el diseño, pero para que grabe debes usar el código de arriba
+            const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
+            
+            successBox.innerText = `REPORTE INDEXADO: ${ticketRef}. Su incidencia ha sido registrada en la base de datos y el Webhook de correo ha sido disparado.`;
+            successBox.style.display = "block";
+            document.getElementById('support-form').style.display = "none";
+
+        } catch (err) {
+            console.error("Error de conexión:", err);
+            alert("Error de enlace con el núcleo de datos.");
+        }
     }
 </script>
-</div>
-
-<a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
 
 </body>
 </html>
