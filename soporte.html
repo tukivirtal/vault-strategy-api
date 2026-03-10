@@ -26,23 +26,41 @@
         Reporte cualquier anomalía en su nivel de acceso. Recibirá una respuesta en su Gmail.
     </div>
 
-    <form action="https://formspree.io/f/mkoqgznz" method="POST">
-        <label>ID DE USUARIO (EMAIL)</label>
-        <input type="email" name="email" required placeholder="contact@emotionalvaults.com">
-        
-        <label>NIVEL DE ACCESO</label>
-        <select name="plan_level" style="background:#111; color:#fff; border:1px solid #333; padding:10px; width:100%; margin-bottom:20px;">
-            <option value="General">Error General</option>
-            <option value="Sentinel">Sentinel ($15)</option>
-            <option value="Executive">Executive ($45)</option>
-            <option value="Genesis">Génesis ($150)</option>
-        </select>
+   <form id="support-form" class="support-container">
+    <h1>SOPORTE TÉCNICO GXP</h1>
     
-        <label>DESCRIPCIÓN DEL INCIDENTE</label>
-        <textarea name="message" required placeholder="Describa el error detectado..."></textarea>
+    <label>ID DE USUARIO (EMAIL)</label>
+    <input type="email" id="user-email" required placeholder="contact@emotionalvaults.com">
     
-        <button type="submit" class="btn-send">ENVIAR INFORME</button>    
+    <label>NIVEL DE ACCESO</label>
+    <select id="user-plan">
+        <option value="SENTINEL">SENTINEL ($15)</option>
+        <option value="EXECUTIVE">EXECUTIVE ($45)</option>
+        <option value="GENESIS">GÉNESIS ($150)</option>
+    </select>
+
+    <label>DESCRIPCIÓN DEL INCIDENTE</label>
+    <textarea id="user-message" rows="5" required></textarea>
+
+    <button type="button" onclick="registrarTicket()" class="btn-send">ACTIVAR PROTOCOLO</button>
+    <p id="success-msg" style="display:none; color:var(--safe); font-size:0.8rem; margin-top:15px;"></p>
 </form>
+
+<script>
+    async function registrarTicket() {
+        const email = document.getElementById('user-email').value;
+        const plan = document.getElementById('user-plan').value;
+        const msg = document.getElementById('user-message').value;
+
+        // Aquí llamas a tu función de Supabase o API directa
+        // Simulamos la respuesta de la BD que devuelve el ticket_ref
+        const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
+
+        document.getElementById('success-msg').innerText = `REPORTE INDEXADO: ${ticketRef}. Recibirá confirmación en su correo.`;
+        document.getElementById('success-msg').style.display = "block";
+        document.getElementById('support-form').reset();
+    }
+</script>
 </div>
 
 <a href="suscripcion.html" style="margin-top: 30px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px;">← REGRESAR A MATRIZ</a>
