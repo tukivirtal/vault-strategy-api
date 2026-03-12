@@ -7,70 +7,42 @@
         :root { --gold: #d4af37; --bg: #050505; --white: #ffffff; }
         body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Contenedor principal alineado */
         .support-container { 
-            max-width: 600px; width: 100%; 
-            background: rgba(10,10,10,0.9); 
-            border: 1px solid #1a1a1a; 
-            padding: 40px; 
-            box-sizing: border-box; /* Evita que el padding tuerza el diseño */
+            max-width: 600px; width: 100%; background: rgba(10,10,10,0.9); 
+            border: 1px solid #1a1a1a; padding: 40px; box-sizing: border-box;
         }
 
         h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); margin-top: 0; }
-        
-        .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; text-align: left; }
+        .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; }
         
         form { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-        
         label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
         
         input, textarea, select { 
-            background: #111; 
-            border: 1px solid #333; 
-            color: #fff; 
-            padding: 15px; 
-            font-family: inherit; 
-            font-size: 0.9rem; 
-            outline: none; 
-            width: 100%; 
-            box-sizing: border-box; 
+            background: #111; border: 1px solid #333; color: #fff; padding: 15px; 
+            font-family: inherit; font-size: 0.9rem; outline: none; width: 100%; box-sizing: border-box; 
         }
 
         input:focus, textarea:focus, select:focus { border-color: var(--gold); background: #161616; }
         
         .btn-send { 
-            background: var(--white); /* Cambio a blanco para máxima visibilidad de acción */
-            color: #000; 
-            border: none; 
-            padding: 18px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            letter-spacing: 3px; 
-            margin-top: 10px; 
-            text-transform: uppercase; 
-            transition: 0.3s;
+            background: var(--white); color: #000; border: none; padding: 18px; 
+            font-weight: bold; cursor: pointer; letter-spacing: 3px; margin-top: 10px; 
+            text-transform: uppercase; transition: 0.3s;
         }
         .btn-send:hover { background: var(--gold); }
 
         #success-msg { 
-            display:none; 
-            color:var(--gold); 
-            font-size:0.75rem; 
-            margin-top:20px; 
-            text-align:center; 
-            border: 1px dashed var(--gold); 
-            padding: 15px; 
+            display:none; color:var(--gold); font-size:0.75rem; margin-top:20px; 
+            text-align:center; border: 1px dashed var(--gold); padding: 15px; 
         }
-
         .back-link { margin-top: 40px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; }
-        .back-link:hover { color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="support-container">
     <h1>SOPORTE TÉCNICO GXP</h1>
-    
     <div class="info-box">
         <b>CANAL DE ENLACE:</b> contact@emotionalvaults.com<br>
         Reporte cualquier anomalía estructural. El sistema generará un ticket GX de seguimiento decenal.
@@ -89,10 +61,8 @@
 
         <label>DESCRIPCIÓN DEL INCIDENTE</label>
         <textarea id="user-message" rows="5" required placeholder="Describa el error detectado..."></textarea>
-
         <button type="button" onclick="registrarTicketReal()" class="btn-send">ACTIVAR PROTOCOLO</button>
     </form>
-
     <div id="success-msg"></div>
 </div>
 
@@ -105,38 +75,39 @@
         const msg = document.getElementById('user-message').value;
         const successBox = document.getElementById('success-msg');
 
-        if(!email || !msg) {
-            alert("Protocolo incompleto: Faltan datos críticos.");
-            return;
-        }
+        // REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES DE SUPABASE
+        const SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
+        const ANON_KEY = "TU_SUPABASE_ANON_KEY";
 
         try {
-            // AQUÍ ES DONDE CONECTAMOS CON TU TABLA DE SUPABASE
-            // Debes asegurarte de que tu tabla 'soporte_tickets' tenga los campos:
-            // email_usuario, plan_nivel, mensaje
-            
-            /* // CÓDIGO DE INSERCIÓN REAL (Requiere tu cliente de Supabase configurado)
-            const { data, error } = await supabase
-                .from('soporte_tickets')
-                .insert([
-                    { email_usuario: email, plan_nivel: plan, mensaje: msg }
-                ])
-                .select();
-            */
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/soporte_tickets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': ANON_KEY,
+                    'Authorization': `Bearer ${ANON_KEY}`,
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({ 
+                    email_usuario: email, 
+                    plan_nivel: plan, 
+                    mensaje: msg 
+                })
+            });
 
-            // Simulamos el éxito para el diseño, pero para que grabe debes usar el código de arriba
-            const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
-            
-            successBox.innerText = `REPORTE INDEXADO: ${ticketRef}. Su incidencia ha sido registrada en la base de datos y el Webhook de correo ha sido disparado.`;
-            successBox.style.display = "block";
-            document.getElementById('support-form').style.display = "none";
-
+            if (response.ok) {
+                const data = await response.json();
+                const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
+                successBox.innerText = `REPORTE INDEXADO: ${ticketRef}. Su incidencia ha sido registrada y el Webhook de correo ha sido disparado.`;
+                successBox.style.display = "block";
+                document.getElementById('support-form').style.display = "none";
+            } else {
+                throw new Error("Fallo en la respuesta de la base de datos.");
+            }
         } catch (err) {
-            console.error("Error de conexión:", err);
-            alert("Error de enlace con el núcleo de datos.");
+            alert("Error de enlace con el núcleo de datos. Verifique su conexión.");
         }
     }
 </script>
-
 </body>
 </html>
