@@ -44,11 +44,18 @@
         const plan = document.getElementById('user-plan').value;
         const msg = document.getElementById('user-message').value;
 
+        // Validamos campos para evitar envíos vacíos
+        if (!email || !msg) {
+            alert("Protocolo incompleto: Email y mensaje son obligatorios.");
+            return;
+        }
+
         const ref = "GX-" + Math.floor(Math.random() * 90000 + 10000);
         const nombre = email.split('@')[0].toUpperCase();
 
+        // Reemplaza con tus valores de Supabase (Project Settings > API)
         const SUPABASE_URL = "https://hfyzgwoivxvzkyfnrlo.supabase.co";
-        const ANON_KEY = "tu_anon_key_aqui";
+        const ANON_KEY = "tu_anon_key_real_aqui"; 
 
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/soporte_tickets`, {
@@ -56,7 +63,8 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': ANON_KEY,
-                    'Authorization': `Bearer ${ANON_KEY}`
+                    'Authorization': `Bearer ${ANON_KEY}`,
+                    'Prefer': 'return=representation' // CRÍTICO: Evita el error 405 en algunas configuraciones
                 },
                 body: JSON.stringify({ 
                     ticket_ref: ref,
@@ -68,12 +76,16 @@
             });
 
             if (response.ok) {
-                feedback.innerText = `TICKET GENERADO: ${ref}. INCIDENCIA REGISTRADA.`;
+                feedback.innerText = `TICKET GENERADO: ${ref}. INCIDENCIA REGISTRADA CON ÉXITO.`;
                 feedback.style.display = "block";
                 document.getElementById('support-form').style.display = "none";
+            } else {
+                const errData = await response.json();
+                console.error("Error BD:", errData);
+                alert("Error de respuesta del núcleo de datos.");
             }
         } catch (err) {
-            alert("Error de enlace.");
+            alert("Fallo de conexión: El servidor no respondió.");
         }
     }
 </script>
