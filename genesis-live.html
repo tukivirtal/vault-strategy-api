@@ -19,6 +19,7 @@
         .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.5s; }
         .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
         .label-mini { font-size: 0.7rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; line-height: 1.4; }
         footer { margin-top: 50px; border-top: 1px solid #222; padding: 30px; text-align: center; font-size: 0.7rem; color: #555; letter-spacing: 3px; }
     </style>
 </head>
@@ -26,8 +27,9 @@
 
     <header>
         <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // ESTRATEGIA</div>
-        <div style="text-align: right; font-size: 0.8rem; color: var(--gold);">
-            DATA: JPL/DE441 COMPLIANT<br><span id="clock">00:00:00</span>
+        <div class="telemetry">
+            DATA: JPL/DE441 SYNC ACTIVE<br>
+            <span id="clock">00:00:00 // SYNCING...</span>
         </div>
     </header>
 
@@ -46,7 +48,7 @@
         <main class="panel">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <div id="user-welcome" style="color: var(--gold); font-weight: bold; font-size: 1.2rem; letter-spacing: 2px;">IDENTIFICANDO...</div>
+                    <div id="user-welcome" style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">IDENTIFICANDO...</div>
                     <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="user-status">MODO: ANÁLISIS</div>
                 </div>
                 <div class="horizon-picker">
@@ -57,7 +59,7 @@
             </div>
 
             <div style="margin-top: 30px;">
-                <span class="label-mini">Análisis Dinámico de Horizonte Seleccionado</span>
+                <span class="label-mini">Análisis Dinámico de Horizonte</span>
                 <div id="main-focus-chart" style="background: #000; padding: 10px; border: 1px solid #111;"></div>
             </div>
 
@@ -85,24 +87,33 @@
     <footer>SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT // VAULT LOGIC 2026</footer>
 
 <script>
+    // VARIABLES GLOBALES PARA MANTENER LAS INSTANCIAS VIVAS
     let mainChart, miniChart, donutChart;
-    const urlParams = new URLSearchParams(window.location.search);
-    const userEmail = urlParams.get('email') || "OPERADOR GXP";
-    const userName = userEmail.split('@')[0].toUpperCase();
 
     function initCharts() {
+        // 1. Gráfica Principal (Se crea una sola vez)
         const mainOptions = {
             series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
-            chart: { id: 'mainChart', type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
+            chart: { 
+                id: 'mainChartInstance', // ID VITAL para poder actualizarla luego
+                type: 'area', 
+                height: 280, 
+                toolbar: { show: false }, 
+                background: 'transparent' 
+            },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
-            xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'], labels: { style: { colors: '#666' } } },
+            xaxis: { 
+                categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+                labels: { style: { colors: '#666' } }
+            },
             fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
             tooltip: { theme: 'dark', y: { formatter: (v) => `${v}ptos Sincro` } }
         };
         mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), mainOptions);
         mainChart.render();
 
+        // 2. Gráfica Mini (10 Años)
         miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
             series: [{ name: 'ROI Est.', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
             chart: { type: 'area', height: 180, sparkline: { enabled: false }, toolbar: { show: false } },
@@ -111,6 +122,7 @@
         });
         miniChart.render();
 
+        // 3. Donut
         donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
             series: [60, 25, 15],
             chart: { type: 'donut', height: 200 },
@@ -123,39 +135,63 @@
 
     function sincronizarPanel() {
         const start = document.getElementById('date-start').value;
-        const end = document.getElementById('date-end').value || "ACTUAL";
+        const end = document.getElementById('date-end').value;
         const status = document.getElementById('user-status');
 
+        if (!start || !end) {
+            alert("Por favor, establezca un rango de fechas.");
+            return;
+        }
+
         status.innerText = "SINCRONIZANDO...";
+        status.style.color = "var(--gold)";
 
         setTimeout(() => {
+            // Algoritmo de Riesgo (Detección de Q2)
             const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
             const newData = isRisk ? [40, 30, 20, 15, 10, 5, 8] : [35, 45, 60, 95, 70, 80, 120];
             
-            // Persistencia para el Dossier
+            // LA CLAVE: No creamos una gráfica nueva. Actualizamos la existente por su ID.
+            ApexCharts.exec('mainChartInstance', 'updateSeries', [{
+                data: newData
+            }], true);
+
+            // Persistencia para el Dossier Dinámico
             localStorage.setItem('ultimo_reporte', JSON.stringify({
                 rango: `${start} a ${end}`,
                 estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
                 roi: isRisk ? "-12.0%" : "+24.8%"
             }));
 
-            ApexCharts.exec('mainChart', 'updateSeries', [{ data: newData }], true);
             status.innerText = `MODO: ${isRisk ? "PRECAUCIÓN" : "EXPANSIÓN"}`;
             status.style.color = isRisk ? "var(--alert)" : "var(--safe)";
+            document.getElementById('roi-cap').innerText = isRisk ? "-12.0%" : "+24.8%";
+            document.getElementById('card-cap').style.borderTopColor = isRisk ? "var(--alert)" : "var(--safe)";
         }, 800);
     }
 
     function descargarDossier() {
-        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('nombre') || "OPERADOR GXP";
+        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(name)}`;
     }
 
     window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userEmail = urlParams.get('email') || "OPERADOR GXP";
+        const userName = userEmail.split('@')[0].toUpperCase();
         document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
+
+        // Setear fecha actual por defecto
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date-start').value = today;
+
         initCharts();
-        sincronizarPanel();
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString().toUpperCase(); }, 1000);
+        sincronizarPanel(); // Carga inicial automática
+
+        setInterval(() => { 
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString().toUpperCase(); 
+        }, 1000);
     };
 </script>
 </body>
