@@ -9,115 +9,121 @@
         :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
         body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
-        .dashboard-grid { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
+        
+        /* Controles de Sincronización */
         .horizon-picker { background: rgba(212,175,55,0.03); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
-        input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; }
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
-        .btn-search:hover { background: #fff; }
+        input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
+        input[type="date"]:focus { border-color: var(--gold); }
+        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; }
+
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .decision-card { border: 1px solid #222; padding: 25px 15px; text-align: center; background: rgba(0,0,0,0.3); }
-        .roi { font-size: 2.2rem; font-weight: bold; margin: 10px 0; color: #fff; }
-        .btn-nasa { background: var(--gold); color: #000; font-weight: bold; padding: 20px; border: none; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.3em; }
+        .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); }
+        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
         .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; }
+        .label-mini { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="letter-spacing: 0.6em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // STRATEGIC COMMAND</div>
-    <div class="telemetry">DATA: JPL/DE441 SYNC ACTIVE<br><span id="clock">CARGANDO TELEMETRÍA...</span></div>
+    <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // ESTRATEGIA</div>
+    <div class="telemetry">SISTEMA ACTIVO // <span id="clock">00:00:00</span></div>
 </header>
 
 <div class="dashboard-grid">
     <aside>
         <div class="panel">
-            <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; display: block; margin-bottom: 15px;">Simulador Decenal de Capital</span>
-            <div id="chart-timeline" style="min-height: 280px;"></div>
+            <span class="label-mini">Simulador 10 Años (Tendencia)</span>
+            <div id="chart-mini-trend"></div>
+            
+            <div style="margin-top: 40px;">
+                <span class="label-mini">Distribución GXP</span>
+                <div id="chart-donut"></div>
+            </div>
         </div>
     </aside>
 
     <main class="panel">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div style="font-size: 2.2rem; font-weight: bold; color: #fff;" id="user-status">MODO: ANÁLISIS</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 1.8rem; font-weight: bold;" id="user-status">MODO: ANÁLISIS</div>
             <div class="horizon-picker">
                 <input type="date" id="date-start">
                 <input type="date" id="date-end">
-                <button class="btn-search" onclick="buscarHorizonte()">SYNC</button>
+                <button class="btn-search" onclick="sincronizarPanel()">SYNC</button>
             </div>
         </div>
-        
-        <div class="executive-summary" id="exec-box" style="margin-top: 30px; border-left: 4px solid var(--gold); padding: 20px; background: rgba(212,175,55,0.02);">
-            <b id="welcome-msg" style="color:var(--gold)">INICIALIZANDO...</b>
-            <p id="exec-msg" style="color:#ccc">Sincronizando vectores de precisión...</p>
-        </div>
+
+        <div id="main-focus-chart" style="margin-top: 30px; background: #000; padding: 10px; border: 1px solid #111;"></div>
 
         <div class="decision-matrix">
-            <div class="decision-card" style="border-top: 3px solid var(--safe);" id="card-capital">
-                <h3 style="font-size: 0.65rem; color: #555;">CAPITAL</h3>
+            <div class="decision-card" style="border-top: 3px solid var(--safe);">
+                <span class="label-mini">CAPITAL</span>
                 <div class="roi" id="roi-cap">+24.8%</div>
-                <span id="status-cap" style="color: var(--safe); font-size: 0.6rem; font-weight: bold;">ÓPTIMO</span>
             </div>
-            <div class="decision-card" style="border-top: 3px solid var(--gold);"><h3 style="font-size: 0.65rem; color: #555;">NEGOCIACIÓN</h3><div class="roi">+12.2%</div><span style="color: var(--gold); font-size: 0.6rem; font-weight: bold;">ESTABLE</span></div>
-            <div class="decision-card" style="border-top: 3px solid var(--alert);"><h3 style="font-size: 0.65rem; color: #555;">RIESGO</h3><div class="roi">-18.5%</div><span style="color: var(--alert); font-size: 0.6rem; font-weight: bold;">ALERTA</span></div>
+            <div class="decision-card" style="border-top: 3px solid var(--gold);">
+                <span class="label-mini">NEGOCIACIÓN</span>
+                <div class="roi">+12.2%</div>
+            </div>
+            <div class="decision-card" style="border-top: 3px solid var(--alert);">
+                <span class="label-mini">RIESGO</span>
+                <div class="roi">-18.5%</div>
+            </div>
         </div>
 
-        <button class="btn-nasa" style="margin-top: 40px;" onclick="window.location.href='dossier-final.html'">EXTRAER DOSSIER ESTRATÉGICO</button>
+        <button onclick="window.location.href='dossier-final.html'" style="margin-top: 40px; background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px;">EXTRAER DOSSIER ESTRATÉGICO</button>
     </main>
 </div>
 
 <script>
-    let timelineChart;
-    const urlParams = new URLSearchParams(window.location.search);
-    const userName = urlParams.get('nombre') || "LÍDER GÉNESIS";
-    const authStatus = urlParams.get('auth');
+    let mainChart, miniChart;
 
-    function initCharts() {
-        const options = {
-            series: [{ name: 'Sincronía GXP', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
-            chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
+    function init() {
+        // Gráfica Principal (Reactiva)
+        mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
+            series: [{ name: 'Sincronía', data: [30, 40, 35, 50, 49, 60, 70] }],
+            chart: { type: 'line', height: 250, toolbar: { show: false } },
             colors: ['#d4af37'],
-            stroke: { curve: 'smooth', width: 2 },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
-            xaxis: { 
-                categories: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'],
-                labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } 
-            },
-            yaxis: { show: false },
-            grid: { borderColor: '#111' },
-            tooltip: { theme: 'dark' }
-        };
-        timelineChart = new ApexCharts(document.querySelector("#chart-timeline"), options);
-        timelineChart.render();
+            stroke: { width: 3, curve: 'smooth' },
+            xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'], labels: { style: { colors: '#444' } } }
+        });
+        mainChart.render();
+
+        // Gráfica de 10 años (Pequeña, como referencia)
+        miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
+            series: [{ name: 'Tendencia', data: [10, 40, 20, 90, 50, 150] }],
+            chart: { type: 'area', height: 150, sparkline: { enabled: true } },
+            colors: ['#d4af37'],
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0 } }
+        });
+        miniChart.render();
+
+        // Donut
+        new ApexCharts(document.querySelector("#chart-donut"), {
+            series: [60, 40],
+            chart: { type: 'donut', height: 180 },
+            labels: ['Estrategia', 'Riesgo'],
+            colors: ['#d4af37', '#111'],
+            legend: { show: false }
+        }).render();
     }
 
-    function buscarHorizonte() {
-        const msg = document.getElementById('exec-msg');
-        msg.style.opacity = 0.5;
+    function sincronizarPanel() {
+        const msg = document.getElementById('user-status');
+        msg.innerText = "SINCRONIZANDO...";
         
-        // Simulación de nuevos datos (puedes vincular esto a tu API de main.py)
-        const nuevosDatos = [40, 55, 65, 80, 110, 140, 170, 200, 230, 250, 280];
-        
+        // Simulación de actualización sin bucles
         setTimeout(() => {
-            timelineChart.updateSeries([{ data: nuevosDatos }]);
-            document.getElementById('user-status').innerText = "MODO: EXPANSIÓN";
-            msg.innerHTML = "<b>HORIZONTE SINCRONIZADO:</b> Se han detectado nuevas ventanas de capitalización en el rango seleccionado.";
-            msg.style.opacity = 1;
+            const nuevosDatos = Array.from({length: 7}, () => Math.floor(Math.random() * 100));
+            mainChart.updateSeries([{ data: nuevosDatos }]);
+            msg.innerText = "MODO: EXPANSIÓN";
         }, 800);
     }
 
     window.onload = function() {
-        initCharts();
-        document.getElementById('welcome-msg').innerText = `BIENVENIDO AL NÚCLEO, ${userName.toUpperCase()}`;
-        document.getElementById('exec-msg').innerText = "Vínculo establecido. Modelos de probabilidad inyectados.";
-        
-        setInterval(() => { 
-            document.getElementById('clock').innerText = new Date().toLocaleString().toUpperCase(); 
-        }, 1000);
-
-        if (authStatus !== 'GENESIS_ACTIVE' && authStatus !== 'SUCCESS') {
-            document.body.innerHTML = "<div style='height:100vh; display:flex; align-items:center; justify-content:center; color:var(--alert); letter-spacing:5px;'>ERROR: ACCESO RESTRINGIDO</div>";
-        }
+        init();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     };
 </script>
 </body>
