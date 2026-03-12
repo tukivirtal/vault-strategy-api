@@ -133,43 +133,49 @@
         donutChart.render();
     }
 
-    function sincronizarPanel() {
-        const start = document.getElementById('date-start').value;
-        const end = document.getElementById('date-end').value;
-        const status = document.getElementById('user-status');
+   function sincronizarPanel() {
+    const start = document.getElementById('date-start').value;
+    const end = document.getElementById('date-end').value || "ACTUAL";
+    const status = document.getElementById('user-status');
+    
+    // Referencias a los números de abajo
+    const roiCap = document.getElementById('roi-cap');
+    const roiNeg = document.getElementById('roi-neg');
+    const roiRisk = document.getElementById('roi-risk');
 
-        if (!start || !end) {
-            alert("Por favor, establezca un rango de fechas.");
-            return;
+    status.innerText = "SINCRONIZANDO...";
+
+    setTimeout(() => {
+        const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
+        
+        // Datos de la gráfica
+        const newData = isRisk ? [40, 30, 20, 15, 10, 5, 8] : [35, 45, 60, 95, 70, 80, 120];
+        
+        // ACTUALIZACIÓN DE NÚMEROS (Lo que faltaba)
+        if (isRisk) {
+            roiCap.innerText = "-12.0%"; // Capital cae en riesgo
+            roiNeg.innerText = "+5.4%";
+            roiRisk.innerText = "-45.2%"; // Riesgo aumenta
+            status.innerText = "MODO: PRECAUCIÓN";
+            status.style.color = "var(--alert)";
+        } else {
+            roiCap.innerText = "+24.8%"; // Capital sube en expansión
+            roiNeg.innerText = "+12.2%";
+            roiRisk.innerText = "-18.5%"; // Riesgo controlado
+            status.innerText = "MODO: EXPANSIÓN";
+            status.style.color = "var(--safe)";
         }
 
-        status.innerText = "SINCRONIZANDO...";
-        status.style.color = "var(--gold)";
+        // Persistencia para que el Dossier sepa qué mostrar
+        localStorage.setItem('ultimo_reporte', JSON.stringify({
+            rango: `${start} a ${end}`,
+            estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
+            roi: isRisk ? "-12.0%" : "+24.8%"
+        }));
 
-        setTimeout(() => {
-            // Algoritmo de Riesgo (Detección de Q2)
-            const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
-            const newData = isRisk ? [40, 30, 20, 15, 10, 5, 8] : [35, 45, 60, 95, 70, 80, 120];
-            
-            // LA CLAVE: No creamos una gráfica nueva. Actualizamos la existente por su ID.
-            ApexCharts.exec('mainChartInstance', 'updateSeries', [{
-                data: newData
-            }], true);
-
-            // Persistencia para el Dossier Dinámico
-            localStorage.setItem('ultimo_reporte', JSON.stringify({
-                rango: `${start} a ${end}`,
-                estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
-                roi: isRisk ? "-12.0%" : "+24.8%"
-            }));
-
-            status.innerText = `MODO: ${isRisk ? "PRECAUCIÓN" : "EXPANSIÓN"}`;
-            status.style.color = isRisk ? "var(--alert)" : "var(--safe)";
-            document.getElementById('roi-cap').innerText = isRisk ? "-12.0%" : "+24.8%";
-            document.getElementById('card-cap').style.borderTopColor = isRisk ? "var(--alert)" : "var(--safe)";
-        }, 800);
-    }
-
+        ApexCharts.exec('mainChart', 'updateSeries', [{ data: newData }], true);
+    }, 800);
+}
     function descargarDossier() {
         const urlParams = new URLSearchParams(window.location.search);
         const name = urlParams.get('nombre') || "OPERADOR GXP";
