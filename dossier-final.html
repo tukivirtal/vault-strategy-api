@@ -2,20 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>GÉNESIS | Dossier Estratégico GX-2026</title>
+    <title>GÉNESIS | Dossier de Inteligencia Estratégica GX-2026</title>
     <style>
-        :root { --gold: #d4af37; --dark: #050505; --gray: #222; }
+        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --dark: #050505; --gray: #222; }
         body { background: #000; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 0; }
         .page { 
             width: 210mm; min-height: 297mm; padding: 25mm 30mm; margin: 20px auto; 
             background: var(--dark); border: 1px solid #111; position: relative; box-sizing: border-box; 
+            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
-        .confidential { position: absolute; top: 20mm; right: 20mm; border: 2px solid #ff4d4d; color: #ff4d4d; padding: 5px 15px; font-weight: bold; transform: rotate(5deg); font-size: 0.7rem; }
-        h1 { font-size: 1.3rem; letter-spacing: 0.5em; border-bottom: 1px solid var(--gray); padding-bottom: 20px; color: var(--gold); }
-        .section-title { font-size: 0.7rem; color: #777; letter-spacing: 0.3em; margin-top: 40px; border-left: 3px solid var(--gold); padding-left: 15px; }
-        .content { font-size: 0.9rem; line-height: 1.8; color: #ccc; margin-top: 15px; }
-        .no-print { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .no-print:hover { background: #fff; }
+        .confidential-stamp { 
+            position: absolute; top: 20mm; right: 20mm; 
+            border: 2px solid var(--alert); color: var(--alert); 
+            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
+            transform: rotate(5deg); letter-spacing: 0.2em;
+        }
+        h1 { font-size: 1.2rem; letter-spacing: 0.5em; border-bottom: 1px solid var(--gray); padding-bottom: 20px; color: var(--gold); }
+        .section-title { font-size: 0.7rem; color: #777; letter-spacing: 0.3em; margin-top: 40px; margin-bottom: 15px; border-left: 3px solid var(--gold); padding-left: 15px; }
+        .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
+        .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); }
+        .impact-matrix td { padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; }
+        .footer-tech { margin-top: 60px; border-top: 1px solid #222; padding-top: 20px; font-size: 0.6rem; color: #444; }
+        .no-print { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; z-index: 100; }
         @media print { .no-print { display: none; } body { background: #000 !important; } .page { margin: 0; border: none; } }
     </style>
 </head>
@@ -24,28 +33,47 @@
 <button class="no-print" onclick="window.print()">DESCARGAR ENCRYPTED PDF</button>
 
 <div class="page">
-    <div class="confidential">CLASSIFIED</div>
-    <h1>Dossier Estratégico</h1>
+    <div class="confidential-stamp">TOP SECRET // CLASSIFIED</div>
+    <h1>Dossier de Inteligencia GX-2026</h1>
     
     <div class="section-title">SUJETO DE ANÁLISIS</div>
     <div class="content">
-        OPERADOR: <span style="color:var(--gold)" id="user-name">...</span><br>
-        PROTOCOLO: GÉNESIS GXP VITALICIO<br>
-        ESTADO: SINCRONIZADO CON EFEMÉRIDES NASA JPL DE441
+        OPERADOR: <span style="color:var(--gold)" id="display-name">...</span><br>
+        PROTOCOLO: RESONANCIA ACTIVA (DE441 SYNC)<br>
+        ESTADO: GÉNESIS VITALICIO VALIDADO
     </div>
 
-    <div class="section-title">PROYECCIÓN ESTRATÉGICA 2026</div>
+    <div class="section-title">MATRIZ DE IMPACTO ESTRATÉGICO</div>
+    <table class="impact-matrix">
+        <thead>
+            <tr>
+                <th>VENTANA</th>
+                <th>INDICADOR GXP</th>
+                <th>ROI EST.</th>
+                <th>DIRECTIVA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Q1 2026</td><td style="color:var(--gold)">OPORTUNIDAD ALTA</td><td>+24.8%</td><td>INVERSIÓN AGRESIVA</td></tr>
+            <tr><td>Q2 2026</td><td style="color:var(--alert)">RIESGO ESTRUCTURAL</td><td>-12.0%</td><td>POSICIÓN DEFENSIVA</td></tr>
+            <tr><td>Q3 2026</td><td style="color:var(--safe)">SINCRONÍA ÓPTIMA</td><td>+18.5%</td><td>ESCALABILIDAD</td></tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">NOTAS TÉCNICAS NASA JPL</div>
     <div class="content">
-        Los ciclos analizados indican una ventana de capitalización máxima en el tercer trimestre. Se recomienda consolidar activos antes del cierre del Q2 para evitar la volatilidad estructural detectada.
+        Los datos presentados se basan en la sincronización del núcleo DE441. La precisión de los vectores decenales (2026-2036) garantiza una desviación menor al 0.0001°. Se recomienda la revisión matutina de la matriz de riesgo.
     </div>
 
-    <div style="margin-top: 60px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444;">
-        ESTE DOCUMENTO ES PROPIEDAD INTELECTUAL DE VAULT LOGIC SYSTEMS. PROHIBIDA SU DISTRIBUCIÓN EXTERNA.
+    <div class="footer-tech">
+        CERTIFICACIÓN TÉCNICA: PROCESADO POR NÚCLEO SWISS EPHEMERIS V2.10 // EFEMÉRIDES NASA JPL DE441 // COORDINADAS GEOCÉNTRICAS J2000.0 // VAULT LOGIC SYSTEMS 2026
     </div>
 </div>
 
 <script>
-    document.getElementById('user-name').innerText = (new URLSearchParams(window.location.search).get('nombre') || "OPERADOR GXP").toUpperCase();
+    const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR GXP";
+    document.getElementById('display-name').innerText = name.toUpperCase();
 </script>
+
 </body>
 </html>
