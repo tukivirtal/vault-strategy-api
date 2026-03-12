@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GÉNESIS | Strategic Command Terminal</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
@@ -12,9 +13,10 @@
         .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
         .horizon-picker { background: rgba(212,175,55,0.03); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
         input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; }
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; }
+        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
+        .btn-search:hover { background: #fff; }
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .decision-card { border: 1px solid #222; padding: 25px 15px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.3s; }
+        .decision-card { border: 1px solid #222; padding: 25px 15px; text-align: center; background: rgba(0,0,0,0.3); }
         .roi { font-size: 2.2rem; font-weight: bold; margin: 10px 0; color: #fff; }
         .btn-nasa { background: var(--gold); color: #000; font-weight: bold; padding: 20px; border: none; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.3em; }
         .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; }
@@ -24,7 +26,7 @@
 
 <header>
     <div style="letter-spacing: 0.6em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // STRATEGIC COMMAND</div>
-    <div class="telemetry">DATA: JPL/DE441 SYNC ACTIVE<br><span id="clock">SYNCING...</span></div>
+    <div class="telemetry">DATA: JPL/DE441 SYNC ACTIVE<br><span id="clock">CARGANDO TELEMETRÍA...</span></div>
 </header>
 
 <div class="dashboard-grid">
@@ -46,7 +48,7 @@
         </div>
         
         <div class="executive-summary" id="exec-box" style="margin-top: 30px; border-left: 4px solid var(--gold); padding: 20px; background: rgba(212,175,55,0.02);">
-            <b id="welcome-msg" style="color:var(--gold)">BIENVENIDO AL NÚCLEO</b>
+            <b id="welcome-msg" style="color:var(--gold)">INICIALIZANDO...</b>
             <p id="exec-msg" style="color:#ccc">Sincronizando vectores de precisión...</p>
         </div>
 
@@ -68,6 +70,7 @@
     let timelineChart;
     const urlParams = new URLSearchParams(window.location.search);
     const userName = urlParams.get('nombre') || "LÍDER GÉNESIS";
+    const authStatus = urlParams.get('auth');
 
     function initCharts() {
         const options = {
@@ -76,7 +79,10 @@
             colors: ['#d4af37'],
             stroke: { curve: 'smooth', width: 2 },
             fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
-            xaxis: { categories: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'], labels: { style: { colors: '#444' } } },
+            xaxis: { 
+                categories: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'],
+                labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } 
+            },
             yaxis: { show: false },
             grid: { borderColor: '#111' },
             tooltip: { theme: 'dark' }
@@ -86,40 +92,32 @@
     }
 
     function buscarHorizonte() {
-        const start = document.getElementById('date-start').value;
-        const end = document.getElementById('date-end').value;
-        if (!start || !end) return;
-
-        // SIMULACIÓN DE DATOS DINÁMICOS BASADOS EN FECHA
-        const esRiesgo = end.includes("-04") || end.includes("-05");
-        const nuevosDatos = esRiesgo ? [80, 60, 40, 20, 15, 10, 5, 5, 10, 15, 20] : [35, 45, 60, 95, 120, 150, 190, 210, 230, 250, 280];
+        const msg = document.getElementById('exec-msg');
+        msg.style.opacity = 0.5;
         
-        // ACTUALIZACIÓN REAL DE LA GRÁFICA
-        timelineChart.updateSeries([{ data: nuevosDatos }]);
-
-        if (esRiesgo) {
-            document.getElementById('user-status').innerText = "MODO: PRECAUCIÓN";
-            document.getElementById('roi-cap').innerText = "-12.0%";
-            document.getElementById('status-cap').innerText = "RIESGO";
-            document.getElementById('status-cap').style.color = "var(--alert)";
-            document.getElementById('card-capital').style.borderTopColor = "var(--alert)";
-        } else {
+        // Simulación de nuevos datos (puedes vincular esto a tu API de main.py)
+        const nuevosDatos = [40, 55, 65, 80, 110, 140, 170, 200, 230, 250, 280];
+        
+        setTimeout(() => {
+            timelineChart.updateSeries([{ data: nuevosDatos }]);
             document.getElementById('user-status').innerText = "MODO: EXPANSIÓN";
-            document.getElementById('roi-cap').innerText = "+24.8%";
-            document.getElementById('status-cap').innerText = "ÓPTIMO";
-            document.getElementById('status-cap').style.color = "var(--safe)";
-            document.getElementById('card-capital').style.borderTopColor = "var(--safe)";
-        }
+            msg.innerHTML = "<b>HORIZONTE SINCRONIZADO:</b> Se han detectado nuevas ventanas de capitalización en el rango seleccionado.";
+            msg.style.opacity = 1;
+        }, 800);
     }
 
     window.onload = function() {
         initCharts();
         document.getElementById('welcome-msg').innerText = `BIENVENIDO AL NÚCLEO, ${userName.toUpperCase()}`;
-        const now = new Date();
-        document.getElementById('date-start').value = now.toISOString().split('T')[0];
+        document.getElementById('exec-msg').innerText = "Vínculo establecido. Modelos de probabilidad inyectados.";
+        
         setInterval(() => { 
             document.getElementById('clock').innerText = new Date().toLocaleString().toUpperCase(); 
         }, 1000);
+
+        if (authStatus !== 'GENESIS_ACTIVE' && authStatus !== 'SUCCESS') {
+            document.body.innerHTML = "<div style='height:100vh; display:flex; align-items:center; justify-content:center; color:var(--alert); letter-spacing:5px;'>ERROR: ACCESO RESTRINGIDO</div>";
+        }
     };
 </script>
 </body>
