@@ -6,101 +6,49 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --white: #ffffff; }
         body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .support-container { 
-            max-width: 600px; width: 100%; 
-            background: rgba(10,10,10,0.9); 
-            border: 1px solid #1a1a1a; 
-            padding: 40px; 
-            box-sizing: border-box;
-            box-shadow: 0 0 30px rgba(0,0,0,1);
-        }
-
-        h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); margin-top: 0; }
-        .info-box { margin-bottom: 30px; font-size: 0.8rem; line-height: 1.8; color: #ccc; }
-        
+        .support-container { max-width: 600px; width: 100%; background: rgba(10,10,10,0.9); border: 1px solid #1a1a1a; padding: 40px; box-sizing: border-box; }
+        h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); }
         form { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-        label { font-size: 0.7rem; color: #fff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
-        
-        input, textarea, select { 
-            background: #111; 
-            border: 1px solid #333; 
-            color: #fff; 
-            padding: 15px; 
-            font-family: inherit; 
-            font-size: 0.9rem; 
-            outline: none; 
-            width: 100%; 
-            box-sizing: border-box; 
-        }
-
-        input:focus, textarea:focus, select:focus { border-color: var(--gold); background: #161616; }
-        
-        .btn-send { 
-            background: var(--white); 
-            color: #000; 
-            border: none; 
-            padding: 18px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            letter-spacing: 3px; 
-            margin-top: 10px; 
-            text-transform: uppercase; 
-            transition: 0.3s;
-        }
-        .btn-send:hover { background: var(--gold); }
-
-        #success-msg { 
-            display:none; 
-            color:var(--gold); 
-            font-size:0.75rem; 
-            margin-top:20px; 
-            text-align:center; 
-            border: 1px dashed var(--gold); 
-            padding: 15px; 
-        }
-        .back-link { margin-top: 40px; color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; }
+        input, select, textarea { background: #111; border: 1px solid #333; color: #fff; padding: 15px; font-family: inherit; width: 100%; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--gold); }
+        .btn-send { background: var(--white); color: #000; border: none; padding: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 3px; }
     </style>
 </head>
 <body>
 
 <div class="support-container">
     <h1>SOPORTE TÉCNICO GXP</h1>
-    <div class="info-box">
-        <b>CANAL DE ENLACE:</b> contact@emotionalvaults.com<br>
-        Reporte cualquier anomalía estructural. El sistema generará un ticket GX de seguimiento decenal.
-    </div>
-
     <form id="support-form">
-        <label>ID DE USUARIO (EMAIL)</label>
+        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">ID DE USUARIO (EMAIL)</label>
         <input type="email" id="user-email" required placeholder="tu-email@dominio.com">
         
-        <label>NIVEL DE ACCESO</label>
+        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">NIVEL DE ACCESO</label>
         <select id="user-plan">
-            <option value="SENTINEL">SENTINEL ($15)</option>
-            <option value="EXECUTIVE">EXECUTIVE ($45)</option>
-            <option value="GENESIS">GÉNESIS ($150)</option>
+            <option value="SENTINEL">SENTINEL</option>
+            <option value="EXECUTIVE">EXECUTIVE</option>
+            <option value="GENESIS">GÉNESIS</option>
         </select>
 
-        <label>DESCRIPCIÓN DEL INCIDENTE</label>
-        <textarea id="user-message" rows="5" required placeholder="Describa el error detectado..."></textarea>
-        <button type="button" onclick="enviarSoporteReal()" class="btn-send">ACTIVAR PROTOCOLO</button>
+        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">DESCRIPCIÓN</label>
+        <textarea id="user-message" rows="5" required></textarea>
+
+        <button type="button" onclick="enviarTicket()" class="btn-send">ACTIVAR PROTOCOLO</button>
     </form>
-    <div id="success-msg"></div>
+    <div id="feedback" style="display:none; margin-top: 20px; text-align: center; border: 1px dashed var(--gold); padding: 15px;"></div>
 </div>
 
-<a href="suscripcion.html" class="back-link">← REGRESAR A MATRIZ</a>
-
 <script>
-    async function enviarSoporteReal() {
+    async function enviarTicket() {
+        const feedback = document.getElementById('feedback');
         const email = document.getElementById('user-email').value;
         const plan = document.getElementById('user-plan').value;
         const msg = document.getElementById('user-message').value;
-        const successBox = document.getElementById('success-msg');
 
-        // REEMPLAZAR CON TUS CREDENCIALES REALES DE SUPABASE
-        const SUPABASE_URL = "https://hfyzgwjoivxvzkyfnrlo.supabase.co";
-        const ANON_KEY = "sb_publishable_1jxSbyPrPAmVszBfRydkeA_x4BX_o8o";
+        const ref = "GX-" + Math.floor(Math.random() * 90000 + 10000);
+        const nombre = email.split('@')[0].toUpperCase();
+
+        const SUPABASE_URL = "https://hfyzgwoivxvzkyfnrlo.supabase.co";
+        const ANON_KEY = "tu_anon_key_aqui";
 
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/soporte_tickets`, {
@@ -108,10 +56,11 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': ANON_KEY,
-                    'Authorization': `Bearer ${ANON_KEY}`,
-                    'Prefer': 'return=representation'
+                    'Authorization': `Bearer ${ANON_KEY}`
                 },
                 body: JSON.stringify({ 
+                    ticket_ref: ref,
+                    nombre_usuario: nombre,
                     email_usuario: email, 
                     plan_nivel: plan, 
                     mensaje: msg 
@@ -119,16 +68,12 @@
             });
 
             if (response.ok) {
-                const ticketRef = "GX-" + Math.floor(Math.random() * 9000 + 1000); 
-                successBox.innerText = `REPORTE INDEXADO: ${ticketRef}. Su incidencia ha sido registrada y el Webhook de correo ha sido disparado.`;
-                successBox.style.display = "block";
+                feedback.innerText = `TICKET GENERADO: ${ref}. INCIDENCIA REGISTRADA.`;
+                feedback.style.display = "block";
                 document.getElementById('support-form').style.display = "none";
-            } else {
-                alert("Error de enlace: Verifique las claves de Supabase.");
             }
         } catch (err) {
-            console.error(err);
-            alert("Error crítico de conexión.");
+            alert("Error de enlace.");
         }
     }
 </script>
