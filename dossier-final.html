@@ -6,26 +6,46 @@
     <style>
         :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --dark: #050505; --gray: #222; }
         body { background: #000; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 0; }
+        
+        /* Formato A4 para impresión profesional */
         .page { 
             width: 210mm; min-height: 297mm; padding: 25mm 30mm; margin: 20px auto; 
             background: var(--dark); border: 1px solid #111; position: relative; box-sizing: border-box; 
             box-shadow: 0 0 50px rgba(0,0,0,1);
         }
+
         .confidential-stamp { 
             position: absolute; top: 20mm; right: 20mm; 
             border: 2px solid var(--alert); color: var(--alert); 
             padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
             transform: rotate(5deg); letter-spacing: 0.2em;
         }
+
         h1 { font-size: 1.2rem; letter-spacing: 0.5em; border-bottom: 1px solid var(--gray); padding-bottom: 20px; color: var(--gold); }
+        
         .section-title { font-size: 0.7rem; color: #777; letter-spacing: 0.3em; margin-top: 40px; margin-bottom: 15px; border-left: 3px solid var(--gold); padding-left: 15px; }
+        
         .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
+
         .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); }
+        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); text-transform: uppercase; }
         .impact-matrix td { padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; }
+
         .footer-tech { margin-top: 60px; border-top: 1px solid #222; padding-top: 20px; font-size: 0.6rem; color: #444; }
-        .no-print { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; z-index: 100; }
-        @media print { .no-print { display: none; } body { background: #000 !important; } .page { margin: 0; border: none; } }
+
+        /* Botón flotante que no sale en la impresión */
+        .no-print { 
+            position: fixed; bottom: 30px; right: 30px; background: var(--gold); 
+            color: #000; border: none; padding: 15px 30px; font-weight: bold; 
+            cursor: pointer; z-index: 100; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .no-print:hover { background: #fff; }
+
+        @media print { 
+            .no-print { display: none; } 
+            body { background: #000 !important; } 
+            .page { margin: 0; border: none; width: 100%; } 
+        }
     </style>
 </head>
 <body>
@@ -38,9 +58,14 @@
     
     <div class="section-title">SUJETO DE ANÁLISIS</div>
     <div class="content">
-        OPERADOR: <span style="color:var(--gold)" id="display-name">...</span><br>
+        OPERADOR: <span style="color:var(--gold)" id="display-name">CARGANDO...</span><br>
         PROTOCOLO: RESONANCIA ACTIVA (DE441 SYNC)<br>
         ESTADO: GÉNESIS VITALICIO VALIDADO
+    </div>
+
+    <div class="section-title">PROYECCIÓN ESTRATÉGICA DINÁMICA</div>
+    <div class="content" id="resumen-dinamico">
+        Sincronizando con la última consulta del panel de control...
     </div>
 
     <div class="section-title">MATRIZ DE IMPACTO ESTRATÉGICO</div>
@@ -53,26 +78,57 @@
                 <th>DIRECTIVA</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>Q1 2026</td><td style="color:var(--gold)">OPORTUNIDAD ALTA</td><td>+24.8%</td><td>INVERSIÓN AGRESIVA</td></tr>
-            <tr><td>Q2 2026</td><td style="color:var(--alert)">RIESGO ESTRUCTURAL</td><td>-12.0%</td><td>POSICIÓN DEFENSIVA</td></tr>
-            <tr><td>Q3 2026</td><td style="color:var(--safe)">SINCRONÍA ÓPTIMA</td><td>+18.5%</td><td>ESCALABILIDAD</td></tr>
+        <tbody id="tabla-cuerpo">
+            <tr>
+                <td>CICLO ANUAL</td>
+                <td style="color:var(--gold)">TENDENCIA BASE</td>
+                <td>+15.2%</td>
+                <td>CONSOLIDACIÓN</td>
+            </tr>
         </tbody>
     </table>
 
     <div class="section-title">NOTAS TÉCNICAS NASA JPL</div>
     <div class="content">
-        Los datos presentados se basan en la sincronización del núcleo DE441. La precisión de los vectores decenales (2026-2036) garantiza una desviación menor al 0.0001°. Se recomienda la revisión matutina de la matriz de riesgo.
+        Los datos presentados se basan en la sincronización del núcleo de efemérides DE441. La precisión de los vectores decenales garantiza una desviación menor al 0.0001°. Este documento es un activo digital extraído de la bóveda privada.
     </div>
 
     <div class="footer-tech">
-        CERTIFICACIÓN TÉCNICA: PROCESADO POR NÚCLEO SWISS EPHEMERIS V2.10 // EFEMÉRIDES NASA JPL DE441 // COORDINADAS GEOCÉNTRICAS J2000.0 // VAULT LOGIC SYSTEMS 2026
+        CERTIFICACIÓN TÉCNICA: NÚCLEO SWISS EPHEMERIS V2.10 // EFEMÉRIDES NASA JPL DE441 // COORDINADAS J2000.0 // VAULT LOGIC SYSTEMS 2026
     </div>
 </div>
 
 <script>
-    const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR GXP";
-    document.getElementById('display-name').innerText = name.toUpperCase();
+    window.onload = function() {
+        // 1. Capturar nombre del usuario desde la URL
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('nombre') || "OPERADOR GXP";
+        document.getElementById('display-name').innerText = name.toUpperCase();
+
+        // 2. Leer la última sincronización guardada en la terminal
+        const reporte = JSON.parse(localStorage.getItem('ultimo_reporte'));
+        
+        if (reporte) {
+            // Actualizar el resumen dinámico
+            document.getElementById('resumen-dinamico').innerHTML = `
+                Basado en el horizonte consultado (<b>${reporte.rango}</b>), el sistema ha detectado un estado de 
+                <span style="color:${reporte.estado === 'PRECAUCIÓN' ? 'var(--alert)' : 'var(--safe)'}">${reporte.estado}</span>. 
+                Se recomienda actuar bajo la directiva de capital proyectada del <b>${reporte.roi}</b>.
+            `;
+
+            // Añadir la fila específica a la tabla
+            const tabla = document.getElementById('tabla-cuerpo');
+            const nuevaFila = `
+                <tr style="background: rgba(212,175,55,0.05)">
+                    <td><b>CONSULTA</b></td>
+                    <td style="color:var(--gold)">HORIZONTE SYNC</td>
+                    <td style="color:${reporte.estado === 'PRECAUCIÓN' ? 'var(--alert)' : 'var(--safe)'}">${reporte.roi}</td>
+                    <td><b>${reporte.estado}</b></td>
+                </tr>
+            `;
+            tabla.innerHTML = nuevaFila + tabla.innerHTML;
+        }
+    }
 </script>
 
 </body>
