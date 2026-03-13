@@ -9,12 +9,12 @@
         body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
         .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
-        .panel { background: rgba(10,10,10,0.95); border: 1px solid rgba(212,175,55,0.2); padding: 30px; box-shadow: 0 0 20px rgba(0,0,0,1); }
+        .panel { background: rgba(10,10,10,0.95); border: 1px solid rgba(212,175,55,0.2); padding: 30px; }
         .horizon-picker { background: rgba(212,175,55,0.05); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
         input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
+        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; }
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); }
+        .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.5s; }
         .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
         footer { margin-top: 50px; border-top: 1px solid #222; padding: 30px; text-align: center; font-size: 0.7rem; color: #555; letter-spacing: 3px; }
     </style>
@@ -23,13 +23,13 @@
 
     <header>
         <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // ESTRATEGIA</div>
-        <div style="text-align: right; font-size: 0.8rem; color: var(--gold);">DATA: JPL/DE441 SYNC ACTIVE<br><span id="clock">00:00:00</span></div>
+        <div style="text-align: right; font-size: 0.8rem; color: var(--gold);">NASA JPL DE441 SYNC ACTIVE<br><span id="clock">00:00:00</span></div>
     </header>
 
     <div class="dashboard-grid">
         <aside>
             <div class="panel">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">TENDENCIA 10 AÑOS</span>
+                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">TENDENCIA DECENAL</span>
                 <div id="chart-mini-trend"></div>
             </div>
         </aside>
@@ -71,55 +71,71 @@
     <footer>NASA JPL DE441 COMPLIANT // VAULT LOGIC 2026</footer>
 
 <script>
-    // ESTADO GLOBAL ÚNICO
-    const Terminal = {
-        mainChart: null,
-        userName: "OPERADOR GXP"
-    };
+    let mainChart;
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email') || "OPERADOR GXP";
+    const userName = userEmail.split('@')[0].toUpperCase();
 
     function initCharts() {
-        Terminal.mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
+        mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
             series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
-            chart: { id: 'chart-instance', type: 'area', height: 280, toolbar: { show: false } },
+            chart: { id: 'gxp-instance', type: 'area', height: 280, toolbar: { show: false } },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
             xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'] }
         });
-        Terminal.mainChart.render();
+        mainChart.render();
     }
 
     function sincronizarPanel() {
         const start = document.getElementById('date-start').value;
-        const end = document.getElementById('date-end').value || "HORIZONTE ACTUAL";
-        const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
+        const end = document.getElementById('date-end').value || "ACTUAL";
+        const status = document.getElementById('user-status');
+        const roiCap = document.getElementById('roi-cap');
+        const roiRisk = document.getElementById('roi-risk');
+        const cardCap = document.getElementById('card-cap');
 
-        // Actualización de Gráfica por ID Único
-        const newData = isRisk ? [40, 25, 15, 10, 5, 2, 8] : [35, 50, 75, 90, 110, 135, 160];
-        ApexCharts.exec('chart-instance', 'updateSeries', [{ data: newData }], true);
+        status.innerText = "SINCRONIZANDO...";
 
-        // ACTUALIZACIÓN DE PORCENTAJES (ROI)
-        document.getElementById('roi-cap').innerText = isRisk ? "-12.0%" : "+24.8%";
-        document.getElementById('roi-cap').style.color = isRisk ? "var(--alert)" : "var(--safe)";
-        document.getElementById('roi-risk').innerText = isRisk ? "-45.2%" : "-18.5%";
-        document.getElementById('user-status').innerText = isRisk ? "MODO: PRECAUCIÓN" : "MODO: EXPANSIÓN";
-        document.getElementById('user-status').style.color = isRisk ? "var(--alert)" : "var(--safe)";
+        setTimeout(() => {
+            const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
+            const newData = isRisk ? [40, 25, 15, 10, 5, 2, 8] : [35, 50, 75, 90, 110, 135, 160];
 
-        // Persistencia para el Dossier
-        localStorage.setItem('ultimo_reporte', JSON.stringify({
-            rango: `${start} a ${end}`,
-            estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
-            roi: isRisk ? "-12.0%" : "+24.8%"
-        }));
+            // ACTUALIZAR GRÁFICA
+            ApexCharts.exec('gxp-instance', 'updateSeries', [{ data: newData }], true);
+
+            // ACTUALIZAR NÚMEROS Y COLORES
+            if (isRisk) {
+                roiCap.innerText = "-12.0%";
+                roiCap.style.color = "var(--alert)";
+                roiRisk.innerText = "-45.2%";
+                status.innerText = "MODO: PRECAUCIÓN";
+                status.style.color = "var(--alert)";
+                cardCap.style.borderTopColor = "var(--alert)";
+            } else {
+                roiCap.innerText = "+24.8%";
+                roiCap.style.color = "var(--safe)";
+                roiRisk.innerText = "-18.5%";
+                status.innerText = "MODO: EXPANSIÓN";
+                status.style.color = "var(--safe)";
+                cardCap.style.borderTopColor = "var(--safe)";
+            }
+
+            // GUARDAR PARA DOSSIER
+            localStorage.setItem('ultimo_reporte', JSON.stringify({
+                rango: `${start} a ${end}`,
+                estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
+                roi: isRisk ? "-12.0%" : "+24.8%"
+            }));
+        }, 800);
     }
 
     function descargarDossier() {
-        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(Terminal.userName)}`;
+        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}`;
     }
 
     window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        Terminal.userName = (urlParams.get('email') || "OPERADOR").split('@')[0].toUpperCase();
-        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${Terminal.userName}`;
+        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
         document.getElementById('date-start').value = new Date().toISOString().split('T')[0];
         initCharts();
         sincronizarPanel();
