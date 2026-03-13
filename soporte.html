@@ -2,90 +2,89 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Vault Logic | Centro de Soporte</title>
+    <title>Soporte GXP | Vault Logic</title>
     <style>
-        :root { --gold: #d4af37; --bg: #050505; --white: #ffffff; }
-        body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .support-container { max-width: 600px; width: 100%; background: rgba(10,10,10,0.9); border: 1px solid #1a1a1a; padding: 40px; box-sizing: border-box; }
-        h1 { letter-spacing: 0.5em; font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 20px; text-align: center; color: var(--white); }
-        form { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-        input, select, textarea { background: #111; border: 1px solid #333; color: #fff; padding: 15px; font-family: inherit; width: 100%; box-sizing: border-box; outline: none; }
+        :root { --gold: #d4af37; --bg: #050505; }
+        body { background: var(--bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .support-box { background: #0a0a0a; border: 1px solid #222; padding: 40px; width: 100%; max-width: 500px; box-sizing: border-box; }
+        h1 { font-size: 1.1rem; letter-spacing: 4px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; color: #fff; }
+        label { font-size: 0.6rem; letter-spacing: 2px; display: block; margin-bottom: 5px; color: #777; }
+        input, select, textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; margin-bottom: 20px; font-family: inherit; box-sizing: border-box; outline: none; }
         input:focus { border-color: var(--gold); }
-        .btn-send { background: var(--white); color: #000; border: none; padding: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 3px; }
+        button { width: 100%; background: #fff; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: var(--gold); }
+        #feedback { display:none; margin-top: 20px; font-size: 0.7rem; text-align: center; border: 1px dashed var(--gold); padding: 10px; }
     </style>
 </head>
 <body>
 
-<div class="support-container">
-    <h1>SOPORTE TÉCNICO GXP</h1>
-    <form id="support-form">
-        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">ID DE USUARIO (EMAIL)</label>
-        <input type="email" id="user-email" required placeholder="tu-email@dominio.com">
-        
-        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">NIVEL DE ACCESO</label>
-        <select id="user-plan">
+<div class="support-box">
+    <h1>CENTRO DE SOPORTE</h1>
+    <form id="form-soporte">
+        <label>EMAIL DE USUARIO</label>
+        <input type="email" id="email" required placeholder="ejemplo@correo.com">
+
+        <label>NIVEL DE ACCESO</label>
+        <select id="plan">
             <option value="SENTINEL">SENTINEL</option>
             <option value="EXECUTIVE">EXECUTIVE</option>
             <option value="GENESIS">GÉNESIS</option>
         </select>
 
-        <label style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">DESCRIPCIÓN</label>
-        <textarea id="user-message" rows="5" required></textarea>
+        <label>DESCRIPCIÓN DEL INCIDENTE</label>
+        <textarea id="mensaje" rows="4" required placeholder="Describa el error..."></textarea>
 
-        <button type="button" onclick="enviarTicket()" class="btn-send">ACTIVAR PROTOCOLO</button>
+        <button type="button" onclick="ejecutarProtocoloEnvio()">ACTIVAR TICKET</button>
     </form>
-    <div id="feedback" style="display:none; margin-top: 20px; text-align: center; border: 1px dashed var(--gold); padding: 15px;"></div>
+    <div id="feedback"></div>
 </div>
 
 <script>
-    async function enviarTicket() {
+    async function ejecutarProtocoloEnvio() {
         const feedback = document.getElementById('feedback');
-        const email = document.getElementById('user-email').value;
-        const plan = document.getElementById('user-plan').value;
-        const msg = document.getElementById('user-message').value;
+        const email = document.getElementById('email').value;
+        const plan = document.getElementById('plan').value;
+        const msg = document.getElementById('mensaje').value;
 
-        // Validamos campos para evitar envíos vacíos
-        if (!email || !msg) {
-            alert("Protocolo incompleto: Email y mensaje son obligatorios.");
-            return;
-        }
+        if(!email || !msg) return alert("Complete los campos obligatorios.");
 
-        const ref = "GX-" + Math.floor(Math.random() * 90000 + 10000);
-        const nombre = email.split('@')[0].toUpperCase();
+        feedback.style.display = "block";
+        feedback.innerText = "GENERANDO REFERENCIA GX...";
 
-        // Reemplaza con tus valores de Supabase (Project Settings > API)
-        const SUPABASE_URL = "https://hfyzgwoivxvzkyfnrlo.supabase.co";
-        const ANON_KEY = "tu_anon_key_real_aqui"; 
+        const ticketRef = "GX-" + Math.floor(Math.random() * 90000 + 10000);
+        const userName = email.split('@')[0].toUpperCase();
+
+        // CREDENCIALES (Usa las de tu captura AstroStrategic)
+        const URL_SB = "https://hfyzgwoivxvzkyfnrlo.supabase.co";
+        const KEY_SB = "TU_ANON_KEY_AQUI"; 
 
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/soporte_tickets`, {
+            const response = await fetch(`${URL_SB}/rest/v1/soporte_tickets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'apikey': ANON_KEY,
-                    'Authorization': `Bearer ${ANON_KEY}`,
-                    'Prefer': 'return=representation' // CRÍTICO: Evita el error 405 en algunas configuraciones
+                    'apikey': KEY_SB,
+                    'Authorization': `Bearer ${KEY_SB}`,
+                    'Prefer': 'return=representation' 
                 },
-                body: JSON.stringify({ 
-                    ticket_ref: ref,
-                    nombre_usuario: nombre,
-                    email_usuario: email, 
-                    plan_nivel: plan, 
-                    mensaje: msg 
+                body: JSON.stringify({
+                    ticket_ref: ticketRef,
+                    nombre_usuario: userName,
+                    email_usuario: email,
+                    plan_nivel: plan,
+                    mensaje: msg,
+                    estado: "ABIERTO"
                 })
             });
 
-            if (response.ok) {
-                feedback.innerText = `TICKET GENERADO: ${ref}. INCIDENCIA REGISTRADA CON ÉXITO.`;
-                feedback.style.display = "block";
-                document.getElementById('support-form').style.display = "none";
+            if(response.ok) {
+                feedback.innerText = `TICKET INDEXADO: ${ticketRef}. EL EQUIPO RECIBIRÁ LA NOTIFICACIÓN.`;
+                document.getElementById('form-soporte').reset();
             } else {
-                const errData = await response.json();
-                console.error("Error BD:", errData);
-                alert("Error de respuesta del núcleo de datos.");
+                throw new Error();
             }
         } catch (err) {
-            alert("Fallo de conexión: El servidor no respondió.");
+            feedback.innerText = "ERROR 405/CORE: FALLO EN EL ENLACE CON LA BASE DE DATOS.";
         }
     }
 </script>
