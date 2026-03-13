@@ -2,7 +2,7 @@ runtime: python3.10
 handler: main:app
 env_vars:
   SUPABASE_URL: "https://hfyzgwoivxvzkyfnrlo.supabase.co"
-  SUPABASE_KEY: "sb_publishable_1jxSbyPrPAmVszBfRydkeA_x4BX_o8o"
+  SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeXpnd2pvaXZ4dnpreWZucmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NTQ4MzAsImV4cCI6MjA4NjQzMDgzMH0.g3h3IJWsSnykuBiDAx9J7AAau9zDcmUUM14e2pezIg8"
 compute:
   latency: "ultra-low"
   region: "auto"
