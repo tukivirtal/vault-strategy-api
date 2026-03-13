@@ -1,8 +1,12 @@
 runtime: python3.10
 handler: main:app
+# Instrucciones de compilación profesional
+build_steps:
+  - "apt-get update && apt-get install -y build-essential libtool autoconf"
+  - "pip install --upgrade pip"
+  - "pip install -r requirements.txt"
 env_vars:
   SUPABASE_URL: "https://hfyzgwoivxvzkyfnrlo.supabase.co"
   SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeXpnd2pvaXZ4dnpreWZucmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NTQ4MzAsImV4cCI6MjA4NjQzMDgzMH0.g3h3IJWsSnykuBiDAx9J7AAau9zDcmUUM14e2pezIg8"
 compute:
   latency: "ultra-low"
-  region: "auto"
