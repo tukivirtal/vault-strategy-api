@@ -1,0 +1,11 @@
+version: 1.0
+runtime: python3.10
+entrypoint: uvicorn main:app --host 0.0.0.0 --port $PORT
+env_vars:
+  SUPABASE_URL: "https://hfyzgwoivxvzkyfnrlo.supabase.co"
+  SUPABASE_KEY: "sb_publishable_1jxSbyPrPAmVszBfRydkeA_x4BX_o8o"
+  NASA_JPL_MODE: "enabled"
+  DEBUG: "false"
+scaling:
+  min_instances: 1
+  max_instances: 3
