@@ -2,134 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>GÉNESIS | Dossier de Inteligencia Estratégica GX-2026</title>
+    <title>Dossier GX-2026</title>
     <style>
-        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --dark: #050505; --gray: #222; }
-        body { background: #000; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 0; }
-        
-        /* Formato A4 para impresión profesional */
-        .page { 
-            width: 210mm; min-height: 297mm; padding: 25mm 30mm; margin: 20px auto; 
-            background: var(--dark); border: 1px solid #111; position: relative; box-sizing: border-box; 
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
-
-        .confidential-stamp { 
-            position: absolute; top: 20mm; right: 20mm; 
-            border: 2px solid var(--alert); color: var(--alert); 
-            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
-            transform: rotate(5deg); letter-spacing: 0.2em;
-        }
-
-        h1 { font-size: 1.2rem; letter-spacing: 0.5em; border-bottom: 1px solid var(--gray); padding-bottom: 20px; color: var(--gold); }
-        
-        .section-title { font-size: 0.7rem; color: #777; letter-spacing: 0.3em; margin-top: 40px; margin-bottom: 15px; border-left: 3px solid var(--gold); padding-left: 15px; }
-        
-        .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
-
-        .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); text-transform: uppercase; }
-        .impact-matrix td { padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; }
-
-        .footer-tech { margin-top: 60px; border-top: 1px solid #222; padding-top: 20px; font-size: 0.6rem; color: #444; }
-
-        /* Botón flotante que no sale en la impresión */
-        .no-print { 
-            position: fixed; bottom: 30px; right: 30px; background: var(--gold); 
-            color: #000; border: none; padding: 15px 30px; font-weight: bold; 
-            cursor: pointer; z-index: 100; text-transform: uppercase; letter-spacing: 2px;
-        }
-        .no-print:hover { background: #fff; }
-
-        @media print { 
-            .no-print { display: none; } 
-            body { background: #000 !important; } 
-            .page { margin: 0; border: none; width: 100%; } 
-        }
+        body { background: #000; color: #fff; font-family: monospace; padding: 40px; }
+        .page { max-width: 800px; margin: auto; border: 1px solid #222; padding: 40px; }
+        .gold { color: #d4af37; }
+        .section { margin-top: 30px; border-left: 3px solid #d4af37; padding-left: 15px; }
     </style>
 </head>
 <body>
-
-<button class="no-print" onclick="window.print()">DESCARGAR ENCRYPTED PDF</button>
-
-<div class="page">
-    <div class="confidential-stamp">TOP SECRET // CLASSIFIED</div>
-    <h1>Dossier de Inteligencia GX-2026</h1>
-    
-    <div class="section-title">SUJETO DE ANÁLISIS</div>
-    <div class="content">
-        OPERADOR: <span style="color:var(--gold)" id="display-name">CARGANDO...</span><br>
-        PROTOCOLO: RESONANCIA ACTIVA (DE441 SYNC)<br>
-        ESTADO: GÉNESIS VITALICIO VALIDADO
+    <div class="page">
+        <h1>DOSSIER ESTRATÉGICO GX</h1>
+        <div class="section">
+            OPERADOR: <span id="display-name" class="gold">...</span><br>
+            ESTADO: <span id="display-status">...</span>
+        </div>
+        <div class="section">
+            <h3>ANÁLISIS DE CONSULTA</h3>
+            <p id="display-range">...</p>
+            <p>ROI PROYECTADO: <span id="display-roi" class="gold">...</span></p>
+        </div>
     </div>
-
-    <div class="section-title">PROYECCIÓN ESTRATÉGICA DINÁMICA</div>
-    <div class="content" id="resumen-dinamico">
-        Sincronizando con la última consulta del panel de control...
-    </div>
-
-    <div class="section-title">MATRIZ DE IMPACTO ESTRATÉGICO</div>
-    <table class="impact-matrix">
-        <thead>
-            <tr>
-                <th>VENTANA</th>
-                <th>INDICADOR GXP</th>
-                <th>ROI EST.</th>
-                <th>DIRECTIVA</th>
-            </tr>
-        </thead>
-        <tbody id="tabla-cuerpo">
-            <tr>
-                <td>CICLO ANUAL</td>
-                <td style="color:var(--gold)">TENDENCIA BASE</td>
-                <td>+15.2%</td>
-                <td>CONSOLIDACIÓN</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="section-title">NOTAS TÉCNICAS NASA JPL</div>
-    <div class="content">
-        Los datos presentados se basan en la sincronización del núcleo de efemérides DE441. La precisión de los vectores decenales garantiza una desviación menor al 0.0001°. Este documento es un activo digital extraído de la bóveda privada.
-    </div>
-
-    <div class="footer-tech">
-        CERTIFICACIÓN TÉCNICA: NÚCLEO SWISS EPHEMERIS V2.10 // EFEMÉRIDES NASA JPL DE441 // COORDINADAS J2000.0 // VAULT LOGIC SYSTEMS 2026
-    </div>
-</div>
-
 <script>
     window.onload = function() {
-        // 1. Capturar nombre del usuario desde la URL
-        const params = new URLSearchParams(window.location.search);
-        const name = params.get('nombre') || "OPERADOR GXP";
+        const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR";
         document.getElementById('display-name').innerText = name.toUpperCase();
 
-        // 2. Leer la última sincronización guardada en la terminal
-        const reporte = JSON.parse(localStorage.getItem('ultimo_reporte'));
-        
-        if (reporte) {
-            // Actualizar el resumen dinámico
-            document.getElementById('resumen-dinamico').innerHTML = `
-                Basado en el horizonte consultado (<b>${reporte.rango}</b>), el sistema ha detectado un estado de 
-                <span style="color:${reporte.estado === 'PRECAUCIÓN' ? 'var(--alert)' : 'var(--safe)'}">${reporte.estado}</span>. 
-                Se recomienda actuar bajo la directiva de capital proyectada del <b>${reporte.roi}</b>.
-            `;
-
-            // Añadir la fila específica a la tabla
-            const tabla = document.getElementById('tabla-cuerpo');
-            const nuevaFila = `
-                <tr style="background: rgba(212,175,55,0.05)">
-                    <td><b>CONSULTA</b></td>
-                    <td style="color:var(--gold)">HORIZONTE SYNC</td>
-                    <td style="color:${reporte.estado === 'PRECAUCIÓN' ? 'var(--alert)' : 'var(--safe)'}">${reporte.roi}</td>
-                    <td><b>${reporte.estado}</b></td>
-                </tr>
-            `;
-            tabla.innerHTML = nuevaFila + tabla.innerHTML;
+        const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
+        if(data) {
+            document.getElementById('display-range').innerText = `RANGO: ${data.rango}`;
+            document.getElementById('display-status').innerText = data.estado;
+            document.getElementById('display-roi').innerText = data.roi;
         }
     }
 </script>
-
 </body>
 </html>
