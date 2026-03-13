@@ -10,16 +10,15 @@
         body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
         .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
-        .panel { background: rgba(10,10,10,0.95); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
+        .panel { background: rgba(10,10,10,0.95); border: 1px solid rgba(212,175,55,0.2); padding: 30px; box-shadow: 0 0 20px rgba(0,0,0,1); }
         .horizon-picker { background: rgba(212,175,55,0.05); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
         input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
         .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
         .btn-search:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.5s; }
-        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
+        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
         .label-mini { font-size: 0.7rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; line-height: 1.4; }
         footer { margin-top: 50px; border-top: 1px solid #222; padding: 30px; text-align: center; font-size: 0.7rem; color: #555; letter-spacing: 3px; }
     </style>
 </head>
@@ -27,7 +26,7 @@
 
     <header>
         <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // ESTRATEGIA</div>
-        <div class="telemetry">
+        <div style="text-align: right; font-size: 0.8rem; color: var(--gold);">
             DATA: JPL/DE441 SYNC ACTIVE<br>
             <span id="clock">00:00:00 // SYNCING...</span>
         </div>
@@ -87,114 +86,97 @@
     <footer>SISTEMA DE APOYO A LA DECISIÓN // NASA JPL DE441 COMPLIANT // VAULT LOGIC 2026</footer>
 
 <script>
-    // VARIABLES GLOBALES PARA MANTENER LAS INSTANCIAS VIVAS
-    let mainChart, miniChart, donutChart;
+    // CORE STATE: Objeto único de control
+    const GenesisTerminal = {
+        mainChart: null,
+        miniChart: null,
+        userName: "OPERADOR GXP"
+    };
 
     function initCharts() {
-        // 1. Gráfica Principal (Se crea una sola vez)
-        const mainOptions = {
+        // Inicialización de Gráfica Principal
+        GenesisTerminal.mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
             series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
-            chart: { 
-                id: 'mainChartInstance', // ID VITAL para poder actualizarla luego
-                type: 'area', 
-                height: 280, 
-                toolbar: { show: false }, 
-                background: 'transparent' 
-            },
+            chart: { id: 'gxp-main', type: 'area', height: 280, toolbar: { show: false } },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
-            xaxis: { 
-                categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
-                labels: { style: { colors: '#666' } }
-            },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
-            tooltip: { theme: 'dark', y: { formatter: (v) => `${v}ptos Sincro` } }
-        };
-        mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), mainOptions);
-        mainChart.render();
+            xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'], labels: { style: { colors: '#666' } } },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } }
+        });
+        GenesisTerminal.mainChart.render();
 
-        // 2. Gráfica Mini (10 Años)
-        miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
+        // Gráfica Decenal
+        GenesisTerminal.miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
             series: [{ name: 'ROI Est.', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
             chart: { type: 'area', height: 180, sparkline: { enabled: false }, toolbar: { show: false } },
             colors: ['#d4af37'],
             fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } }
         });
-        miniChart.render();
-
-        // 3. Donut
-        donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
-            series: [60, 25, 15],
-            chart: { type: 'donut', height: 200 },
-            labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
-            colors: ['#d4af37', '#222', '#111'],
-            legend: { position: 'bottom', labels: { colors: '#666' } }
-        });
-        donutChart.render();
+        GenesisTerminal.miniChart.render();
     }
 
-   function sincronizarPanel() {
-    const start = document.getElementById('date-start').value;
-    const end = document.getElementById('date-end').value || "ACTUAL";
-    const status = document.getElementById('user-status');
-    
-    // Referencias a los números de abajo
-    const roiCap = document.getElementById('roi-cap');
-    const roiNeg = document.getElementById('roi-neg');
-    const roiRisk = document.getElementById('roi-risk');
-
-    status.innerText = "SINCRONIZANDO...";
-
-    setTimeout(() => {
-        const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
+    function sincronizarPanel() {
+        const start = document.getElementById('date-start').value;
+        const end = document.getElementById('date-end').value || "HORIZONTE ACTUAL";
+        const status = document.getElementById('user-status');
         
-        // Datos de la gráfica
-        const newData = isRisk ? [40, 30, 20, 15, 10, 5, 8] : [35, 45, 60, 95, 70, 80, 120];
-        
-        // ACTUALIZACIÓN DE NÚMEROS (Lo que faltaba)
-        if (isRisk) {
-            roiCap.innerText = "-12.0%"; // Capital cae en riesgo
-            roiNeg.innerText = "+5.4%";
-            roiRisk.innerText = "-45.2%"; // Riesgo aumenta
-            status.innerText = "MODO: PRECAUCIÓN";
-            status.style.color = "var(--alert)";
-        } else {
-            roiCap.innerText = "+24.8%"; // Capital sube en expansión
-            roiNeg.innerText = "+12.2%";
-            roiRisk.innerText = "-18.5%"; // Riesgo controlado
-            status.innerText = "MODO: EXPANSIÓN";
-            status.style.color = "var(--safe)";
-        }
+        // Elementos de números dinámicos
+        const roiCap = document.getElementById('roi-cap');
+        const roiRisk = document.getElementById('roi-risk');
+        const cardCap = document.getElementById('card-cap');
 
-        // Persistencia para que el Dossier sepa qué mostrar
-        localStorage.setItem('ultimo_reporte', JSON.stringify({
-            rango: `${start} a ${end}`,
-            estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
-            roi: isRisk ? "-12.0%" : "+24.8%"
-        }));
+        status.innerText = "SINCRONIZANDO...";
 
-        ApexCharts.exec('mainChart', 'updateSeries', [{ data: newData }], true);
-    }, 800);
-}
+        setTimeout(() => {
+            const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
+            const newData = isRisk ? [40, 30, 20, 15, 10, 5, 8] : [35, 45, 60, 95, 70, 80, 120];
+            
+            // 1. ACTUALIZACIÓN DE GRÁFICA (Vía ID único)
+            ApexCharts.exec('gxp-main', 'updateSeries', [{ data: newData }], true);
+
+            // 2. ACTUALIZACIÓN DE NÚMEROS Y COLORES
+            if (isRisk) {
+                status.innerText = "MODO: PRECAUCIÓN";
+                status.style.color = "var(--alert)";
+                roiCap.innerText = "-12.0%";
+                roiCap.style.color = "var(--alert)";
+                roiRisk.innerText = "-45.2%";
+                cardCap.style.borderTopColor = "var(--alert)";
+            } else {
+                status.innerText = "MODO: EXPANSIÓN";
+                status.style.color = "var(--safe)";
+                roiCap.innerText = "+24.8%";
+                roiCap.style.color = "var(--safe)";
+                roiRisk.innerText = "-18.5%";
+                cardCap.style.borderTopColor = "var(--safe)";
+            }
+
+            // 3. ACTUALIZACIÓN DEL DOSSIER (Persistencia)
+            localStorage.setItem('ultimo_reporte', JSON.stringify({
+                rango: `${start} a ${end}`,
+                estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
+                roi: isRisk ? "-12.0%" : "+24.8%"
+            }));
+        }, 800);
+    }
+
     function descargarDossier() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('nombre') || "OPERADOR GXP";
-        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(name)}`;
+        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(GenesisTerminal.userName)}`;
     }
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const userEmail = urlParams.get('email') || "OPERADOR GXP";
-        const userName = userEmail.split('@')[0].toUpperCase();
-        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
+        const userEmail = urlParams.get('email') || "OPERADOR@GXP.COM";
+        GenesisTerminal.userName = userEmail.split('@')[0].toUpperCase();
+        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${GenesisTerminal.userName}`;
 
-        // Setear fecha actual por defecto
+        // Carga inicial de fecha
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date-start').value = today;
 
         initCharts();
-        sincronizarPanel(); // Carga inicial automática
-
+        sincronizarPanel(); // Ejecución profesional: carga datos al entrar
+        
         setInterval(() => { 
             document.getElementById('clock').innerText = new Date().toLocaleTimeString().toUpperCase(); 
         }, 1000);
