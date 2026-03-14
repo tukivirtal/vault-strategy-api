@@ -3,46 +3,53 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from supabase import create_client, Client
 import os
+import httpx  # Necesario para hablar con MailerLite
 from dotenv import load_dotenv
 
-# 1. Cargar llaves maestras
 load_dotenv()
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
+MAILER_KEY = os.environ.get("MAILERLITE_API_KEY")
 
 app = FastAPI()
 
-# 2. Configuración de Seguridad (CORS)
-# Esto permite que tu web en Vercel pueda hablar con este servidor en Render
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, podrías poner aquí tu URL de Vercel
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 3. Modelo de datos para el Ticket
 class Ticket(BaseModel):
     email_usuario: str
     plan_nivel: str
     mensaje: str
     estado: str = "ABIERTO"
 
-@app.get("/")
-async def root():
-    return {"status": "Vault Logic API Operativa", "nucleo": "GXP-2026"}
+# Función interna para enviar correos vía MailerLite
+async def enviar_notificacion(email_destino, asunto, contenido):
+    url_mailer = "https://connect.mailerlite.com/api/emails/transactional"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {MAILER_KEY}"
+    }
+    data = {
+        "to": email_destino,
+        "subject": asunto,
+        "html": f"<div style='font-family:monospace; background:#000; color:#d4af37; padding:20px;'>{contenido}</div>",
+        "from": "GXP System <soporte@emotionalvaults.com>" # Asegúrate que este dominio esté verificado en MailerLite
+    }
+    async with httpx.AsyncClient() as client:
+        await client.post(url_mailer, json=data, headers=headers)
 
-# 4. Ruta para recibir los tickets de Soporte.html
 @app.post("/generar_ticket")
 async def generar_ticket(ticket: Ticket):
     try:
-        # Generamos una referencia aleatoria GX
         import random
         ref = f"GX-{random.randint(10000, 99999)}"
         nombre = ticket.email_usuario.split('@')[0].upper()
 
+        # 1. Guardar en Supabase (Ya funciona)
         data = {
             "ticket_ref": ref,
             "nombre_usuario": nombre,
@@ -51,14 +58,19 @@ async def generar_ticket(ticket: Ticket):
             "mensaje": ticket.mensaje,
             "estado": ticket.estado
         }
+        supabase.table("soporte_tickets").insert(data).execute()
 
-        # Insertar en Supabase
-        response = supabase.table("soporte_tickets").insert(data).execute()
+        # 2. ENVIAR CORREOS DE AVISO (Lo nuevo)
+        cuerpo_admin = f"NUEVO TICKET: {ref}<br>Usuario: {nombre}<br>Plan: {ticket.plan_nivel}<br>Mensaje: {ticket.mensaje}"
+        cuerpo_usuario = f"Hola {nombre}, tu ticket {ref} ha sido recibido. Nuestro equipo lo revisará bajo protocolo {ticket.plan_nivel}."
+
+        # Aviso a la empresa
+        await enviar_notificacion("contact@emotionalvaults.com", f"ALERTA SOPORTE: {ref}", cuerpo_admin)
+        # Aviso al cliente
+        await enviar_notificacion(ticket.email_usuario, "Confirmación de Ticket GXP", cuerpo_usuario)
         
         return {"status": "success", "ticket_ref": ref}
     
     except Exception as e:
-        print(f"Error Crítico: {e}")
-        raise HTTPException(status_code=500, detail="Error al indexar ticket en el núcleo")
-
-# Aquí podrías añadir tus rutas de la NASA JPL para Génesis más adelante
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Error en el proceso de notificación")
