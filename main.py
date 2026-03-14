@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
-MAILER_KEY = os.environ.get("MAILERLITE_API_KEY")
+# MAILER_KEY ya no se usa globalmente, se llama directo en la función.
 
 app = FastAPI()
 
@@ -26,22 +26,24 @@ class Ticket(BaseModel):
     mensaje: str
     estado: str = "ABIERTO"
 
-# Función interna para enviar correos vía MailerLite
+# Función interna para enviar correos vía MailerLite (actualizada)
 async def enviar_notificacion(email_destino, asunto, contenido):
+    # Endpoint alternativo más compatible
     url_mailer = "https://connect.mailerlite.com/api/emails/transactional"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {MAILER_KEY}"
+        "Authorization": f"Bearer {os.environ.get('MAILERLITE_API_KEY')}"
     }
     data = {
         "to": email_destino,
+        "from": "contact@emotionalvaults.com",
         "subject": asunto,
-        "html": f"<div style='font-family:monospace; background:#000; color:#d4af37; padding:20px;'>{contenido}</div>",
-        "from": "GXP System <contact@emotionalvaults.com>" # Asegúrate que este dominio esté verificado en MailerLite
+        "html": f"<div style='font-family:sans-serif; color:#333;'>{contenido}</div>"
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(url_mailer, json=data, headers=headers)
-        print(response.text)
+        # ESTO ES VITAL: Ver en los logs qué dice ahora
+        print(f"DEBUG MAIL: {response.status_code} - {response.text}")
 
 @app.post("/generar_ticket")
 async def generar_ticket(ticket: Ticket):
