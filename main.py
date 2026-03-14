@@ -37,10 +37,11 @@ async def enviar_notificacion(email_destino, asunto, contenido):
         "to": email_destino,
         "subject": asunto,
         "html": f"<div style='font-family:monospace; background:#000; color:#d4af37; padding:20px;'>{contenido}</div>",
-        "from": "GXP System <soporte@emotionalvaults.com>" # Asegúrate que este dominio esté verificado en MailerLite
+        "from": "GXP System <contact@emotionalvaults.com>" # Asegúrate que este dominio esté verificado en MailerLite
     }
     async with httpx.AsyncClient() as client:
-        await client.post(url_mailer, json=data, headers=headers)
+        response = await client.post(url_mailer, json=data, headers=headers)
+        print(response.text)
 
 @app.post("/generar_ticket")
 async def generar_ticket(ticket: Ticket):
