@@ -2,14 +2,73 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Soporte GXP</title>
+    <title>Soporte GXP | Vault Logic</title>
     <style>
-        body { background: #050505; color: #d4af37; font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .support-box { background: #0a0a0a; border: 1px solid #222; padding: 40px; width: 100%; max-width: 500px; box-sizing: border-box; }
-        input, select, textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; margin-bottom: 20px; font-family: inherit; box-sizing: border-box; }
-        button { width: 100%; background: #fff; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        body { 
+            background: #050505; 
+            color: #d4af37; 
+            font-family: 'JetBrains Mono', monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .support-box { 
+            background: #0a0a0a; 
+            border: 1px solid #222; 
+            padding: 40px; 
+            width: 100%; 
+            max-width: 500px; 
+            box-sizing: border-box; 
+        }
+        h1 { 
+            font-size: 1rem; 
+            letter-spacing: 4px; 
+            text-align: center; 
+            border-bottom: 1px solid #222; 
+            padding-bottom: 20px; 
+            color: #fff;
+        }
+        label { 
+            font-size: 0.6rem; 
+            color: #777; 
+            display: block; 
+            margin-bottom: 5px; 
+            text-transform: uppercase;
+        }
+        input, select, textarea { 
+            width: 100%; 
+            background: #000; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            font-family: inherit; 
+            box-sizing: border-box; 
+            outline: none;
+        }
+        input:focus { border-color: #d4af37; }
+        button { 
+            width: 100%; 
+            background: #fff; 
+            color: #000; 
+            border: none; 
+            padding: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+        }
         button:hover { background: #d4af37; }
-        h1 { font-size: 1rem; letter-spacing: 4px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        #feedback { 
+            display: none; 
+            margin-top: 20px; 
+            text-align: center; 
+            font-size: 0.75rem; 
+            border: 1px dashed #d4af37; 
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -17,67 +76,67 @@
 <div class="support-box">
     <h1>CENTRO DE SOPORTE GXP</h1>
     <form id="form-soporte">
-        <label style="font-size: 0.6rem; color: #777;">EMAIL DE USUARIO</label>
-        <input type="email" id="email" required>
+        <label>Email de Usuario</label>
+        <input type="email" id="email" required placeholder="ejemplo@correo.com">
 
-        <label style="font-size: 0.6rem; color: #777;">PLAN</label>
+        <label>Plan de Acceso</label>
         <select id="plan">
             <option value="SENTINEL">SENTINEL</option>
             <option value="EXECUTIVE">EXECUTIVE</option>
             <option value="GENESIS">GÉNESIS</option>
         </select>
 
-        <label style="font-size: 0.6rem; color: #777;">MENSAJE</label>
-        <textarea id="mensaje" rows="4" required></textarea>
+        <label>Descripción del Incidente</label>
+        <textarea id="mensaje" rows="4" required placeholder="Describa el problema..."></textarea>
 
-        <button type="button" onclick="enviar()">ACTIVAR TICKET</button>
+        <button type="button" onclick="enviar()">Activar Ticket</button>
     </form>
-    <div id="feedback" style="display:none; margin-top: 20px; text-align: center; font-size: 0.75rem;"></div>
+    <div id="feedback"></div>
 </div>
 
 <script>
     async function enviar() {
         const feedback = document.getElementById('feedback');
-        feedback.style.display = "block";
-        feedback.innerText = "CONECTANDO CON EL NÚCLEO...";
-
-        const ticketRef = "GX-" + Math.floor(Math.random() * 90000 + 10000);
         const email = document.getElementById('email').value;
-        const nombre = email.split('@')[0].toUpperCase();
+        const plan = document.getElementById('plan').value;
+        const mensaje = document.getElementById('mensaje').value;
 
-        // VALORES DE TU CAPTURA Screenshot 2026-03-11 223524.png
-        const URL_SB = "https://hfyzgwoivxvzkyfnrlo.supabase.co"; 
-        const KEY_SB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeXpnd2pvaXZ4dnpreWZucmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NTQ4MzAsImV4cCI6MjA4NjQzMDgzMH0.g3h3IJWsSnykuBiDAx9J7AAau9zDcmUUM14e2pezIg8"; // Copia tu Publishable Key completa
+        if (!email || !mensaje) {
+            alert("Por favor, complete todos los campos.");
+            return;
+        }
+
+        feedback.style.display = "block";
+        feedback.innerText = "ENVIANDO DATOS AL NÚCLEO RENDER...";
 
         try {
-            const res = await fetch(`${URL_SB}/rest/v1/soporte_tickets`, {
+            // El frontend le habla a RENDER, no a Supabase directamente
+            const res = await fetch(`https://vault-strategy-api.onrender.com/generar_ticket`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': KEY_SB,
-                    'Authorization': `Bearer ${KEY_SB}`,
-                    'Prefer': 'return=representation'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    ticket_ref: ticketRef,
-                    nombre_usuario: nombre,
                     email_usuario: email,
-                    plan_nivel: document.getElementById('plan').value,
-                    mensaje: document.getElementById('mensaje').value,
+                    plan_nivel: plan,
+                    mensaje: mensaje,
                     estado: "ABIERTO"
                 })
             });
 
-            if(res.ok) {
-                feedback.innerText = `TICKET INDEXADO: ${ticketRef}. PROTOCOLO DE AVISO ACTIVADO.`;
+            if (res.ok) {
+                const data = await res.json();
+                feedback.innerText = `TICKET INDEXADO EXITOSAMENTE. PROTOCOLO ACTIVADO.`;
                 document.getElementById('form-soporte').reset();
             } else {
-                feedback.innerText = "ERROR 405/DB: ACCESO DENEGADO POR EL HOST.";
+                feedback.innerText = "ERROR EN EL SERVIDOR RENDER. VERIFIQUE LOGS.";
             }
         } catch (err) {
-            feedback.innerText = "FALLO CRÍTICO DE SINCRONIZACIÓN.";
+            console.error(err);
+            feedback.innerText = "FALLO CRÍTICO: NO SE PUDO CONECTAR CON RENDER.";
         }
     }
 </script>
+
 </body>
 </html>
