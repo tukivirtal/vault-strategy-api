@@ -78,65 +78,86 @@
 
     function initCharts() {
         mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
-            series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
-            chart: { id: 'gxp-instance', type: 'area', height: 280, toolbar: { show: false } },
+            series: [{ name: 'Sincronía GXP', data: [] }],
+            chart: { id: 'gxp-instance', type: 'area', height: 280, toolbar: { show: false }, foreColor: '#fff' },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
-            xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'] }
+            xaxis: { categories: [], labels: { style: { colors: '#fff' } } },
+            yaxis: { labels: { style: { colors: '#fff' } } },
+            dataLabels: { enabled: false }
         });
         mainChart.render();
     }
 
-    function sincronizarPanel() {
-        const start = document.getElementById('date-start').value;
-        const end = document.getElementById('date-end').value || "ACTUAL";
+    async function sincronizarPanel() {
+        const startDate = document.getElementById('date-start').value;
+        const endDate = document.getElementById('date-end').value || new Date().toISOString().split('T')[0];
         const status = document.getElementById('user-status');
-        const roiCap = document.getElementById('roi-cap');
-        const roiRisk = document.getElementById('roi-risk');
-        const cardCap = document.getElementById('card-cap');
-
+        
         status.innerText = "SINCRONIZANDO...";
 
-        setTimeout(() => {
-            const isRisk = end.includes("-04") || end.includes("-05") || end.includes("-06");
-            const newData = isRisk ? [40, 25, 15, 10, 5, 2, 8] : [35, 50, 75, 90, 110, 135, 160];
+        try {
+            // Asumiendo que la API está en el mismo host/puerto, de lo contrario, usa la URL completa
+            const response = await fetch(`/api/stats?start_date=${startDate}&end_date=${endDate}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
 
-            // ACTUALIZAR GRÁFICA
-            ApexCharts.exec('gxp-instance', 'updateSeries', [{ data: newData }], true);
+            // Actualizar Gráfica
+            ApexCharts.exec('gxp-instance', 'updateOptions', {
+                series: data.chart.series,
+                xaxis: data.chart.xaxis
+            }, true, true);
 
-            // ACTUALIZAR NÚMEROS Y COLORES
-            if (isRisk) {
-                roiCap.innerText = "-12.0%";
-                roiCap.style.color = "var(--alert)";
-                roiRisk.innerText = "-45.2%";
+            // Actualizar KPIs
+            updateKPI('roi-cap', data.capital_gxp, 'card-cap');
+            updateKPI('roi-neg', data.negociacion);
+            updateKPI('roi-risk', data.riesgo);
+
+            // Actualizar estado
+            if (data.capital_gxp < 0) {
                 status.innerText = "MODO: PRECAUCIÓN";
                 status.style.color = "var(--alert)";
-                cardCap.style.borderTopColor = "var(--alert)";
             } else {
-                roiCap.innerText = "+24.8%";
-                roiCap.style.color = "var(--safe)";
-                roiRisk.innerText = "-18.5%";
                 status.innerText = "MODO: EXPANSIÓN";
                 status.style.color = "var(--safe)";
-                cardCap.style.borderTopColor = "var(--safe)";
             }
 
-            // GUARDAR PARA DOSSIER
+            // Guardar para dossier
             localStorage.setItem('ultimo_reporte', JSON.stringify({
-                rango: `${start} a ${end}`,
-                estado: isRisk ? "PRECAUCIÓN" : "EXPANSIÓN",
-                roi: isRisk ? "-12.0%" : "+24.8%"
+                rango: `${startDate} a ${endDate}`,
+                estado: data.capital_gxp < 0 ? "PRECAUCIÓN" : "EXPANSIÓN",
+                roi: `${data.capital_gxp}%`
             }));
-        }, 800);
+            
+        } catch (error) {
+            console.error("Error al sincronizar el panel:", error);
+            status.innerText = "ERROR DE SINCRONIZACIÓN";
+            status.style.color = "var(--alert)";
+        }
+    }
+
+    function updateKPI(elementId, value, cardId) {
+        const element = document.getElementById(elementId);
+        const sign = value > 0 ? '+' : '';
+        element.innerText = `${sign}${value}%`;
+        element.style.color = value < 0 ? 'var(--alert)' : 'var(--safe)';
+        if (cardId) {
+            const card = document.getElementById(cardId);
+            card.style.borderTopColor = value < 0 ? 'var(--alert)' : 'var(--safe)';
+        }
     }
 
     function descargarDossier() {
-        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}`;
+        const startDate = document.getElementById('date-start').value;
+        const endDate = document.getElementById('date-end').value || new Date().toISOString().split('T')[0];
+        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}&start_date=${startDate}&end_date=${endDate}`;
     }
 
     window.onload = function() {
         document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
-        document.getElementById('date-start').value = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date-start').value = today;
+        document.getElementById('date-end').value = today;
         initCharts();
         sincronizarPanel();
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString().toUpperCase(); }, 1000);
