@@ -40,8 +40,8 @@ async def add_subscriber_to_mailerlite(email, fields):
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(url_mailer, json=data, headers=headers)
-        # Imprimir la respuesta completa para depuración
-        print(f'DEBUG MAILERLITE: {response.status_code} - {response.text}')
+        if response.status_code not in [200, 201]:
+            print(f'ERROR CRÍTICO MAILERLITE: {response.status_code} - {response.text}')
 
 @app.post("/generar_ticket")
 async def generar_ticket(ticket: Ticket):
