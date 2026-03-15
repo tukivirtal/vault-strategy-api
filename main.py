@@ -31,14 +31,17 @@ async def add_subscriber_to_mailerlite(email, fields):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {os.environ.get('MAILERLITE_API_KEY')}"
     }
+    # Usar la variable de entorno para el ID del grupo
+    group_id = os.environ.get('MAILERLITE_GROUP_ID')
     data = {
         "email": email,
         "fields": fields,
-        "groups": ["181959152455649078"]  # ID de la automatización
+        "groups": [group_id] if group_id else []
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(url_mailer, json=data, headers=headers)
-        print(f"DEBUG MAIL: {response.status_code} - {response.text}")
+        # Imprimir la respuesta completa para depuración
+        print(f'DEBUG MAILERLITE: {response.status_code} - {response.text}')
 
 @app.post("/generar_ticket")
 async def generar_ticket(ticket: Ticket):
