@@ -32,7 +32,8 @@ async def add_subscriber_to_mailerlite(email, fields):
         "Authorization": f"Bearer {os.environ.get('MAILERLITE_API_KEY')}"
     }
     # Usar la variable de entorno para el ID del grupo
-    group_id = os.environ.get('MAILERLITE_GROUP_ID')
+    group_id_str = os.environ.get('MAILERLITE_GROUP_ID')
+    group_id = int(group_id_str) if group_id_str else None
     data = {
         "email": email,
         "fields": fields,
