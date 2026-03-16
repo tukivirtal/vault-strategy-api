@@ -171,8 +171,15 @@
 
     window.onload = function() {
         document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
-        // No se sincroniza al cargar, esperando la acción del usuario
         initCharts();
+        
+        // Carga automática de datos
+        const today = new Date();
+        const aMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+        document.getElementById('date-start').value = aMonthAgo.toISOString().split('T')[0];
+        document.getElementById('date-end').value = today.toISOString().split('T')[0];
+        sincronizarPanel();
+
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB').toUpperCase(); }, 1000);
     };
 </script>
