@@ -37,30 +37,10 @@ class Ticket(BaseModel):
     mensaje: str
     estado: str = "ABIERTO"
 
-# ... (resto de las rutas de la API como /generar_ticket, etc.)
-
 @app.get("/api/stats")
 async def get_stats(start_date: date, end_date: date):
-    try:
-        num_days = max(1, (end_date - start_date).days + 1)
-        chart_labels = [(start_date + timedelta(days=i)).strftime('%a %d') for i in range(num_days)]
-        chart_data = [random.randint(20, 150) for _ in range(num_days)]
-
-        capital_gxp_pct = round(random.uniform(-25, 50), 1)
-        negociacion_pct = round(random.uniform(-15, 30), 1)
-        riesgo_pct = round(random.uniform(-50, 0), 1)
-
-        return {
-            "capital_gxp": capital_gxp_pct,
-            "negociacion": negociacion_pct,
-            "riesgo": riesgo_pct,
-            "chart": {
-                "series": [{"name": "Sincronía GXP", "data": chart_data}],
-                "xaxis": {"categories": chart_labels}
-            }
-        }
-    except Exception as e:
-        print(f"Error CRÍTICO en /api/stats: {e}")
+    if not supabase:
+        # Fallback to placeholder data if Supabase is not connected
         num_days = max(1, (end_date - start_date).days + 1)
         default_categories = [(start_date + timedelta(days=i)).strftime('%a %d') for i in range(num_days)]
         return {
@@ -73,14 +53,45 @@ async def get_stats(start_date: date, end_date: date):
             }
         }
 
+    try:
+        # Fetch data from Supabase
+        query_result = supabase.table('gxp_metrics').select('fecha', 'sincronia_gxp', 'capital_gxp', 'negociacion', 'riesgo').gte('fecha', start_date).lte('fecha', end_date).order('fecha').execute()
+        
+        if not query_result.data:
+            raise HTTPException(status_code=404, detail="No se encontraron datos para el rango de fechas especificado.")
+
+        data = query_result.data
+        
+        # Process data for the frontend
+        chart_labels = [item['fecha'] for item in data]
+        chart_data = [item['sincronia_gxp'] for item in data]
+        
+        # Calculate averages for the KPIs, handle potential division by zero
+        num_records = len(data)
+        capital_gxp_avg = round(sum(d['capital_gxp'] for d in data) / num_records, 1) if num_records > 0 else 0
+        negociacion_avg = round(sum(d['negociacion'] for d in data) / num_records, 1) if num_records > 0 else 0
+        riesgo_avg = round(sum(d['riesgo'] for d in data) / num_records, 1) if num_records > 0 else 0
+
+        return {
+            "capital_gxp": capital_gxp_avg,
+            "negociacion": negociacion_avg,
+            "riesgo": riesgo_avg,
+            "chart": {
+                "series": [{"name": "Sincronía GXP", "data": chart_data}],
+                "xaxis": {"categories": chart_labels}
+            }
+        }
+
+    except Exception as e:
+        print(f"Error CRÍTICO en /api/stats: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor al procesar las estadísticas.")
+
 @app.get("/")
 async def read_index():
     return FileResponse('genesis-live.html')
 
-# Ruta genérica para servir otros archivos HTML
 @app.get("/{file_path:path}")
 async def serve_static_html(file_path: str):
-    # Por seguridad, solo permitir archivos .html
     if file_path.endswith('.html'):
         if os.path.exists(file_path):
             return FileResponse(file_path)
