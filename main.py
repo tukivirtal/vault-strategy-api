@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from supabase import create_client, Client
 import os
@@ -31,9 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Monta el directorio 'static' en la ruta '/static'
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class Ticket(BaseModel):
     email_usuario: str
@@ -77,18 +73,15 @@ async def get_stats(start_date: date, end_date: date):
             }
         }
 
-# Ruta para servir genesis-live.html en la raíz
 @app.get("/")
-async def serve_genesis_live():
-    return FileResponse('static/genesis-live.html')
+async def read_index():
+    return FileResponse('genesis-live.html')
 
 # Ruta genérica para servir otros archivos HTML
 @app.get("/{file_path:path}")
 async def serve_static_html(file_path: str):
     # Por seguridad, solo permitir archivos .html
     if file_path.endswith('.html'):
-        file_location = f"static/{file_path}"
-        if os.path.exists(file_location):
-            return FileResponse(file_location)
+        if os.path.exists(file_path):
+            return FileResponse(file_path)
     return Response(status_code=404)
-
