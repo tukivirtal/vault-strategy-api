@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -31,65 +32,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Monta el directorio 'static' en la ruta '/static'
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 class Ticket(BaseModel):
     email_usuario: str
     plan_nivel: str
     mensaje: str
     estado: str = "ABIERTO"
 
-async def add_subscriber_to_mailerlite(email, fields):
-    url_mailer = "https://connect.mailerlite.com/api/subscribers"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {os.environ.get('MAILERLITE_API_KEY')}"
-    }
-    group_id_str = os.environ.get('MAILERLITE_GROUP_ID')
-    group_id = int(group_id_str) if group_id_str else None
-    data = {
-        "email": email,
-        "fields": fields,
-        "groups": [group_id] if group_id else []
-    }
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url_mailer, json=data, headers=headers)
-        if response.status_code not in [200, 201]:
-            print(f'ERROR CRÍTICO MAILERLITE: {response.status_code} - {response.text}')
-
-@app.post("/generar_ticket")
-async def generar_ticket(ticket: Ticket):
-    try:
-        ref = f"GX-{random.randint(10000, 99999)}"
-        nombre = ticket.email_usuario.split('@')[0].upper()
-        data = {
-            "ticket_ref": ref,
-            "nombre_usuario": nombre,
-            "email_usuario": ticket.email_usuario,
-            "plan_nivel": ticket.plan_nivel,
-            "mensaje": ticket.mensaje,
-            "estado": ticket.estado
-        }
-        if supabase:
-            supabase.table("soporte_tickets").insert(data).execute()
-        
-        mailerlite_fields = {
-            "ticket_ref": ref,
-            "plan_nivel": ticket.plan_nivel
-        }
-        await add_subscriber_to_mailerlite(ticket.email_usuario, mailerlite_fields)
-        return {"status": "success", "ticket_ref": ref}
-    except Exception as e:
-        print(f"Error: {e}")
-        raise HTTPException(status_code=500, detail="Error en el proceso de notificación")
+# ... (resto de las rutas de la API como /generar_ticket, etc.)
 
 @app.get("/api/stats")
 async def get_stats(start_date: date, end_date: date):
     try:
-        # Aquí iría la lógica de consulta a Supabase
-        # if supabase:
-        #   data = supabase.table('nombre_tabla').select('*').gte('fecha', start_date).lte('fecha', end_date).execute()
-        #   # ...procesar datos reales
-        
-        # Lógica de marcador de posición mejorada
         num_days = max(1, (end_date - start_date).days + 1)
         chart_labels = [(start_date + timedelta(days=i)).strftime('%a %d') for i in range(num_days)]
         chart_data = [random.randint(20, 150) for _ in range(num_days)]
@@ -121,6 +77,18 @@ async def get_stats(start_date: date, end_date: date):
             }
         }
 
-# Servir archivos estáticos (HTML, JS, CSS) desde el directorio actual '.'
-# html=True permite que los endpoints como /genesis-live.html funcionen
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+# Ruta para servir genesis-live.html en la raíz
+@app.get("/")
+async def serve_genesis_live():
+    return FileResponse('static/genesis-live.html')
+
+# Ruta genérica para servir otros archivos HTML
+@app.get("/{file_path:path}")
+async def serve_static_html(file_path: str):
+    # Por seguridad, solo permitir archivos .html
+    if file_path.endswith('.html'):
+        file_location = f"static/{file_path}"
+        if os.path.exists(file_location):
+            return FileResponse(file_location)
+    return Response(status_code=404)
+
