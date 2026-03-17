@@ -23,6 +23,28 @@
             <p>ROI PROYECTADO: <span id="display-roi" class="gold">...</span></p>
         </div>
     </div>
+    <div class="dossier-container" style="background: #000; color: #fff; padding: 50px; border: 1px solid var(--gold); font-family: 'JetBrains Mono';">
+    <h2 style="color: var(--gold); border-bottom: 2px solid var(--gold);">DOSSIER ESTRATÉGICO GX-2026</h2>
+    <p><strong>OPERADOR:</strong> <span id="out-name"></span></p>
+    <p><strong>ESTADO DE CARTERA:</strong> <span id="out-status" style="color: var(--safe);">ACTIVO // EXPANSIÓN</span></p>
+    
+    <div style="margin-top: 30px; border: 1px solid #333; padding: 20px;">
+        <h3 style="font-size: 0.8rem; color: #666;">ANÁLISIS DE RENDIMIENTO POR CICLO</h3>
+        <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #444; color: var(--gold);">
+                <th style="text-align: left; padding: 10px;">MÉTRICA</th>
+                <th style="text-align: right; padding: 10px;">VALOR</th>
+            </tr>
+            <tr><td style="padding: 10px;">Capital GXP</td><td style="text-align: right; color: var(--safe);">+24.83%</td></tr>
+            <tr><td style="padding: 10px;">Margen de Negociación</td><td style="text-align: right;">12.21%</td></tr>
+            <tr><td style="padding: 10px;">Exposición al Riesgo</td><td style="text-align: right; color: var(--alert);">-18.50%</td></tr>
+        </table>
+    </div>
+    
+    <div style="margin-top: 50px; text-align: center; font-size: 0.6rem; color: #444;">
+        NASA JPL DE441 COMPLIANT // GENERADO POR VAULT LOGIC 2026
+    </div>
+</div>
 <script>
     window.onload = function() {
         const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR";
