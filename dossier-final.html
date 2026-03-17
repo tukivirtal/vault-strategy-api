@@ -72,7 +72,7 @@
     <div class="section-title">SUJETO DE ANÁLISIS</div>
     <div class="content">
         OPERADOR: <span style="color:var(--gold)" id="user-name">...</span><br>
-        PROTOCOLO: GÉNESIS GXP VITALICIO<br>
+        RANGO DE ANÁLISIS: <span id="display-range" style="color:var(--gold)">...</span><br>
         ESTADO: <span id="display-status">SINCRONIZADO NASA JPL DE441</span>
     </div>
 
@@ -109,31 +109,40 @@
     </table>
 
     <div class="section-title">PROYECCIÓN ESTRATÉGICA</div>
-    <div class="content">
+    <div class="content" id="proyeccion-texto">
         Los ciclos analizados indican una ventana de capitalización máxima en curso. 
-        Se recomienda consolidar activos antes del cierre del trimestre para evitar la volatilidad estructural detectada. [cite: 55, 56]
+        Se recomienda consolidar activos antes del cierre del trimestre para evitar la volatilidad estructural detectada.
     </div>
 
     <div class="footer-tech" style="margin-top: 60px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444;">
-        CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026. [cite: 54, 57]
+        CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026.
     </div>
 </div>
 
 <script>
  window.onload = function() {
-    // Captura del nombre
     const params = new URLSearchParams(window.location.search);
     const name = params.get('nombre') || "OPERADOR GXP";
     document.getElementById('user-name').innerText = name.toUpperCase();
 
-    // Recuperación de datos con validación para evitar 'undefined'
     const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
     if(data) {
-        // Mapeo directo a la Matriz de Impacto
+        // Actualización de cabecera y métricas
+        if(document.getElementById('display-range')) document.getElementById('display-range').innerText = data.rango || "PERIODO ESTÁNDAR";
         if(document.getElementById('val-cap')) document.getElementById('val-cap').innerText = data.cap || "+24.8%";
         if(document.getElementById('val-risk')) document.getElementById('val-risk').innerText = data.risk || "-12.0%";
         if(document.getElementById('val-neg')) document.getElementById('val-neg').innerText = data.neg || "+18.5%";
         if(document.getElementById('display-status')) document.getElementById('display-status').innerText = data.estado || "EXPANSIÓN";
+
+        // Lógica de texto dinámico según el estado
+        const pTexto = document.getElementById('proyeccion-texto');
+        if(data.estado && data.estado.includes("PRECAUCIÓN")) {
+            pTexto.innerHTML = "Se ha detectado una <strong>VOLATILIDAD ESTRUCTURAL</strong> elevada en el rango seleccionado. Se recomienda la liquidación parcial de posiciones y el refugio en activos de baja correlación hasta el cierre del ciclo actual.";
+            pTexto.style.color = "var(--alert)";
+        } else {
+            pTexto.innerHTML = "Los ciclos confirman una <strong>SINCRONÍA ÓPTIMA</strong> para el periodo analizado. Es un periodo ideal para el escalamiento de capital y la expansión de operaciones bajo el protocolo GXP.";
+            pTexto.style.color = "#ccc";
+        }
     }
 }
 </script>
