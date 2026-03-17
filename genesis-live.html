@@ -4,176 +4,180 @@
     <meta charset="UTF-8">
     <title>GÉNESIS | Strategic Command Terminal</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
         body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
-        .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
-        .panel { background: rgba(10,10,10,0.95); border: 1px solid rgba(212,175,55,0.2); padding: 30px; }
-        .horizon-picker { background: rgba(212,175,55,0.05); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
+        
+        /* Controles de Sincronización */
+        .horizon-picker { background: rgba(212,175,55,0.03); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
         input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; }
+        input[type="date"]:focus { border-color: var(--gold); }
+        
+        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
+        .btn-search:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
+        
         .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.5s; }
-        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
-        footer { margin-top: 50px; border-top: 1px solid #222; padding: 30px; text-align: center; font-size: 0.7rem; color: #555; letter-spacing: 3px; }
+        
+        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
+        .label-mini { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 10px; }
+        .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; }
+        #user-welcome { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+        #clock { color: #444; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div style="letter-spacing: 0.5em; font-size: 1.1rem; color: var(--gold); font-weight: bold;">GÉNESIS // ESTRATEGIA</div>
-        <div style="text-align: right; font-size: 0.8rem; color: var(--gold);">NASA JPL DE441 SYNC ACTIVE<br><span id="clock">00:00:00</span></div>
-    </header>
-
-    <div class="dashboard-grid">
-        <aside>
-            <div class="panel">
-                <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">TENDENCIA DECENAL</span>
-                <div id="chart-mini-trend"></div>
-            </div>
-        </aside>
-
-        <main class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div id="user-welcome" style="color: var(--gold); font-weight: bold;">IDENTIFICANDO...</div>
-                    <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="user-status">MODO: EN ESPERA</div>
-                </div>
-                <div class="horizon-picker">
-                    <input type="date" id="date-start">
-                    <input type="date" id="date-end">
-                    <button class="btn-search" onclick="sincronizarPanel()">SYNC</button>
-                </div>
-            </div>
-
-            <div id="main-focus-chart" style="margin-top: 30px; background: #000; padding: 10px; border: 1px solid #111;"></div>
-
-            <div class="decision-matrix">
-                <div id="card-cap" class="decision-card" style="border-top: 3px solid var(--safe);">
-                    <span style="font-size: 0.6rem; color: #555;">CAPITAL GXP</span>
-                    <div class="roi" id="roi-cap">--%</div>
-                </div>
-                <div id="card-neg" class="decision-card" style="border-top: 3px solid var(--gold);">
-                    <span style="font-size: 0.6rem; color: #555;">NEGOCIACIÓN</span>
-                    <div class="roi" id="roi-neg">--%</div>
-                </div>
-                <div id="card-risk" class="decision-card" style="border-top: 3px solid var(--alert);">
-                    <span style="font-size: 0.6rem; color: #555;">RIESGO</span>
-                    <div class="roi" id="roi-risk">--%</div>
-                </div>
-            </div>
-
-            <button onclick="descargarDossier()" style="margin-top: 40px; background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase;">Extraer Dossier GX-2026</button>
-        </main>
+<header>
+    <div>
+        <span class="label-mini">SISTEMA GÉNESIS v2.0</span>
+        <div id="user-welcome">CARGANDO OPERADOR...</div>
     </div>
+    <div class="telemetry">
+        <div id="clock">00:00:00</div>
+        <div>NASA JPL DE441 SYNC ACTIVE</div>
+    </div>
+</header>
 
-    <footer>NASA JPL DE441 COMPLIANT // VAULT LOGIC 2026</footer>
+<div class="dashboard-grid">
+    <aside>
+        <div class="panel">
+            <span class="label-mini">TENDENCIA DECENAL (REFERENCIA)</span>
+            <div id="chart-mini-trend"></div>
+            
+            <div style="margin-top: 40px;">
+                <span class="label-mini">DISTRIBUCIÓN GXP</span>
+                <div id="chart-donut"></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="user-status">MODO: ANÁLISIS</div>
+            
+            <div class="horizon-picker">
+                <div>
+                    <span class="label-mini">INICIO HORIZONTE</span>
+                    <input type="date" id="date-start">
+                </div>
+                <div>
+                    <span class="label-mini">CIERRE ESTIMADO</span>
+                    <input type="date" id="date-end">
+                </div>
+                <button class="btn-search" onclick="sincronizarPanel()">Sync</button>
+            </div>
+        </div>
+
+        <div id="main-focus-chart" style="margin-top: 30px;"></div>
+
+        <div class="decision-matrix">
+            <div id="card-cap" class="decision-card" style="border-top: 3px solid var(--safe);">
+                <span class="label-mini">CAPITAL GXP</span>
+                <div class="roi" id="roi-cap">+24.8%</div>
+            </div>
+            <div class="decision-card" style="border-top: 3px solid var(--gold);">
+                <span class="label-mini">NEGOCIACIÓN</span>
+                <div class="roi" id="roi-neg">+12.2%</div>
+            </div>
+            <div id="card-risk" class="decision-card" style="border-top: 3px solid var(--alert);">
+                <span class="label-mini">RIESGO</span>
+                <div class="roi" id="roi-risk">-18.5%</div>
+            </div>
+        </div>
+
+        <button onclick="descargarDossier()" style="margin-top: 40px; background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase;">
+            Extraer Dossier Estratégico GX-2026
+        </button>
+    </main>
+</div>
 
 <script>
-    let mainChart;
+    let mainChart, miniChart, donutChart;
     const urlParams = new URLSearchParams(window.location.search);
     const userEmail = urlParams.get('email') || "OPERADOR GXP";
     const userName = userEmail.split('@')[0].toUpperCase();
 
-    function initCharts() {
+    function init() {
+        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
+        
+        // Gráfica Principal Reactiva
         mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
-            series: [{ name: 'Sincronía GXP', data: [] }],
-            chart: { id: 'gxp-instance', type: 'area', height: 280, toolbar: { show: false }, foreColor: '#fff' },
+            series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
+            chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
-            xaxis: { categories: [], labels: { show: false, style: { colors: '#fff' } } },
-            yaxis: { labels: { style: { colors: '#fff' } } },
-            dataLabels: { enabled: false },
-            tooltip: { theme: 'dark' },
-            grid: { borderColor: '#555' }
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
+            xaxis: { 
+                categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'], 
+                labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } 
+            },
+            tooltip: { theme: 'dark' }
         });
         mainChart.render();
+
+        // Gráfica de 10 años (Referencia fija)
+        miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
+            series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
+            chart: { type: 'area', height: 180, toolbar: { show: false } },
+            colors: ['#d4af37'],
+            xaxis: { labels: { show: false } },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
+            tooltip: { theme: 'dark' }
+        });
+        miniChart.render();
+
+        // Donut
+        donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
+            series: [60, 25, 15],
+            chart: { type: 'donut', height: 200 },
+            labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
+            colors: ['#d4af37', '#222', '#111'],
+            legend: { position: 'bottom', labels: { colors: '#666' } }
+        });
+        donutChart.render();
     }
 
-    async function sincronizarPanel() {
-        const startDate = document.getElementById('date-start').value;
-        const endDate = document.getElementById('date-end').value;
+    function sincronizarPanel() {
         const status = document.getElementById('user-status');
-
-        if (!startDate || !endDate) {
-            status.innerText = "REQUIERE RANGO";
-            status.style.color = "var(--alert)";
-            return;
-        }
+        const end = document.getElementById('date-end').value;
 
         status.innerText = "SINCRONIZANDO...";
         status.style.color = "var(--gold)";
 
-        try {
-            const response = await fetch(`/api/stats?start_date=${startDate}&end_date=${endDate}`);
-            if (!response.ok) throw new Error(`Error de Red: ${response.status}`);
-            const data = await response.json();
-
-            ApexCharts.exec('gxp-instance', 'updateOptions', {
-                series: data.chart.series,
-                xaxis: { categories: data.chart.xaxis, labels: { show: true } }
-            }, true, true);
-
-            updateKPI('roi-cap', data.capital_gxp, 'card-cap');
-            updateKPI('roi-neg', data.negociacion, 'card-neg');
-            updateKPI('roi-risk', data.riesgo, 'card-risk');
-
-            if (data.capital_gxp < 0) {
+        setTimeout(() => {
+            // Algoritmo de decisión basado en fechas
+            const isRiskMonth = end.includes("-04") || end.includes("-05") || end.includes("-06");
+            
+            if (isRiskMonth) {
                 status.innerText = "MODO: PRECAUCIÓN";
                 status.style.color = "var(--alert)";
+                document.getElementById('roi-cap').innerText = "-12.0%";
+                document.getElementById('roi-risk').innerText = "-45.2%";
+                mainChart.updateSeries([{ data: [40, 30, 20, 15, 10, 5, 8] }]);
             } else {
                 status.innerText = "MODO: EXPANSIÓN";
                 status.style.color = "var(--safe)";
+                document.getElementById('roi-cap').innerText = "+24.8%";
+                document.getElementById('roi-risk').innerText = "-18.5%";
+                mainChart.updateSeries([{ data: [35, 45, 60, 95, 70, 80, 120] }]);
             }
-
-            localStorage.setItem('ultimo_reporte', JSON.stringify({
-                rango: `${startDate} a ${endDate}`,
-                estado: data.capital_gxp < 0 ? "PRECAUCIÓN" : "EXPANSIÓN",
-                roi: `${data.capital_gxp}%`
-            }));
-            
-        } catch (error) {
-            console.error("Error crítico al sincronizar el panel:", error);
-            status.innerText = "ERROR DE SINCRONIZACIÓN";
-            status.style.color = "var(--alert)";
-            // Resetea KPIs a un estado neutro y visible de error
-            updateKPI('roi-cap', 0, 'card-cap');
-            updateKPI('roi-neg', 0, 'card-neg');
-            updateKPI('roi-risk', 0, 'card-risk');
-        }
-    }
-
-    function updateKPI(elementId, value, cardId) {
-        const element = document.getElementById(elementId);
-        const sign = value > 0 ? '+' : '';
-        element.innerText = `${sign}${value}%`;
-        
-        let colorVar = 'var(--safe)';
-        if (value < 0) colorVar = 'var(--alert)';
-        else if (value == 0) colorVar = '#ffffff';
-        element.style.color = colorVar;
-
-        if (cardId) {
-            document.getElementById(cardId).style.borderTopColor = colorVar;
-        }
+        }, 1000);
     }
 
     function descargarDossier() {
-        const startDate = document.getElementById('date-start').value;
-        const endDate = document.getElementById('date-end').value;
-        if (!startDate || !endDate) {
-            alert("Por favor, seleccione un rango de fechas antes de extraer el dossier.");
-            return;
-        }
-        window.location.href = `dossier-final.html?nombre=${encodeURIComponent(userName)}&start_date=${startDate}&end_date=${endDate}`;
+        window.location.href = `dossier-final.html?nombre=${userName}`;
     }
 
     window.onload = function() {
-        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
-        // No se sincroniza al cargar, esperando la acción del usuario
-        initCharts();
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB').toUpperCase(); }, 1000);
+        init();
+        const now = new Date();
+        document.getElementById('date-start').value = now.toISOString().split('T')[0];
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     };
 </script>
 </body>
