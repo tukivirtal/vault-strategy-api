@@ -145,33 +145,47 @@
  function sincronizarPanel() {
     const status = document.getElementById('user-status');
     const end = document.getElementById('date-end').value;
-    const roiCap = document.getElementById('roi-cap');
-    const roiRisk = document.getElementById('roi-risk');
-    const roiNeg = document.getElementById('roi-neg');
+    const start = document.getElementById('date-start').value;
 
     status.innerText = "SINCRONIZANDO...";
     status.style.color = "var(--gold)";
 
     setTimeout(() => {
         const isRiskMonth = end.includes("-04") || end.includes("-05") || end.includes("-06");
+        let currentData = {};
         
         if (isRiskMonth) {
             status.innerText = "MODO: PRECAUCIÓN";
             status.style.color = "var(--alert)";
-            // Valores dinámicos simulando el riesgo
-            roiCap.innerText = (-(Math.random() * 5 + 10).toFixed(1)) + "%";
-            roiNeg.innerText = "+" + (Math.random() * 3 + 5).toFixed(1) + "%";
-            roiRisk.innerText = (-(Math.random() * 10 + 35).toFixed(1)) + "%";
+            currentData = {
+                cap: (-(Math.random() * 5 + 10).toFixed(1)) + "%",
+                neg: "+" + (Math.random() * 3 + 5).toFixed(1) + "%",
+                risk: (-(Math.random() * 10 + 35).toFixed(1)) + "%",
+                estado: "RIESGO ESTRUCTURAL // PRECAUCIÓN",
+                rango: `${start} A ${end}`
+            };
             mainChart.updateSeries([{ data: [40, 30, 22, 18, 12, 8, 15] }]);
         } else {
             status.innerText = "MODO: EXPANSIÓN";
             status.style.color = "var(--safe)";
-            // Valores dinámicos simulando crecimiento
-            roiCap.innerText = "+" + (Math.random() * 5 + 22).toFixed(1) + "%";
-            roiNeg.innerText = "+" + (Math.random() * 2 + 11).toFixed(1) + "%";
-            roiRisk.innerText = "-" + (Math.random() * 2 + 17).toFixed(1) + "%";
+            currentData = {
+                cap: "+" + (Math.random() * 5 + 22).toFixed(1) + "%",
+                neg: "+" + (Math.random() * 2 + 11).toFixed(1) + "%",
+                risk: "-" + (Math.random() * 2 + 17).toFixed(1) + "%",
+                estado: "SINCRONÍA ÓPTIMA // EXPANSIÓN",
+                rango: `${start} A ${end}`
+            };
             mainChart.updateSeries([{ data: [35, 48, 62, 98, 75, 82, 125] }]);
         }
+
+        // ACTUALIZACIÓN VISUAL DE ETIQUETAS
+        document.getElementById('roi-cap').innerText = currentData.cap;
+        document.getElementById('roi-neg').innerText = currentData.neg;
+        document.getElementById('roi-risk').innerText = currentData.risk;
+
+        // GUARDADO PARA EL DOSSIER (EL PUENTE)
+        localStorage.setItem('ultimo_reporte', JSON.stringify(currentData));
+
     }, 1000);
 }
     function descargarDossier() {
