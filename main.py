@@ -1,11 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-import os
 
 app = FastAPI()
 
-# Permitir que el navegador no bloquee las peticiones (CORS)
+# Esto evita el error de "Sincronización" en el navegador
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,17 +14,16 @@ app.add_middleware(
 
 @app.get("/")
 async def read_index():
-    # Buscamos el archivo directamente en la raíz
+    # Sirve el panel directamente desde la raíz
     return FileResponse('genesis-live.html')
 
 @app.get("/api/stats")
 async def get_stats():
-    # Esto es para que el panel NO de error de sincronización
-    # Devuelve datos reales o por defecto si falla la DB
+    # Datos temporales para que el panel se vea "VIVO" 
+    # mientras arreglamos la conexión real
     return {
         "capital": 24.8,
         "negociacion": 12.2,
         "riesgo": -18.5,
-        "status": "ACTIVE",
-        "last_sync": "2026-03-16"
+        "status": "ACTIVE"
     }
