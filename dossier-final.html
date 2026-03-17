@@ -2,61 +2,120 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dossier GX-2026</title>
+    <title>GÉNESIS | Dossier Estratégico GX-2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: monospace; padding: 40px; }
-        .page { max-width: 800px; margin: auto; border: 1px solid #222; padding: 40px; }
-        .gold { color: #d4af37; }
-        .section { margin-top: 30px; border-left: 3px solid #d4af37; padding-left: 15px; }
+        :root { 
+            --gold: #d4af37; 
+            --alert: #ff4d4d; 
+            --safe: #00ff88; 
+            --bg: #000; 
+        }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'JetBrains Mono', monospace; 
+            padding: 40px; 
+            display: flex;
+            justify-content: center;
+        }
+        .page { 
+            max-width: 800px; 
+            width: 100%;
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            padding: 50px; 
+            position: relative;
+            background: rgba(10, 10, 10, 0.9);
+        }
+        .header-line {
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .gold { color: var(--gold); }
+        .section { 
+            margin-top: 30px; 
+            border-left: 3px solid var(--gold); 
+            padding-left: 15px; 
+        }
+        table { 
+            width: 100%; 
+            margin-top: 20px; 
+            border-collapse: collapse; 
+        }
+        th { color: var(--gold); text-align: left; padding: 10px; font-size: 0.8rem; border-bottom: 1px solid #333; }
+        td { padding: 10px; border-bottom: 1px solid #111; }
+        .footer { 
+            margin-top: 60px; 
+            text-align: center; 
+            font-size: 0.7rem; 
+            color: #444; 
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
     <div class="page">
-        <h1>DOSSIER ESTRATÉGICO GX</h1>
-        <div class="section">
-            OPERADOR: <span id="display-name" class="gold">...</span><br>
-            ESTADO: <span id="display-status">...</span>
+        <div class="header-line">
+            <h1 style="margin: 0; font-size: 1.5rem;">DOSSIER ESTRATÉGICO <span class="gold">GX-2026</span></h1>
         </div>
-        <div class="section">
-            <h3>ANÁLISIS DE CONSULTA</h3>
-            <p id="display-range">...</p>
-            <p>ROI PROYECTADO: <span id="display-roi" class="gold">...</span></p>
-        </div>
-    </div>
-    <div class="dossier-container" style="background: #000; color: #fff; padding: 50px; border: 1px solid var(--gold); font-family: 'JetBrains Mono';">
-    <h2 style="color: var(--gold); border-bottom: 2px solid var(--gold);">DOSSIER ESTRATÉGICO GX-2026</h2>
-    <p><strong>OPERADOR:</strong> <span id="out-name"></span></p>
-    <p><strong>ESTADO DE CARTERA:</strong> <span id="out-status" style="color: var(--safe);">ACTIVO // EXPANSIÓN</span></p>
-    
-    <div style="margin-top: 30px; border: 1px solid #333; padding: 20px;">
-        <h3 style="font-size: 0.8rem; color: #666;">ANÁLISIS DE RENDIMIENTO POR CICLO</h3>
-        <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #444; color: var(--gold);">
-                <th style="text-align: left; padding: 10px;">MÉTRICA</th>
-                <th style="text-align: right; padding: 10px;">VALOR</th>
-            </tr>
-            <tr><td style="padding: 10px;">Capital GXP</td><td style="text-align: right; color: var(--safe);">+24.83%</td></tr>
-            <tr><td style="padding: 10px;">Margen de Negociación</td><td style="text-align: right;">12.21%</td></tr>
-            <tr><td style="padding: 10px;">Exposición al Riesgo</td><td style="text-align: right; color: var(--alert);">-18.50%</td></tr>
-        </table>
-    </div>
-    
-    <div style="margin-top: 50px; text-align: center; font-size: 0.6rem; color: #444;">
-        NASA JPL DE441 COMPLIANT // GENERADO POR VAULT LOGIC 2026
-    </div>
-</div>
-<script>
-    window.onload = function() {
-        const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR";
-        document.getElementById('display-name').innerText = name.toUpperCase();
 
-        const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
-        if(data) {
-            document.getElementById('display-range').innerText = `RANGO: ${data.rango}`;
-            document.getElementById('display-status').innerText = data.estado;
-            document.getElementById('display-roi').innerText = data.roi;
+        <div class="section">
+            <p><strong>OPERADOR:</strong> <span id="display-name" class="gold">...</span></p>
+            <p><strong>ESTADO DE CARTERA:</strong> <span id="display-status">...</span></p>
+        </div>
+
+        <div class="section">
+            <h3 style="font-size: 0.9rem;">ANÁLISIS DE RENDIMIENTO</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÉTRICA</th>
+                        <th style="text-align: right;">VALOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Capital GXP</td>
+                        <td style="text-align: right; color: var(--safe);" id="display-cap">+24.83%</td>
+                    </tr>
+                    <tr>
+                        <td>Margen de Negociación</td>
+                        <td style="text-align: right;" id="display-neg">12.21%</td>
+                    </tr>
+                    <tr>
+                        <td>Exposición al Riesgo</td>
+                        <td style="text-align: right; color: var(--alert);" id="display-risk">-18.50%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            NASA JPL DE441 COMPLIANT // GENERADO POR VAULT LOGIC 2026
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // 1. Obtener nombre del Operador
+            const params = new URLSearchParams(window.location.search);
+            const name = params.get('nombre') || params.get('email') || "OPERADOR GXP";
+            document.getElementById('display-name').innerText = name.toUpperCase().split('@')[0];
+
+            // 2. Intentar obtener datos reales de la última sesión (localStorage)
+            // Si no existen, mantiene los valores base del HTML
+            const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
+            if(data) {
+                if(data.estado) document.getElementById('display-status').innerText = data.estado;
+                if(data.cap) document.getElementById('display-cap').innerText = data.cap;
+                if(data.risk) document.getElementById('display-risk').innerText = data.risk;
+                if(data.neg) document.getElementById('display-neg').innerText = data.neg;
+            } else {
+                // Estado por defecto si no hay datos de sincronización previa
+                document.getElementById('display-status').innerText = "ACTIVO // MODO ESTÁNDAR";
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
