@@ -142,33 +142,38 @@
         donutChart.render();
     }
 
-    function sincronizarPanel() {
-        const status = document.getElementById('user-status');
-        const end = document.getElementById('date-end').value;
+ function sincronizarPanel() {
+    const status = document.getElementById('user-status');
+    const end = document.getElementById('date-end').value;
+    const roiCap = document.getElementById('roi-cap');
+    const roiRisk = document.getElementById('roi-risk');
+    const roiNeg = document.getElementById('roi-neg');
 
-        status.innerText = "SINCRONIZANDO...";
-        status.style.color = "var(--gold)";
+    status.innerText = "SINCRONIZANDO...";
+    status.style.color = "var(--gold)";
 
-        setTimeout(() => {
-            // Algoritmo de decisión basado en fechas
-            const isRiskMonth = end.includes("-04") || end.includes("-05") || end.includes("-06");
-            
-            if (isRiskMonth) {
-                status.innerText = "MODO: PRECAUCIÓN";
-                status.style.color = "var(--alert)";
-                document.getElementById('roi-cap').innerText = "-12.0%";
-                document.getElementById('roi-risk').innerText = "-45.2%";
-                mainChart.updateSeries([{ data: [40, 30, 20, 15, 10, 5, 8] }]);
-            } else {
-                status.innerText = "MODO: EXPANSIÓN";
-                status.style.color = "var(--safe)";
-                document.getElementById('roi-cap').innerText = "+24.8%";
-                document.getElementById('roi-risk').innerText = "-18.5%";
-                mainChart.updateSeries([{ data: [35, 45, 60, 95, 70, 80, 120] }]);
-            }
-        }, 1000);
-    }
-
+    setTimeout(() => {
+        const isRiskMonth = end.includes("-04") || end.includes("-05") || end.includes("-06");
+        
+        if (isRiskMonth) {
+            status.innerText = "MODO: PRECAUCIÓN";
+            status.style.color = "var(--alert)";
+            // Valores dinámicos simulando el riesgo
+            roiCap.innerText = (-(Math.random() * 5 + 10).toFixed(1)) + "%";
+            roiNeg.innerText = "+" + (Math.random() * 3 + 5).toFixed(1) + "%";
+            roiRisk.innerText = (-(Math.random() * 10 + 35).toFixed(1)) + "%";
+            mainChart.updateSeries([{ data: [40, 30, 22, 18, 12, 8, 15] }]);
+        } else {
+            status.innerText = "MODO: EXPANSIÓN";
+            status.style.color = "var(--safe)";
+            // Valores dinámicos simulando crecimiento
+            roiCap.innerText = "+" + (Math.random() * 5 + 22).toFixed(1) + "%";
+            roiNeg.innerText = "+" + (Math.random() * 2 + 11).toFixed(1) + "%";
+            roiRisk.innerText = "-" + (Math.random() * 2 + 17).toFixed(1) + "%";
+            mainChart.updateSeries([{ data: [35, 48, 62, 98, 75, 82, 125] }]);
+        }
+    }, 1000);
+}
     function descargarDossier() {
         window.location.href = `dossier-final.html?nombre=${userName}`;
     }
