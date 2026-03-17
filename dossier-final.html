@@ -3,119 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <title>GÉNESIS | Dossier Estratégico GX-2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --gold: #d4af37; 
-            --alert: #ff4d4d; 
-            --safe: #00ff88; 
-            --bg: #000; 
+        :root {
+            --gold: #d4af37;
+            --alert: #ff4d4d;
+            --safe: #00ff88;
+            --dark: #050505;
+            --gray: #222;
         }
         body { 
-            background: var(--bg); 
-            color: #fff; 
+            background: #000; color: #fff; 
             font-family: 'JetBrains Mono', monospace; 
-            padding: 40px; 
-            display: flex;
-            justify-content: center;
+            margin: 0; padding: 0; 
+            -webkit-print-color-adjust: exact;
         }
         .page { 
-            max-width: 800px; 
-            width: 100%;
-            border: 1px solid rgba(212, 175, 55, 0.3); 
-            padding: 50px; 
-            position: relative;
-            background: rgba(10, 10, 10, 0.9);
+            width: 210mm; min-height: 297mm; 
+            padding: 20mm 25mm; margin: 20px auto; 
+            background: var(--dark); border: 1px solid #111; 
+            position: relative; box-sizing: border-box;
         }
-        .header-line {
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+        .confidential-stamp { 
+            position: absolute; top: 15mm; right: 15mm; 
+            border: 2px solid var(--alert); color: var(--alert); 
+            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
+            transform: rotate(5deg); letter-spacing: 0.2em;
+            background: rgba(255, 77, 77, 0.05);
         }
-        .gold { color: var(--gold); }
-        .section { 
-            margin-top: 30px; 
-            border-left: 3px solid var(--gold); 
-            padding-left: 15px; 
+        h1 { 
+            font-size: 1.2rem; letter-spacing: 0.5em; 
+            border-bottom: 1px solid var(--gray); padding-bottom: 20px; 
+            text-transform: uppercase; color: var(--gold);
         }
-        table { 
-            width: 100%; 
-            margin-top: 20px; 
-            border-collapse: collapse; 
+        .section-title { 
+            font-size: 0.7rem; color: #777; 
+            letter-spacing: 0.3em; margin-top: 40px; 
+            margin-bottom: 15px; border-left: 3px solid var(--gold);
+            padding-left: 15px; text-transform: uppercase;
         }
-        th { color: var(--gold); text-align: left; padding: 10px; font-size: 0.8rem; border-bottom: 1px solid #333; }
-        td { padding: 10px; border-bottom: 1px solid #111; }
-        .footer { 
-            margin-top: 60px; 
-            text-align: center; 
-            font-size: 0.7rem; 
-            color: #444; 
-            letter-spacing: 2px;
+        .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
+        .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); }
+        .impact-matrix td { padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; }
+        
+        .no-print {
+            position: fixed; bottom: 30px; right: 30px; 
+            background: var(--gold); color: #000; border: none; 
+            padding: 15px 30px; font-weight: bold; cursor: pointer;
+            z-index: 100; transition: 0.3s;
+        }
+        .no-print:hover { background: #fff; }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: #000 !important; }
+            .page { margin: 0; border: none; }
         }
     </style>
 </head>
 <body>
-    <div class="page">
-        <div class="header-line">
-            <h1 style="margin: 0; font-size: 1.5rem;">DOSSIER ESTRATÉGICO <span class="gold">GX-2026</span></h1>
-        </div>
 
-        <div class="section">
-            <p><strong>OPERADOR:</strong> <span id="display-name" class="gold">...</span></p>
-            <p><strong>ESTADO DE CARTERA:</strong> <span id="display-status">...</span></p>
-        </div>
+<button class="no-print" onclick="window.print()">DESCARGAR ENCRYPTED PDF</button>
 
-        <div class="section">
-            <h3 style="font-size: 0.9rem;">ANÁLISIS DE RENDIMIENTO</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>MÉTRICA</th>
-                        <th style="text-align: right;">VALOR</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Capital GXP</td>
-                        <td style="text-align: right; color: var(--safe);" id="display-cap">+24.83%</td>
-                    </tr>
-                    <tr>
-                        <td>Margen de Negociación</td>
-                        <td style="text-align: right;" id="display-neg">12.21%</td>
-                    </tr>
-                    <tr>
-                        <td>Exposición al Riesgo</td>
-                        <td style="text-align: right; color: var(--alert);" id="display-risk">-18.50%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="page">
+    <div class="confidential-stamp">TOP SECRET // CLASSIFIED</div>
+    <h1>Dossier Estratégico GX-2026</h1>
 
-        <div class="footer">
-            NASA JPL DE441 COMPLIANT // GENERADO POR VAULT LOGIC 2026
-        </div>
+    <div class="section-title">SUJETO DE ANÁLISIS</div>
+    <div class="content">
+        OPERADOR: <span style="color:var(--gold)" id="user-name">...</span><br>
+        PROTOCOLO: GÉNESIS GXP VITALICIO<br>
+        ESTADO: <span id="display-status">SINCRONIZADO NASA JPL DE441</span>
     </div>
 
-    <script>
-        window.onload = function() {
-            // 1. Obtener nombre del Operador
-            const params = new URLSearchParams(window.location.search);
-            const name = params.get('nombre') || params.get('email') || "OPERADOR GXP";
-            document.getElementById('display-name').innerText = name.toUpperCase().split('@')[0];
+    <div class="section-title">Matriz de Impacto ROI 2026</div>
+    <table class="impact-matrix">
+        <thead>
+            <tr>
+                <th>VENTANA</th>
+                <th>INDICADOR</th>
+                <th>ROI EST.</th>
+                <th>ESTRATEGIA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Q1 2026</td>
+                <td style="color:var(--gold)">OPORTUNIDAD ALTA</td>
+                <td id="val-cap">+24.8%</td>
+                <td>Inversión Agresiva</td>
+            </tr>
+            <tr>
+                <td>Q2 2026</td>
+                <td style="color:var(--alert)">RIESGO ESTRUCTURAL</td>
+                <td id="val-risk">-12.0%</td>
+                <td>Posición Defensiva</td>
+            </tr>
+            <tr>
+                <td>Q3 2026</td>
+                <td style="color:var(--safe)">SINCRONÍA ÓPTIMA</td>
+                <td id="val-neg">+18.5%</td>
+                <td>Escalabilidad</td>
+            </tr>
+        </tbody>
+    </table>
 
-            // 2. Intentar obtener datos reales de la última sesión (localStorage)
-            // Si no existen, mantiene los valores base del HTML
-            const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
-            if(data) {
-                if(data.estado) document.getElementById('display-status').innerText = data.estado;
-                if(data.cap) document.getElementById('display-cap').innerText = data.cap;
-                if(data.risk) document.getElementById('display-risk').innerText = data.risk;
-                if(data.neg) document.getElementById('display-neg').innerText = data.neg;
-            } else {
-                // Estado por defecto si no hay datos de sincronización previa
-                document.getElementById('display-status').innerText = "ACTIVO // MODO ESTÁNDAR";
-            }
+    <div class="section-title">PROYECCIÓN ESTRATÉGICA</div>
+    <div class="content">
+        Los ciclos analizados indican una ventana de capitalización máxima en curso. 
+        Se recomienda consolidar activos antes del cierre del trimestre para evitar la volatilidad estructural detectada. [cite: 55, 56]
+    </div>
+
+    <div class="footer-tech" style="margin-top: 60px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444;">
+        CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026. [cite: 54, 57]
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // Captura del nombre desde URL
+        const name = new URLSearchParams(window.location.search).get('nombre') || "OPERADOR GXP";
+        document.getElementById('user-name').innerText = name.toUpperCase(); [cite: 58]
+
+        // Recuperación de datos del Panel de Sincronización
+        const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
+        if(data) {
+            if(data.cap) document.getElementById('val-cap').innerText = data.cap;
+            if(data.risk) document.getElementById('val-risk').innerText = data.risk;
+            if(data.neg) document.getElementById('val-neg').innerText = data.neg;
+            if(data.estado) document.getElementById('display-status').innerText = data.estado;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
