@@ -12,7 +12,6 @@
         .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
         
-        /* Controles de Sincronización */
         .horizon-picker { background: rgba(212,175,55,0.03); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
         input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
         input[type="date"]:focus { border-color: var(--gold); }
@@ -26,8 +25,13 @@
         .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
         .label-mini { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 10px; }
         .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; }
-        #user-welcome { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+        #user-welcome { color: var(--gold); font-weight: bold; font-size: 1.2rem; text-transform: uppercase; }
         #clock { color: #444; }
+
+        /* NUEVO: Traductor Ejecutivo */
+        .executive-summary { margin-top: 20px; padding: 20px; border-left: 4px solid var(--gold); background: rgba(212,175,55,0.05); }
+        .executive-summary h4 { margin: 0 0 10px 0; font-size: 0.8rem; color: var(--gold); letter-spacing: 1px; }
+        .executive-summary p { margin: 0; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -77,17 +81,22 @@
 
         <div class="decision-matrix">
             <div id="card-cap" class="decision-card" style="border-top: 3px solid var(--safe);">
-                <span class="label-mini">CAPITAL GXP</span>
-                <div class="roi" id="roi-cap">+24.8%</div>
+                <span class="label-mini">POTENCIAL CAPITAL</span>
+                <div class="roi" id="roi-cap">--%</div>
             </div>
             <div class="decision-card" style="border-top: 3px solid var(--gold);">
-                <span class="label-mini">NEGOCIACIÓN</span>
-                <div class="roi" id="roi-neg">+12.2%</div>
+                <span class="label-mini">CLIMA DE NEGOCIACIÓN</span>
+                <div class="roi" id="roi-neg">--%</div>
             </div>
             <div id="card-risk" class="decision-card" style="border-top: 3px solid var(--alert);">
-                <span class="label-mini">RIESGO</span>
-                <div class="roi" id="roi-risk">-18.5%</div>
+                <span class="label-mini">EXPOSICIÓN AL RIESGO</span>
+                <div class="roi" id="roi-risk">--%</div>
             </div>
+        </div>
+
+        <div class="executive-summary" id="executive-translation" style="display: none;">
+            <h4>DIRECTIVA OPERATIVA</h4>
+            <p id="translation-text">Esperando sincronización de parámetros temporales...</p>
         </div>
 
         <button onclick="descargarDossier()" style="margin-top: 40px; background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase;">
@@ -97,38 +106,29 @@
 </div>
 
 <script>
-    // 🔒 SEGURIDAD: Leer el email desde localStorage, no desde la URL
     const userEmail = localStorage.getItem('vault_user_email');
+    if (!userEmail) window.location.href = 'index.html';
     
-    // Si no hay usuario logueado, lo expulsamos por seguridad
-    if (!userEmail) {
-        window.location.href = 'index.html';
-    }
-    
-    // Extraemos el nombre antes del @
-    const userName = userEmail ? userEmail.split('@')[0].toUpperCase() : "OPERADOR GXP";
+    // Obtenemos el nombre real guardado, si no, usamos un genérico
+    const storedName = localStorage.getItem('vault_user_nombre');
+    const userName = storedName ? storedName : "OPERADOR GXP";
 
     let mainChart, miniChart, donutChart;
 
     function init() {
         document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
         
-        // Gráfica Principal Reactiva
         mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
-            series: [{ name: 'Sincronía GXP', data: [65, 58, 42, 35, 60, 85, 45] }],
+            series: [{ name: 'Sincronía GXP', data: [0, 0, 0, 0, 0, 0, 0] }], // Inicia vacío
             chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
             colors: ['#d4af37'],
             stroke: { width: 3, curve: 'smooth' },
             fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
-            xaxis: { 
-                categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'], 
-                labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } 
-            },
+            xaxis: { categories: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'], labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } },
             tooltip: { theme: 'dark' }
         });
         mainChart.render();
 
-        // Gráfica de 10 años (Referencia fija)
         miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
             series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
             chart: { type: 'area', height: 180, toolbar: { show: false } },
@@ -139,7 +139,6 @@
         });
         miniChart.render();
 
-        // Donut
         donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
             series: [60, 25, 15],
             chart: { type: 'donut', height: 200 },
@@ -148,6 +147,9 @@
             legend: { position: 'bottom', labels: { colors: '#666' } }
         });
         donutChart.render();
+        
+        // Ejecuta la primera sincronización automáticamente
+        setTimeout(sincronizarPanel, 500); 
     }
 
 function sincronizarPanel() {
@@ -155,11 +157,7 @@ function sincronizarPanel() {
     const startInput = document.getElementById('date-start').value;
     const endInput = document.getElementById('date-end').value;
 
-    // 🛡️ VALIDACIÓN DE FECHAS ESTRICTA
-    if (!startInput || !endInput) {
-        alert("SISTEMA GÉNESIS: Debe definir un horizonte de inicio y cierre.");
-        return;
-    }
+    if (!startInput || !endInput) return;
 
     const startDate = new Date(startInput);
     const endDate = new Date(endInput);
@@ -168,32 +166,35 @@ function sincronizarPanel() {
         status.innerText = "ERROR DE SINCRONÍA";
         status.style.color = "var(--alert)";
         alert("ANOMALÍA TEMPORAL DETECTADA: La fecha de inicio no puede ser mayor o igual a la fecha de cierre. Reajuste el horizonte.");
-        
-        // Limpiamos las cajas para obligarlo a escribir bien
-        document.getElementById('date-start').value = "";
-        document.getElementById('date-end').value = "";
         return;
     }
 
-    // Si las fechas son lógicas, procede con la simulación normal
-    status.innerText = "SINCRONIZANDO...";
+    status.innerText = "SINTETIZANDO...";
     status.style.color = "var(--gold)";
+    document.getElementById('executive-translation').style.display = 'none';
 
     setTimeout(() => {
+        // Lógica de simulación (puedes reemplazarla con llamadas reales a tu API luego)
         const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
         let currentData = {};
+        let translation = "";
         
         if (isRiskMonth) {
-            status.innerText = "MODO: PRECAUCIÓN";
+            status.innerText = "MODO: DEFENSA";
             status.style.color = "var(--alert)";
             currentData = {
                 cap: (-(Math.random() * 5 + 10).toFixed(1)) + "%",
                 neg: "+" + (Math.random() * 3 + 5).toFixed(1) + "%",
                 risk: (-(Math.random() * 10 + 35).toFixed(1)) + "%",
-                estado: "RIESGO ESTRUCTURAL // PRECAUCIÓN",
-                rango: `${startInput} A ${endInput}`
+                estado: "RIESGO ESTRUCTURAL // POSICIÓN DEFENSIVA",
+                rango: `${startInput} A ${endInput}`,
+                estrategia: "Posición Defensiva" // Dato para el Dossier
             };
             mainChart.updateSeries([{ data: [40, 30, 22, 18, 12, 8, 15] }]);
+            
+            // Traducción Operativa para el Ejecutivo
+            translation = "Los ciclos indican alta volatilidad en este periodo. <b>Acción sugerida:</b> Congele contrataciones agresivas, evite lanzamientos de nuevos productos y céntrese en fidelizar a sus clientes actuales. Las negociaciones serán tensas; no ceda margen de ganancia.";
+            
         } else {
             status.innerText = "MODO: EXPANSIÓN";
             status.style.color = "var(--safe)";
@@ -201,28 +202,44 @@ function sincronizarPanel() {
                 cap: "+" + (Math.random() * 5 + 22).toFixed(1) + "%",
                 neg: "+" + (Math.random() * 2 + 11).toFixed(1) + "%",
                 risk: "-" + (Math.random() * 2 + 17).toFixed(1) + "%",
-                estado: "SINCRONÍA ÓPTIMA // EXPANSIÓN",
-                rango: `${startInput} A ${endInput}`
+                estado: "SINCRONÍA ÓPTIMA // ESCALABILIDAD",
+                rango: `${startInput} A ${endInput}`,
+                estrategia: "Inversión Agresiva" // Dato para el Dossier
             };
             mainChart.updateSeries([{ data: [35, 48, 62, 98, 75, 82, 125] }]);
+            
+            // Traducción Operativa para el Ejecutivo
+            translation = "Ventana de sincronicidad excepcional. <b>Acción sugerida:</b> Acelere cierres de ventas, asigne presupuesto adicional a campañas de marketing y firme alianzas estratégicas. El clima de negociación favorece acuerdos de alto valor a largo plazo.";
         }
 
         document.getElementById('roi-cap').innerText = currentData.cap;
         document.getElementById('roi-neg').innerText = currentData.neg;
         document.getElementById('roi-risk').innerText = currentData.risk;
+        
+        // Mostrar la traducción
+        document.getElementById('translation-text').innerHTML = translation;
+        document.getElementById('executive-translation').style.display = 'block';
 
+        // GUARDAMOS EN MEMORIA PARA QUE EL DOSSIER LO LEA CORRECTAMENTE
         localStorage.setItem('ultimo_reporte', JSON.stringify(currentData));
 
-    }, 1000);
+    }, 800);
 }
+
     function descargarDossier() {
-        window.location.href = `dossier-final.html?nombre=${userName}`;
+        // El Dossier ahora leerá el nombre desde localStorage y los datos desde 'ultimo_reporte'
+        window.location.href = `dossier-final.html`; 
     }
 
     window.onload = function() {
-        init();
         const now = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(now.getMonth() + 1);
+        
         document.getElementById('date-start').value = now.toISOString().split('T')[0];
+        document.getElementById('date-end').value = nextMonth.toISOString().split('T')[0];
+        
+        init();
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     };
 </script>
