@@ -39,18 +39,15 @@
             border-bottom: 1px solid #222;
             font-family: 'JetBrains Mono', monospace;
         }
-        .autocomplete-item:hover {
-            background-color: #1a1a1a;
-            color: #d4af37;
-        }
+        .autocomplete-item:hover { background-color: #1a1a1a; color: #d4af37; }
     </style>
 </head>
 <body class="p-4 md:p-10 text-white">
     <header class="flex justify-between items-center mb-16">
         <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
         <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-400">
-            <span class="cursor-default">Análisis</span>
-            <span class="cursor-default">Pricing</span>
+            <span class="cursor-pointer hover:text-white transition">Análisis</span>
+            <span class="cursor-pointer hover:text-white transition">Pricing</span>
             <button onclick="toggleModo(true)" class="text-yellow-600 font-bold hover:text-yellow-500 transition">Acceso VIP</button>
         </nav>
     </header>
@@ -65,11 +62,11 @@
 
     <div id="acceso-boveda" class="card p-8 w-full max-w-md">
         <h3 id="form-title" class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Registro de Nueva Terminal</h3>
-        
+
         <div class="space-y-4">
             <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono lowercase placeholder-gray-600">
             <input type="password" id="password" placeholder="CONTRASEÑA ESTRATÉGICA" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
-            
+
             <div id="campos-registro" class="space-y-4">
                 <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono uppercase placeholder-gray-600">
                 <div class="grid grid-cols-2 gap-4">
@@ -111,8 +108,8 @@
 
 <script>
 // === INSERTA AQUÍ TUS CREDENCIALES DE SUPABASE ===
-const supabaseUrl = 'TU_URL_DE_SUPABASE_AQUI'; 
-const supabaseKey = 'TU_CLAVE_ANON_DE_SUPABASE_AQUI';
+const supabaseUrl = 'hfyzgwjoivxvzkyfnrlo'; 
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeXpnd2pvaXZ4dnpreWZucmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NTQ4MzAsImV4cCI6MjA4NjQzMDgzMH0.g3h3IJWsSnykuBiDAx9J7AAau9zDcmUUM14e2pezIg8';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // =================================================
 
