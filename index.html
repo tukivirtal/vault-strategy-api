@@ -101,7 +101,11 @@
 </main>
 
 <footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
-    © 2026 VAULT LOGIC - Executive Intelligence Suite
+    <p class="mb-2">© 2026 VAULT LOGIC - Executive Intelligence Suite</p>
+    <p>
+        <a href="privacidad.html" class="hover:text-yellow-600 transition mx-2">Privacidad</a> | 
+        <a href="terminos.html" class="hover:text-yellow-600 transition mx-2">Términos</a>
+    </p>
 </footer>
 
 <script>
@@ -193,7 +197,7 @@ async function consultar() {
 
         const data = await respuesta.json();
         
-      if (data.status === "success" || data.status === "exists") {
+        if (data.status === "success" || data.status === "exists") {
             resTitulo.innerHTML = "ACCESO AUTORIZADO";
             resCuerpo.innerHTML = "Vínculo establecido. Redirigiendo...";
             
@@ -214,6 +218,14 @@ async function consultar() {
             resTitulo.innerHTML = "ACCESO DENEGADO";
             resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
         }
+    } catch (error) { // <-- ESTE ES EL BLOQUE QUE FALTABA
+        btn.disabled = false;
+        btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
+        resTitulo.innerHTML = "ERROR CRÍTICO";
+        resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+        console.error(error);
+    }
+}
 
 // Lógica de Autocompletado Photon
 const lugarInput = document.getElementById('lugar');
