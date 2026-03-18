@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import os
+from supabase import create_client, Client
 
 app = FastAPI()
 
-# Esto evita el error de "Sincronización" en el navegador
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,18 +14,49 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# === LAS CLAVES ESTÁN INVISIBLES AQUÍ ===
+# Python las lee directamente del entorno de Render, no del código fuente
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Estructura de datos esperada desde el HTML
+class LoginData(BaseModel):
+    email: str
+    password: str
+    login_only: bool = False
+    nombre: str = None
+    lugar: str = None
+    fecha: str = None
+    hora: str = None
+
 @app.get("/")
 async def read_index():
-    # Sirve el panel directamente desde la raíz
-    return FileResponse('genesis-live.html')
+    return FileResponse('index.html')
 
-@app.get("/api/stats")
-async def get_stats():
-    # Datos temporales para que el panel se vea "VIVO" 
-    # mientras arreglamos la conexión real
-    return {
-        "capital": 24.8,
-        "negociacion": 12.2,
-        "riesgo": -18.5,
-        "status": "ACTIVE"
-    }
+@app.post("/consultar")
+async def consultar(data: LoginData):
+    try:
+        if data.login_only:
+            # Lógica de Inicio de Sesión
+            res = supabase.auth.sign_in_with_password({"email": data.email, "password": data.password})
+            return {"status": "success"}
+        else:
+            # Lógica de Registro
+            res = supabase.auth.sign_up({
+                "email": data.email,
+                "password": data.password,
+                "options": {
+                    "data": {
+                        "nombre": data.nombre,
+                        "lugar": data.lugar,
+                        "fecha": data.fecha,
+                        "hora": data.hora
+                    }
+                }
+            })
+            return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "analisis_ejecutivo": "Credenciales incorrectas o usuario no registrado."}
