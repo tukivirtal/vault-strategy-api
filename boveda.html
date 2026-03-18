@@ -73,12 +73,18 @@
 
 <script>
 async function conectar() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email') || "marcoaurelio@gmail.com";
+    // 🔒 SEGURIDAD: Leer desde la memoria invisible
+    const email = localStorage.getItem('vault_user_email');
+    
+    // Si alguien intenta entrar a boveda.html sin haberse logueado, lo expulsamos
+    if (!email) {
+        window.location.href = 'index.html';
+        return;
+    }
     
     try {
-        // === CAMBIO AQUÍ PARA QUE HABLE CON LA NUEVA RUTA DEL MAIN.PY ===
         const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
+// ... (el resto del código sigue igual)
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email: email })
