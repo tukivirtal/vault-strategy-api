@@ -185,7 +185,6 @@ async function consultar() {
     resContainer.classList.remove('hidden');
 
     try {
-        // ENVIAMOS LOS DATOS A TU SERVIDOR SEGURO (RENDER)
         const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -196,9 +195,14 @@ async function consultar() {
         
         if (data.status === "success" || data.status === "exists") {
             resTitulo.innerHTML = "ACCESO AUTORIZADO";
-            resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
+            resCuerpo.innerHTML = "Vínculo establecido. Redirigiendo...";
             setTimeout(() => {
-                window.location.href = `genesis-live.html?email=${encodeURIComponent(emailInput)}`;
+                // === ENRUTAMIENTO INTELIGENTE ===
+                if (data.nivel_suscripcion === "genesis") {
+                    window.location.href = `genesis-live.html?email=${encodeURIComponent(emailInput)}`;
+                } else {
+                    window.location.href = `boveda.html?email=${encodeURIComponent(emailInput)}`;
+                }
             }, 1200);
         } else {
             btn.disabled = false;
