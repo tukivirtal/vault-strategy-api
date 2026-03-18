@@ -59,4 +59,8 @@ async def consultar(data: LoginData):
             })
             return {"status": "success"}
     except Exception as e:
-        return {"status": "error", "analisis_ejecutivo": "Credenciales incorrectas o usuario no registrado."}
+        # Esto imprimirá el error real en los logs de Render (letras rojas/blancas)
+        print(f"🚨 ERROR CRÍTICO DETECTADO: {str(e)}") 
+        
+        # Esto enviará el error real directamente a tu pantalla de la web
+        return {"status": "error", "analisis_ejecutivo": f"Fallo interno: {str(e)}"}
