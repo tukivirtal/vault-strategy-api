@@ -193,15 +193,19 @@ async function consultar() {
 
         const data = await respuesta.json();
         
-        if (data.status === "success" || data.status === "exists") {
+      if (data.status === "success" || data.status === "exists") {
             resTitulo.innerHTML = "ACCESO AUTORIZADO";
             resCuerpo.innerHTML = "Vínculo establecido. Redirigiendo...";
+            
+            // 🔒 SEGURIDAD: Guardamos el email en memoria local, NO en la URL
+            localStorage.setItem('vault_user_email', emailInput);
+            
             setTimeout(() => {
-                // === ENRUTAMIENTO INTELIGENTE ===
+                // Enrutamiento limpio (sin ?email=...)
                 if (data.nivel_suscripcion === "genesis") {
-                    window.location.href = `genesis-live.html?email=${encodeURIComponent(emailInput)}`;
+                    window.location.href = 'genesis-live.html';
                 } else {
-                    window.location.href = `boveda.html?email=${encodeURIComponent(emailInput)}`;
+                    window.location.href = 'boveda.html';
                 }
             }, 1200);
         } else {
@@ -210,12 +214,6 @@ async function consultar() {
             resTitulo.innerHTML = "ACCESO DENEGADO";
             resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
         }
-    } catch (error) {
-        btn.disabled = false;
-        resTitulo.innerHTML = "ERROR CRÍTICO";
-        resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
-    }
-}
 
 // Lógica de Autocompletado Photon
 const lugarInput = document.getElementById('lugar');
