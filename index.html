@@ -201,8 +201,16 @@ async function consultar() {
             resTitulo.innerHTML = "ACCESO AUTORIZADO";
             resCuerpo.innerHTML = "Vínculo establecido. Redirigiendo...";
             
-            // 🔒 SEGURIDAD: Guardamos el email en memoria local, NO en la URL
+            // 🔒 SEGURIDAD: Guardamos el email en memoria local
             localStorage.setItem('vault_user_email', emailInput);
+            
+            // 🧠 INTELIGENCIA: Guardamos el nombre real para que el panel lo use
+            if (data.nombre) {
+                localStorage.setItem('vault_user_nombre', data.nombre);
+            } else if (!modoVIP && document.getElementById('nombre').value) {
+                // Si es un registro nuevo, guardamos el nombre que acaba de escribir
+                localStorage.setItem('vault_user_nombre', document.getElementById('nombre').value.trim().toUpperCase());
+            }
             
             setTimeout(() => {
                 // Enrutamiento limpio (sin ?email=...)
@@ -218,7 +226,7 @@ async function consultar() {
             resTitulo.innerHTML = "ACCESO DENEGADO";
             resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
         }
-    } catch (error) { // <-- ESTE ES EL BLOQUE QUE FALTABA
+    } catch (error) { 
         btn.disabled = false;
         btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
         resTitulo.innerHTML = "ERROR CRÍTICO";
