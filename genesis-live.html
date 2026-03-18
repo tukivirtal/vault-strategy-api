@@ -142,16 +142,37 @@
         donutChart.render();
     }
 
- function sincronizarPanel() {
+function sincronizarPanel() {
     const status = document.getElementById('user-status');
-    const end = document.getElementById('date-end').value;
-    const start = document.getElementById('date-start').value;
+    const startInput = document.getElementById('date-start').value;
+    const endInput = document.getElementById('date-end').value;
 
+    // 🛡️ VALIDACIÓN DE FECHAS ESTRICTA
+    if (!startInput || !endInput) {
+        alert("SISTEMA GÉNESIS: Debe definir un horizonte de inicio y cierre.");
+        return;
+    }
+
+    const startDate = new Date(startInput);
+    const endDate = new Date(endInput);
+
+    if (startDate >= endDate) {
+        status.innerText = "ERROR DE SINCRONÍA";
+        status.style.color = "var(--alert)";
+        alert("ANOMALÍA TEMPORAL DETECTADA: La fecha de inicio no puede ser mayor o igual a la fecha de cierre. Reajuste el horizonte.");
+        
+        // Limpiamos las cajas para obligarlo a escribir bien
+        document.getElementById('date-start').value = "";
+        document.getElementById('date-end').value = "";
+        return;
+    }
+
+    // Si las fechas son lógicas, procede con la simulación normal
     status.innerText = "SINCRONIZANDO...";
     status.style.color = "var(--gold)";
 
     setTimeout(() => {
-        const isRiskMonth = end.includes("-04") || end.includes("-05") || end.includes("-06");
+        const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
         let currentData = {};
         
         if (isRiskMonth) {
@@ -162,7 +183,7 @@
                 neg: "+" + (Math.random() * 3 + 5).toFixed(1) + "%",
                 risk: (-(Math.random() * 10 + 35).toFixed(1)) + "%",
                 estado: "RIESGO ESTRUCTURAL // PRECAUCIÓN",
-                rango: `${start} A ${end}`
+                rango: `${startInput} A ${endInput}`
             };
             mainChart.updateSeries([{ data: [40, 30, 22, 18, 12, 8, 15] }]);
         } else {
@@ -173,17 +194,15 @@
                 neg: "+" + (Math.random() * 2 + 11).toFixed(1) + "%",
                 risk: "-" + (Math.random() * 2 + 17).toFixed(1) + "%",
                 estado: "SINCRONÍA ÓPTIMA // EXPANSIÓN",
-                rango: `${start} A ${end}`
+                rango: `${startInput} A ${endInput}`
             };
             mainChart.updateSeries([{ data: [35, 48, 62, 98, 75, 82, 125] }]);
         }
 
-        // ACTUALIZACIÓN VISUAL DE ETIQUETAS
         document.getElementById('roi-cap').innerText = currentData.cap;
         document.getElementById('roi-neg').innerText = currentData.neg;
         document.getElementById('roi-risk').innerText = currentData.risk;
 
-        // GUARDADO PARA EL DOSSIER (EL PUENTE)
         localStorage.setItem('ultimo_reporte', JSON.stringify(currentData));
 
     }, 1000);
