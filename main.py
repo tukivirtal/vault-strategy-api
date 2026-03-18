@@ -14,15 +14,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === LAS CLAVES ESTÁN INVISIBLES AQUÍ ===
-# Python las lee directamente del entorno de Render, no del código fuente
+# === LAS CLAVES SIGUEN INVISIBLES Y SEGURAS AQUÍ ===
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 if SUPABASE_URL and SUPABASE_KEY:
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Estructura de datos esperada desde el HTML
 class LoginData(BaseModel):
     email: str
     password: str
@@ -40,27 +38,37 @@ async def read_index():
 async def consultar(data: LoginData):
     try:
         if data.login_only:
-            # Lógica de Inicio de Sesión
-            res = supabase.auth.sign_in_with_password({"email": data.email, "password": data.password})
-            return {"status": "success"}
-        else:
-            # Lógica de Registro
-            res = supabase.auth.sign_up({
-                "email": data.email,
-                "password": data.password,
-                "options": {
-                    "data": {
-                        "nombre": data.nombre,
-                        "lugar": data.lugar,
-                        "fecha": data.fecha,
-                        "hora": data.hora
-                    }
-                }
-            })
-            return {"status": "success"}
-    except Exception as e:
-        # Esto imprimirá el error real en los logs de Render (letras rojas/blancas)
-        print(f"🚨 ERROR CRÍTICO DETECTADO: {str(e)}") 
+            # === LA CLAVE DEL MISTERIO ===
+            # Buscamos en tu tabla 'clientes_vip', NO en el sistema Auth
+            res = supabase.table("clientes_vip").select("*").eq("email", data.email).execute()
+            
+            if len(res.data) > 0:
+                usuario = res.data[0]
+                
+                # Verificamos la contraseña (asumiendo que la columna está más a la derecha en tu tabla)
+                if "password" in usuario and str(usuario["password"]) != str(data.password):
+                    return {"status": "error", "analisis_ejecutivo": "Contraseña estratégica incorrecta."}
+                    
+                return {"status": "success"}
+            else:
+                return {"status": "error", "analisis_ejecutivo": "El email no se encuentra en la base de datos VIP."}
         
-        # Esto enviará el error real directamente a tu pantalla de la web
-        return {"status": "error", "analisis_ejecutivo": f"Fallo interno: {str(e)}"}
+        else:
+            # Lógica de Registro exacta a tu captura de Supabase
+            nuevo_usuario = {
+                "email": data.email,
+                "password": data.password, 
+                "nombre": data.nombre,
+                "datos_natales": {
+                    "fecha": data.fecha,
+                    "hora": data.hora,
+                    "lugar_original": data.lugar
+                },
+                "nivel_suscripcion": "free"
+            }
+            supabase.table("clientes_vip").insert(nuevo_usuario).execute()
+            return {"status": "success"}
+            
+    except Exception as e:
+        print(f"🚨 ERROR CRÍTICO DETECTADO: {str(e)}")
+        return {"status": "error", "analisis_ejecutivo": f"Fallo en la tabla: {str(e)}"}
