@@ -54,6 +54,12 @@
         }
         .no-print:hover { background: #fff; }
         
+        .disclaimer-legal {
+            margin-top: 50px; padding: 20px; border-top: 1px solid #222; 
+            font-size: 0.55rem; color: #555; font-family: 'Inter', sans-serif; 
+            text-transform: uppercase; letter-spacing: 1px; text-align: justify;
+        }
+
         @media print {
             .no-print { display: none; }
             body { background: #000 !important; }
@@ -76,78 +82,99 @@
         ESTADO: <span id="display-status">SINCRONIZADO NASA JPL DE441</span>
     </div>
 
-    <div class="section-title">Matriz de Impacto ROI 2026</div>
+    <div class="section-title">Matriz de Impacto de Ciclos</div>
     <table class="impact-matrix">
         <thead>
             <tr>
-                <th>VENTANA</th>
+                <th>FASE</th>
                 <th>INDICADOR</th>
                 <th>ROI EST.</th>
-                <th>ESTRATEGIA</th>
+                <th>ESTRATEGIA RECOMENDADA</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Q1 2026</td>
-                <td style="color:var(--gold)">OPORTUNIDAD ALTA</td>
+                <td>POTENCIAL CAPITAL</td>
+                <td style="color:var(--safe)">OPORTUNIDAD VIGENTE</td>
                 <td id="val-cap">+24.8%</td>
-                <td>Inversión Agresiva</td>
+                <td id="est-cap">Expansión Inmediata</td>
             </tr>
             <tr>
-                <td>Q2 2026</td>
-                <td style="color:var(--alert)">RIESGO ESTRUCTURAL</td>
-                <td id="val-risk">-12.0%</td>
-                <td>Posición Defensiva</td>
-            </tr>
-            <tr>
-                <td>Q3 2026</td>
-                <td style="color:var(--safe)">SINCRONÍA ÓPTIMA</td>
+                <td>CLIMA NEGOCIACIÓN</td>
+                <td style="color:var(--gold)">FLUCTUACIÓN MODERADA</td>
                 <td id="val-neg">+18.5%</td>
-                <td>Escalabilidad</td>
+                <td id="est-neg">Aceleración de Cierres</td>
+            </tr>
+            <tr>
+                <td>EXPOSICIÓN RIESGO</td>
+                <td style="color:var(--alert)">VULNERABILIDAD ESTRUCTURAL</td>
+                <td id="val-risk">-12.0%</td>
+                <td id="est-risk">Auditoría de Pasivos</td>
             </tr>
         </tbody>
     </table>
 
-    <div class="section-title">PROYECCIÓN ESTRATÉGICA</div>
+    <div class="section-title">PROYECCIÓN ESTRATÉGICA Y DIRECTIVA</div>
     <div class="content" id="proyeccion-texto">
-        Los ciclos analizados indican una ventana de capitalización máxima en curso. 
-        Se recomienda consolidar activos antes del cierre del trimestre para evitar la volatilidad estructural detectada.
+        Sincronizando directivas del núcleo...
     </div>
 
-    <div class="footer-tech" style="margin-top: 60px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444;">
+    <div class="disclaimer-legal">
+        <strong>Aviso Legal y de Riesgo:</strong> Vault Logic Terminal proporciona análisis basados en ciclos matemáticos y efemérides astronómicas (NASA JPL DE441). Las métricas presentadas (ROI, Riesgo, Sincronía) constituyen modelos probabilísticos prospectivos, no asesoramiento financiero, legal o de inversión garantizado. El uso de esta inteligencia estratégica para la toma de decisiones corporativas es bajo la exclusiva responsabilidad del operador.
+    </div>
+
+    <div class="footer-tech" style="margin-top: 30px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444; text-align: center;">
         CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026.
     </div>
 </div>
 
 <script>
  window.onload = function() {
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get('nombre') || "OPERADOR GXP";
+    // 🔒 SEGURIDAD: Leer el nombre desde localStorage en lugar de la URL
+    const storedName = localStorage.getItem('vault_user_nombre');
+    const name = storedName ? storedName : "OPERADOR GXP";
     document.getElementById('user-name').innerText = name.toUpperCase();
 
+    // 📥 EXTRAER DATOS EN TIEMPO REAL DEL SIMULADOR GÉNESIS
     const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
+    
     if(data) {
-        // Actualización de cabecera y métricas
+        // Actualización de cabecera y métricas exactas que vio el usuario
         if(document.getElementById('display-range')) document.getElementById('display-range').innerText = data.rango || "PERIODO ESTÁNDAR";
-        if(document.getElementById('val-cap')) document.getElementById('val-cap').innerText = data.cap || "+24.8%";
-        if(document.getElementById('val-risk')) document.getElementById('val-risk').innerText = data.risk || "-12.0%";
-        if(document.getElementById('val-neg')) document.getElementById('val-neg').innerText = data.neg || "+18.5%";
-        if(document.getElementById('display-status')) document.getElementById('display-status').innerText = data.estado || "EXPANSIÓN";
+        if(document.getElementById('val-cap')) document.getElementById('val-cap').innerText = data.cap || "--";
+        if(document.getElementById('val-risk')) document.getElementById('val-risk').innerText = data.risk || "--";
+        if(document.getElementById('val-neg')) document.getElementById('val-neg').innerText = data.neg || "--";
+        if(document.getElementById('display-status')) document.getElementById('display-status').innerText = data.estado || "ANÁLISIS COMPLETADO";
 
-        // Lógica de texto dinámico según el estado
+        // Lógica de texto dinámico y traducción operativa para el reporte
         const pTexto = document.getElementById('proyeccion-texto');
+        const estCap = document.getElementById('est-cap');
+        const estNeg = document.getElementById('est-neg');
+        const estRisk = document.getElementById('est-risk');
+
         if(data.estado && data.estado.includes("PRECAUCIÓN")) {
-            pTexto.innerHTML = "Se ha detectado una <strong>VOLATILIDAD ESTRUCTURAL</strong> elevada en el rango seleccionado. Se recomienda la liquidación parcial de posiciones y el refugio en activos de baja correlación hasta el cierre del ciclo actual.";
+            pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los algoritmos detectan una <strong>VOLATILIDAD ESTRUCTURAL</strong> crítica. <br><br><strong>ACCIÓN SUGERIDA:</strong> Se recomienda la congelación de contrataciones agresivas, liquidación de posiciones de alto riesgo y refugio en activos de baja correlación. Las negociaciones enfrentarán fricción; priorice la defensa de márgenes sobre el volumen de cierre.`;
             pTexto.style.color = "var(--alert)";
+            
+            // Ajustar la tabla para modo riesgo
+            estCap.innerText = "Protección de Capital";
+            estNeg.innerText = "Negociación Conservadora";
+            estRisk.innerText = "Mitigación Activa";
+            
         } else {
-            pTexto.innerHTML = "Los ciclos confirman una <strong>SINCRONÍA ÓPTIMA</strong> para el periodo analizado. Es un periodo ideal para el escalamiento de capital y la expansión de operaciones bajo el protocolo GXP.";
+            pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los ciclos confirman una <strong>SINCRONÍA ÓPTIMA</strong>. <br><br><strong>ACCIÓN SUGERIDA:</strong> Es un momento ideal para el escalamiento agresivo de capital y la expansión operativa. Se recomienda adelantar firmas de contratos y despliegue de presupuestos. El clima favorece la aceptación de sus términos comerciales.`;
             pTexto.style.color = "#ccc";
+            
+            // Ajustar la tabla para modo expansión
+            estCap.innerText = "Inversión Agresiva";
+            estNeg.innerText = "Aceleración de Cierres";
+            estRisk.innerText = "Asunción Controlada";
         }
+    } else {
+        document.getElementById('display-range').innerText = "ERROR DE SINCRONIZACIÓN. REGRESE A LA TERMINAL.";
+        document.getElementById('display-range').style.color = "var(--alert)";
     }
 }
 </script>
-    <div style="text-align: center; margin-top: 50px; padding: 20px; border-top: 1px solid #222; font-size: 0.55rem; color: #555; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
-    <strong>Aviso Legal y de Riesgo:</strong> Vault Logic Terminal proporciona análisis basados en ciclos matemáticos y efemérides astronómicas (NASA JPL DE441). Las métricas presentadas (ROI, Riesgo, Sincronía) constituyen modelos probabilísticos prospectivos, no asesoramiento financiero, legal o de inversión garantizado. El uso de esta inteligencia estratégica para la toma de decisiones corporativas es bajo la exclusiva responsabilidad del operador.
-</div>
 </body>
 </html>
