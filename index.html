@@ -104,15 +104,7 @@
     © 2026 VAULT LOGIC - Executive Intelligence Suite
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-// === INSERTA AQUÍ TUS CREDENCIALES DE SUPABASE ===
-const supabaseUrl = 'hfyzgwjoivxvzkyfnrlo'; 
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeXpnd2pvaXZ4dnpreWZucmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NTQ4MzAsImV4cCI6MjA4NjQzMDgzMH0.g3h3IJWsSnykuBiDAx9J7AAau9zDcmUUM14e2pezIg8';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-// =================================================
-
 let modoVIP = false;
 
 function toggleModo(forzarVIP = false) {
@@ -159,10 +151,32 @@ async function consultar() {
         resCuerpo.innerText = "Ingrese un formato de email válido.";
         return;
     }
-    if (passInput.length < 6) {
+    if (passInput.length < 4) {
         resContainer.classList.remove('hidden');
         resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
-        resCuerpo.innerText = "La contraseña requiere al menos 6 caracteres por seguridad del núcleo.";
+        resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
+        return;
+    }
+
+    const payload = modoVIP ? { 
+        email: emailInput, 
+        password: passInput, 
+        login_only: true 
+    } : {
+        nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+        email: emailInput,
+        password: passInput,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+        lat: document.getElementById('lat').value,
+        lon: document.getElementById('lon').value
+    };
+
+    if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "DATOS INCOMPLETOS:";
+        resCuerpo.innerText = "Complete los parámetros de nacimiento.";
         return;
     }
 
@@ -171,71 +185,31 @@ async function consultar() {
     resContainer.classList.remove('hidden');
 
     try {
-        if (modoVIP) {
-            // LOGIN DIRECTO A SUPABASE
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: emailInput,
-                password: passInput,
-            });
+        // ENVIAMOS LOS DATOS A TU SERVIDOR SEGURO (RENDER)
+        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
 
-            if (error) {
-                btn.disabled = false;
-                btn.innerText = "Vincular con el Núcleo";
-                resTitulo.innerHTML = "ACCESO DENEGADO";
-                resCuerpo.innerHTML = "Credenciales incorrectas o terminal no autorizada.";
-            } else {
-                resTitulo.innerHTML = "ACCESO AUTORIZADO";
-                resCuerpo.innerHTML = "Vínculo establecido. Abriendo Terminal Génesis...";
-                setTimeout(() => {
-                    // REDIRECCIÓN A TU NUEVO PANEL
-                    window.location.href = `genesis-live.html?email=${encodeURIComponent(emailInput)}`;
-                }, 1200);
-            }
+        const data = await respuesta.json();
+        
+        if (data.status === "success" || data.status === "exists") {
+            resTitulo.innerHTML = "ACCESO AUTORIZADO";
+            resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
+            setTimeout(() => {
+                window.location.href = `genesis-live.html?email=${encodeURIComponent(emailInput)}`;
+            }, 1200);
         } else {
-            // REGISTRO DIRECTO A SUPABASE
-            const nombre = document.getElementById('nombre').value.trim().toUpperCase();
-            const lugar = document.getElementById('lugar').value.trim().toUpperCase();
-            const fecha = document.getElementById('fecha').value;
-            const hora = document.getElementById('hora').value;
-
-            if (!fecha || !lugar || !nombre) {
-                btn.disabled = false;
-                btn.innerText = "Iniciar Secuencia de Cálculo";
-                resTitulo.innerText = "DATOS INCOMPLETOS:";
-                resCuerpo.innerText = "Complete los parámetros de nacimiento obligatorios.";
-                return;
-            }
-
-            const { data, error } = await supabase.auth.signUp({
-                email: emailInput,
-                password: passInput,
-                options: { 
-                    data: { 
-                        nombre: nombre, 
-                        lugar: lugar, 
-                        fecha: fecha,
-                        hora: hora
-                    } 
-                }
-            });
-
-            if (error) {
-                btn.disabled = false;
-                btn.innerText = "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR DE SISTEMA";
-                resCuerpo.innerHTML = error.message;
-            } else {
-                resTitulo.innerHTML = "TERMINAL REGISTRADA";
-                resCuerpo.innerHTML = "Registro exitoso. Revise su correo si requiere confirmación, o intente ingresar en modo VIP.";
-                btn.disabled = false;
-                btn.innerText = "Secuencia Completa";
-            }
+            btn.disabled = false;
+            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
+            resTitulo.innerHTML = "ACCESO DENEGADO";
+            resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
         }
     } catch (error) {
         btn.disabled = false;
         resTitulo.innerHTML = "ERROR CRÍTICO";
-        resCuerpo.innerHTML = "Fallo de conexión con la base de datos central.";
-        console.error(error);
+        resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
     }
 }
 
@@ -270,5 +244,6 @@ lugarInput.addEventListener('input', async (e) => {
 
 document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
 </script>
+
 </body>
 </html>
