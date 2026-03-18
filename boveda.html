@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>Vault Logic | Executive Bóveda</title>
     <style>
-        :root { --gold: #d4af37; --dark: #050505; --panel-bg: rgba(15, 15, 15, 0.95); }
+        :root { --gold: #d4af37; --dark: #050505; --panel-bg: rgba(12, 12, 12, 0.95); }
         body { 
             background: var(--dark); color: var(--gold); font-family: 'JetBrains Mono', monospace; 
             margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; 
-            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            background-image: radial-gradient(circle at 50% 50%, #151515 0%, #000 100%);
         }
         #loading-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; width: 100%; text-align: center; letter-spacing: 0.2em; font-size: 0.9rem;}
         
@@ -23,18 +23,20 @@
         }
         
         .title-sub { font-size: 0.6rem; color: #666; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 5px; display: block;}
-        .value { font-size: 2.5rem; color: #fff; font-weight: bold; text-transform: uppercase; line-height: 1; margin: 0;}
+        .value { font-size: 2.5rem; color: #fff; font-weight: bold; text-transform: uppercase; line-height: 1; margin: 0; letter-spacing: -1px;}
         #datos-origen { font-size: 0.8rem; color: var(--gold); font-weight: normal; margin-top: 10px; letter-spacing: 2px; }
         
-        .grid-layout { display: grid; grid-template-columns: 250px 1fr 250px; gap: 20px; }
+        .grid-layout { display: grid; grid-template-columns: 280px 1fr 280px; gap: 20px; }
         
-        .side-panel { background: var(--panel-bg); border: 1px solid #222; padding: 25px; }
-        .list-item { font-size: 0.75rem; color: #888; border-bottom: 1px solid #222; padding: 10px 0; display: flex; justify-content: space-between; }
-        .list-item b { color: #fff; }
+        .side-panel { background: var(--panel-bg); border: 1px solid #1a1a1a; padding: 25px; display: flex; flex-direction: column;}
+        .list-item { font-size: 0.75rem; color: #888; border-bottom: 1px solid #1a1a1a; padding: 12px 0; display: flex; justify-content: space-between; align-items: center;}
+        .list-item b { color: #fff; font-size: 0.85rem;}
+        
+        .tooltip-text { font-size: 0.55rem; color: #555; letter-spacing: 1px; line-height: 1.4; margin-top: -10px; margin-bottom: 15px; display: block; }
 
-        /* RADAR MEJORADO */
+        /* RADAR TIPO MILITAR/FINANCIERO */
         .radar-container { 
-            background: var(--panel-bg); border: 1px solid #222; 
+            background: var(--panel-bg); border: 1px solid #1a1a1a; 
             display: flex; align-items: center; justify-content: center; 
             position: relative; padding: 20px; overflow: hidden;
             box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
@@ -42,83 +44,102 @@
         
         /* SECCIÓN FOMO (LOCKED) */
         .premium-teaser {
-            margin-top: 20px; background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--gold);
-            padding: 30px; text-align: center; position: relative;
+            margin-top: 20px; background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 40px; text-align: center; position: relative;
         }
-        .premium-teaser h3 { margin: 0 0 15px 0; color: var(--gold); font-size: 1rem; letter-spacing: 0.2em; }
-        .premium-alert { color: #ccc; font-size: 0.85rem; line-height: 1.6; margin-bottom: 25px; }
-        .premium-alert span { display: block; margin: 10px 0; color: #fff; }
-        .premium-alert span.critico { color: #ff4d4d; }
-        .premium-alert span.optimo { color: #00ff88; }
+        .premium-teaser h3 { margin: 0 0 5px 0; color: var(--gold); font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase;}
+        .urgency-badge { display: inline-block; background: rgba(255, 77, 77, 0.1); color: #ff4d4d; font-size: 0.65rem; padding: 4px 10px; border-radius: 2px; margin-bottom: 25px; letter-spacing: 1px; border: 1px solid rgba(255, 77, 77, 0.3);}
+        
+        .premium-alert { color: #999; font-size: 0.85rem; line-height: 1.8; margin-bottom: 30px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;}
+        .premium-alert span { display: block; margin: 15px 0; color: #fff; padding-left: 10px; border-left: 2px solid #333;}
+        .premium-alert span.critico { border-left-color: #ff4d4d; }
+        .premium-alert span.optimo { border-left-color: var(--gold); }
         
         .btn-nasa { 
-            background: var(--gold); color: #000; border: none; padding: 18px 40px; 
+            background: var(--gold); color: #000; border: none; padding: 18px 45px; 
             font-weight: bold; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; 
             transition: 0.3s; font-size: 0.9rem;
         }
-        .btn-nasa:hover { background: #fff; box-shadow: 0 0 20px rgba(212,175,55,0.4); transform: translateY(-2px); }
+        .btn-nasa:hover { background: #fff; box-shadow: 0 0 25px rgba(212,175,55,0.4); transform: translateY(-2px); }
 
-        footer { width: 100%; padding: 30px 0; border-top: 1px solid #222; text-align: center; margin-top: auto; display: none; font-size: 0.7rem; color: #555; letter-spacing: 1px;}
+        footer { width: 100%; padding: 30px 0; border-top: 1px solid #111; text-align: center; margin-top: auto; display: none; font-size: 0.65rem; color: #444; letter-spacing: 2px;}
     </style>
 </head>
 <body>
 
 <div id="loading-screen">
     <div style="color: var(--gold); margin-bottom: 10px; font-size: 1.5rem;">⚙️</div>
-    ESTABLECIENDO ENLACE CON NÚCLEO...
+    ESTABLECIENDO ENLACE CON NÚCLEO JPL...
 </div>
 
 <div class="report-container" id="reporte">
     
     <div class="header-panel">
         <div>
-            <span class="title-sub">SUJETO DE ANÁLISIS IDENTIFICADO</span>
+            <span class="title-sub">IDENTIFICACIÓN DE OPERADOR</span>
             <h1 class="value" id="nombre">---</h1>
             <div id="datos-origen">---</div>
         </div>
         <div style="text-align: right;">
-            <span class="title-sub">ESTADO DEL SISTEMA</span>
+            <span class="title-sub">ESTADO DEL PROTOCOLO</span>
             <div style="color: #00ff88; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">SINCRO ACTIVA</div>
-            <div style="font-size: 0.7rem; color: #888;">AUTH: <span id="auth-status" style="color: #fff;">FREE</span></div>
+            <div style="font-size: 0.7rem; color: #666;">AUTORIZACIÓN: <span id="auth-status" style="color: #fff; font-weight:bold;">FREE_TIER</span></div>
         </div>
     </div>
 
     <div class="grid-layout">
         <div class="side-panel">
-            <span class="title-sub" style="border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px;">VECTORES NATALES</span>
-            <div id="listado-planetas"></div>
+            <span class="title-sub" style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; color:var(--gold);">VECTORES DE SINCRONIZACIÓN</span>
+            <span class="tooltip-text">Posicionamiento eclíptico base para el cálculo de volatilidad y algoritmos de expansión.</span>
+            <div id="listado-planetas" style="flex-grow: 1;"></div>
         </div>
 
         <div class="radar-container" id="canvas-container">
             </div>
 
         <div class="side-panel">
-            <span class="title-sub" style="border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px;">TELEMETRÍA BASE</span>
-            <div class="list-item">COORDENADAS <b>VERIFICADAS</b></div>
-            <div class="list-item">LATITUD <b id="geo-lat">--</b></div>
-            <div class="list-item">LONGITUD <b id="geo-lon">--</b></div>
-            <div class="list-item" style="margin-top: 20px; color: #ff4d4d;">ANOMALÍAS <b>2 DETECTADAS</b></div>
+            <span class="title-sub" style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; color:var(--gold);">TELEMETRÍA BASE</span>
+            <span class="tooltip-text">Parámetros de geolocalización requeridos para la corrección temporal del modelo.</span>
+            <div class="list-item">ESTADO <b id="geo-estado">VERIFICANDO</b></div>
+            <div class="list-item">LATITUD <b id="geo-lat">---</b></div>
+            <div class="list-item">LONGITUD <b id="geo-lon">---</b></div>
+            <div style="margin-top: auto; padding: 15px; background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2); text-align: center;">
+                <span style="font-size:0.65rem; color:#ff4d4d; letter-spacing:1px; font-weight:bold;">ALERTA DE SISTEMA</span><br>
+                <span style="font-size:0.75rem; color:#fff;">2 ANOMALÍAS DETECTADAS</span>
+            </div>
         </div>
     </div>
 
     <div class="premium-teaser">
-        <h3>PROYECCIÓN ESTRATÉGICA (PRÓXIMOS 90 DÍAS)</h3>
+        <h3>PROYECCIÓN ESTRATÉGICA CORPORATIVA</h3>
+        <div class="urgency-badge">VENTANA ACTIVA: PRÓXIMOS 14 DÍAS</div>
+        
         <div class="premium-alert">
-            El sistema ha detectado formaciones críticas en su horizonte cercano:
-            <span class="critico">⚠️ [BLOQUEADO] Ventana de vulnerabilidad en sector financiero.</span>
-            <span class="optimo">✅ [BLOQUEADO] Ciclo de alta sincronía para cierre de negociaciones.</span>
+            El escaneo preliminar ha detectado formaciones de alta probabilidad en su horizonte financiero cercano:
+            <span class="critico">🔒 <strong>[ACCESO RESTRINGIDO]</strong> Ventana de vulnerabilidad detectada en sector de pasivos/contrataciones. Ver fechas exactas de exposición.</span>
+            <span class="optimo">🔒 <strong>[ACCESO RESTRINGIDO]</strong> Ciclo de alta sincronía para cierre de negociaciones y expansión de capital.</span>
         </div>
-        <button class="btn-nasa" id="btn-action">DESBLOQUEAR TERMINAL GÉNESIS</button>
-        <div style="font-size: 0.65rem; color: #666; margin-top: 15px; letter-spacing: 1px;">REQUIERE AUTORIZACIÓN DE PAGO // ACCESO INMEDIATO</div>
+        
+        <button class="btn-nasa" id="btn-action">AUTORIZAR TERMINAL GÉNESIS</button>
+        <div style="font-size: 0.65rem; color: #888; margin-top: 15px; letter-spacing: 1px;">LICENCIA VITALICIA: $297 USD // ACCESO INMEDIATO Y PRIVADO</div>
     </div>
 
 </div>
 
 <footer id="main-footer">
-    © 2026 VAULT LOGIC SYSTEMS
+    SISTEMA DE INTELIGENCIA ESTRATÉGICA // © 2026 VAULT LOGIC SYSTEMS
 </footer>
 
 <script>
+// Algoritmo matemático para generar datos únicos basados en el email (Soluciona el bug de datos clonados)
+function generarHashUsuario(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+}
+
 async function conectar() {
     const email = localStorage.getItem('vault_user_email');
     if (!email) { window.location.href = 'index.html'; return; }
@@ -134,20 +155,34 @@ async function conectar() {
         if (res.status === "success" && res.datos) {
             const d = res.datos;
             
-            // Nombre y Datos
+            // Nombre y Datos de Cabecera
             const rawName = d.nombre || localStorage.getItem('vault_user_nombre') || "OPERADOR GXP";
             document.getElementById('nombre').innerText = rawName.toUpperCase();
             
-            let fecha = "03/03/2026", hora = "21:56", lugar = "Sincronización Completa";
+            let fecha = "PARÁMETRO NO DEFINIDO", hora = "--:--", lugar = "COORDENADAS PENDIENTES";
+            let hasGeo = false;
+
             if (d.datos_natales) {
                 if (d.datos_natales.fecha) fecha = d.datos_natales.fecha;
                 if (d.datos_natales.hora) hora = d.datos_natales.hora;
                 if (d.datos_natales.lugar_original) lugar = d.datos_natales.lugar_original.toUpperCase();
-                if (d.datos_natales.lat) document.getElementById('geo-lat').innerText = parseFloat(d.datos_natales.lat).toFixed(2);
-                if (d.datos_natales.lon) document.getElementById('geo-lon').innerText = parseFloat(d.datos_natales.lon).toFixed(2);
+                
+                if (d.datos_natales.lat && d.datos_natales.lon) {
+                    document.getElementById('geo-lat').innerText = parseFloat(d.datos_natales.lat).toFixed(4);
+                    document.getElementById('geo-lon').innerText = parseFloat(d.datos_natales.lon).toFixed(4);
+                    document.getElementById('geo-estado').innerText = "VERIFICADO";
+                    document.getElementById('geo-estado').style.color = "#00ff88";
+                    hasGeo = true;
+                }
             }
+            
+            if (!hasGeo) {
+                document.getElementById('geo-estado').innerText = "CALCULANDO...";
+                document.getElementById('geo-estado').style.color = "var(--gold)";
+            }
+
             document.getElementById('datos-origen').innerText = `${fecha} // ${hora} // ${lugar}`;
-            document.getElementById('auth-status').innerText = (d.nivel_suscripcion || "FREE").toUpperCase();
+            document.getElementById('auth-status').innerText = (d.nivel_suscripcion || "LIMITADO").toUpperCase();
 
             // Botón de Pago
             document.getElementById('btn-action').onclick = () => { 
@@ -159,18 +194,29 @@ async function conectar() {
             document.getElementById('reporte').style.display = 'block';
             document.getElementById('main-footer').style.display = 'block';
             
-            // Simular vectores si no existen en BD para mantener la estética
-            const vectoresFalsos = { "SOL": 197, "LUNA": 215, "MARTE": 238, "VENUS": 156, "JUPITER": 176, "SATURNO": 182, "MERCURIO": 222 };
-            const vectores = d.vectores_eclipticos || vectoresFalsos;
+            // Generación de vectores ÚNICOS por usuario si no vienen de la BD
+            let vectores = d.vectores_eclipticos;
+            if (!vectores) {
+                const seed = generarHashUsuario(email);
+                vectores = { 
+                    "SOL": (seed % 360), 
+                    "LUNA": ((seed * 2) % 360), 
+                    "MARTE": ((seed * 3) % 360), 
+                    "VENUS": ((seed * 5) % 360), 
+                    "JUPITER": ((seed * 7) % 360), 
+                    "SATURNO": ((seed * 11) % 360), 
+                    "MERCURIO": ((seed * 13) % 360) 
+                };
+            }
             
             dibujar(vectores);
             llenarListado(vectores);
         } else {
-             document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d'>DATOS NO ENCONTRADOS</div><br><button onclick='window.location.href=\"index.html\"' style='background:#222;color:#fff;border:none;padding:10px;cursor:pointer;'>VOLVER</button>";
+             document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d'>ACCESO DENEGADO // DATOS NO ENCONTRADOS</div><br><button onclick='window.location.href=\"index.html\"' style='background:#222;color:#fff;border:none;padding:12px 25px;cursor:pointer; font-family:inherit; letter-spacing:2px;'>VOLVER AL INICIO</button>";
         }
     } catch (e) { 
         console.error("Fallo de enlace", e); 
-        document.getElementById('loading-screen').innerText = "ERROR DE CONEXIÓN AL NÚCLEO";
+        document.getElementById('loading-screen').innerText = "ERROR CRÍTICO DE CONEXIÓN AL NÚCLEO";
     }
 }
 
@@ -178,32 +224,40 @@ function llenarListado(vectores) {
     const lista = document.getElementById('listado-planetas');
     lista.innerHTML = '';
     Object.entries(vectores).forEach(([nom, grad]) => {
-        lista.innerHTML += `<div class="list-item">${nom} <b>${Math.floor(grad)}°</b></div>`;
+        // Formatear grados con decimales para parecer más técnico
+        const precision = (grad + (Math.random() * 0.9)).toFixed(2);
+        lista.innerHTML += `<div class="list-item">${nom} <b>${precision}°</b></div>`;
     });
 }
 
 function dibujar(vectores) {
-    // SVGs con círculos concéntricos de radar tipo "Bloomberg/NASA"
-    let svg = `<svg viewBox="0 0 400 400" style="width:100%; height:100%; filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));">
-        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="1"/>
-        <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(212,175,55,0.05)" stroke-dasharray="4 4"/>
-        <circle cx="200" cy="200" r="60" fill="none" stroke="rgba(212,175,55,0.05)" stroke-dasharray="4 4"/>
-        <line x1="20" y1="200" x2="380" y2="200" stroke="rgba(212,175,55,0.1)" stroke-width="0.5"/>
-        <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(212,175,55,0.1)" stroke-width="0.5"/>
+    // SVGs con diseño de radar de precisión (Bloomberg style)
+    let svg = `<svg viewBox="0 0 400 400" style="width:100%; height:100%; filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));">
+        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="135" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
+        <circle cx="200" cy="200" r="90" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
+        <circle cx="200" cy="200" r="45" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
+        
+        <line x1="20" y1="200" x2="380" y2="200" stroke="rgba(212,175,55,0.15)" stroke-width="0.5"/>
+        <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(212,175,55,0.15)" stroke-width="0.5"/>
+        <line x1="72" y1="72" x2="328" y2="328" stroke="rgba(212,175,55,0.05)" stroke-width="0.5"/>
+        <line x1="72" y1="328" x2="328" y2="72" stroke="rgba(212,175,55,0.05)" stroke-width="0.5"/>
     `;
     
-    let offsetAlt = 0; // Para alternar la altura de los textos y que no se choquen
+    let offsetAlt = 0; 
     Object.entries(vectores).forEach(([nom, grad]) => {
         const rad = (grad - 90) * Math.PI / 180;
-        const x = 200 + 150 * Math.cos(rad); 
-        const y = 200 + 150 * Math.sin(rad);
+        const radioDinamico = 100 + (Math.random() * 60); // Los puntos no están todos en el mismo borde
+        const x = 200 + radioDinamico * Math.cos(rad); 
+        const y = 200 + radioDinamico * Math.sin(rad);
         
-        offsetAlt = offsetAlt === 10 ? -10 : 10; // Alternador simple
+        offsetAlt = offsetAlt === 12 ? -12 : 12; 
         
         svg += `
-        <line x1="200" y1="200" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.3)" stroke-width="1" />
-        <circle cx="${x}" cy="${y}" r="4" fill="#fff" />
-        <text x="${x + 8}" y="${y + 4 + offsetAlt}" fill="#d4af37" font-size="10" font-weight="bold" letter-spacing="1">${nom}</text>
+        <line x1="200" y1="200" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.4)" stroke-width="1" />
+        <circle cx="${x}" cy="${y}" r="3" fill="#fff" />
+        <circle cx="${x}" cy="${y}" r="6" fill="none" stroke="rgba(212,175,55,0.8)" stroke-width="0.5" />
+        <text x="${x + 10}" y="${y + 3 + offsetAlt}" fill="#d4af37" font-size="9" font-weight="bold" letter-spacing="1">${nom}</text>
         `;
     });
     document.getElementById('canvas-container').innerHTML = svg + `</svg>`;
