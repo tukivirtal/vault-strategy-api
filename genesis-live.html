@@ -97,10 +97,18 @@
 </div>
 
 <script>
+    // 🔒 SEGURIDAD: Leer el email desde localStorage, no desde la URL
+    const userEmail = localStorage.getItem('vault_user_email');
+    
+    // Si no hay usuario logueado, lo expulsamos por seguridad
+    if (!userEmail) {
+        window.location.href = 'index.html';
+    }
+    
+    // Extraemos el nombre antes del @
+    const userName = userEmail ? userEmail.split('@')[0].toUpperCase() : "OPERADOR GXP";
+
     let mainChart, miniChart, donutChart;
-    const urlParams = new URLSearchParams(window.location.search);
-    const userEmail = urlParams.get('email') || "OPERADOR GXP";
-    const userName = userEmail.split('@')[0].toUpperCase();
 
     function init() {
         document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
