@@ -41,7 +41,7 @@ async def read_index():
 async def consultar(data: LoginData):
     try:
         if data.login_only:
-            # Buscamos en tu tabla 'clientes_vip', NO en el sistema Auth
+            # === MODO VIP (LOGIN) ===
             res = supabase.table("clientes_vip").select("*").eq("email", data.email).execute()
             
             if len(res.data) > 0:
@@ -51,37 +51,49 @@ async def consultar(data: LoginData):
                 if "password" in usuario and str(usuario["password"]) != str(data.password):
                     return {"status": "error", "analisis_ejecutivo": "Contraseña estratégica incorrecta."}
                 
-                # === ENRUTAMIENTO INTELIGENTE ===
-                # Extraemos el plan. Si no tiene, se le asigna 'free' por defecto.
+                # Extraemos el plan. Si no tiene, se le asigna 'free'
                 suscripcion = usuario.get("nivel_suscripcion", "free")
                 
-                return {"status": "success", "nivel_suscripcion": suscripcion}
+                # AQUÍ ESTÁ LA MAGIA DEL NOMBRE:
+                # Extraemos el nombre de la BD y se lo pasamos al navegador
+                nombre_usuario = usuario.get("nombre", "OPERADOR GXP")
+                
+                return {
+                    "status": "success", 
+                    "nivel_suscripcion": suscripcion,
+                    "nombre": nombre_usuario
+                }
             else:
                 return {"status": "error", "analisis_ejecutivo": "El email no se encuentra en la base de datos VIP."}
         
         else:
-            # Lógica de Registro
+            # === MODO NUEVA TERMINAL (REGISTRO) ===
             nuevo_usuario = {
-               "email": data.email,
+                "email": data.email,
                 "password": data.password, 
                 "nombre": data.nombre,
                 "datos_natales": {
                     "fecha": data.fecha,
                     "hora": data.hora,
                     "lugar_original": data.lugar,
-                    "lat": data.lat,  # <--- ESTO FALTABA
-                    "lon": data.lon   # <--- ESTO FALTABA
+                    "lat": data.lat,  
+                    "lon": data.lon   
                 },
                 "nivel_suscripcion": "free"
             }
             supabase.table("clientes_vip").insert(nuevo_usuario).execute()
             
-            # Al registrarse, por defecto es free
-            return {"status": "success", "nombre", "nivel_suscripcion": "free"}
+            # Al registrarse, el navegador ya tiene el nombre que el usuario escribió, 
+            # pero por las dudas también se lo enviamos limpio.
+            return {
+                "status": "success", 
+                "nivel_suscripcion": "free",
+                "nombre": data.nombre
+            }
             
     except Exception as e:
         print(f"🚨 ERROR CRÍTICO DETECTADO: {str(e)}")
-        return {"status": "error", "analisis_ejecutivo": f"Fallo en la tabla: {str(e)}"}
+        return {"status": "error", "analisis_ejecutivo": f"Fallo en el núcleo: {str(e)}"}
 
 # === NUEVA RUTA PARA REVIVIR BOVEDA.HTML ===
 @app.post("/obtener_perfil")
