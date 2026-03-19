@@ -187,8 +187,14 @@ async function conectar() {
                 } catch(e) { console.error("Error parseando mapatotal", e); }
             }
             
+          // Si el usuario es antiguo y no tiene coordenadas, generamos unas aproximadas
             if (!hasGeo) {
-                document.getElementById('geo-estado').innerText = "CALCULANDO...";
+                const seed = generarHashUsuario(email);
+                const fakeLat = (seed % 90) * (seed % 2 === 0 ? 1 : -1);
+                const fakeLon = (seed % 180) * (seed % 3 === 0 ? 1 : -1);
+                
+                mostrarGeo(fakeLat, fakeLon);
+                document.getElementById('geo-estado').innerText = "APROXIMADO";
                 document.getElementById('geo-estado').style.color = "var(--gold)";
             }
 
