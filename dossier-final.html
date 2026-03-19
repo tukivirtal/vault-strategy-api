@@ -127,47 +127,57 @@
         CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026.
     </div>
 </div>
-
 <script>
  window.onload = function() {
-    // 🔒 SEGURIDAD: Leer el nombre desde localStorage en lugar de la URL
     const storedName = localStorage.getItem('vault_user_nombre');
     const name = storedName ? storedName : "OPERADOR GXP";
     document.getElementById('user-name').innerText = name.toUpperCase();
 
-    // 📥 EXTRAER DATOS EN TIEMPO REAL DEL SIMULADOR GÉNESIS
     const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
     
     if(data) {
-        // Actualización de cabecera y métricas exactas que vio el usuario
         if(document.getElementById('display-range')) document.getElementById('display-range').innerText = data.rango || "PERIODO ESTÁNDAR";
         if(document.getElementById('val-cap')) document.getElementById('val-cap').innerText = data.cap || "--";
         if(document.getElementById('val-risk')) document.getElementById('val-risk').innerText = data.risk || "--";
         if(document.getElementById('val-neg')) document.getElementById('val-neg').innerText = data.neg || "--";
         if(document.getElementById('display-status')) document.getElementById('display-status').innerText = data.estado || "ANÁLISIS COMPLETADO";
 
-        // Lógica de texto dinámico y traducción operativa para el reporte
         const pTexto = document.getElementById('proyeccion-texto');
         const estCap = document.getElementById('est-cap');
         const estNeg = document.getElementById('est-neg');
         const estRisk = document.getElementById('est-risk');
+        
+        // Elementos de la matriz para cambiar color
+        const indCap = document.getElementById('val-cap').previousElementSibling; 
+        const indNeg = document.getElementById('val-neg').previousElementSibling;
+        const indRisk = document.getElementById('val-risk').previousElementSibling;
 
-        if(data.estado && data.estado.includes("PRECAUCIÓN")) {
+        // AQUÍ ESTABA EL BUG: Ahora busca la palabra "DEFENSIVA" o "RIESGO"
+        if(data.estado && (data.estado.includes("DEFENSIVA") || data.estado.includes("RIESGO"))) {
             pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los algoritmos detectan una <strong>VOLATILIDAD ESTRUCTURAL</strong> crítica. <br><br><strong>ACCIÓN SUGERIDA:</strong> Se recomienda la congelación de contrataciones agresivas, liquidación de posiciones de alto riesgo y refugio en activos de baja correlación. Las negociaciones enfrentarán fricción; priorice la defensa de márgenes sobre el volumen de cierre.`;
             pTexto.style.color = "var(--alert)";
             
-            // Ajustar la tabla para modo riesgo
             estCap.innerText = "Protección de Capital";
-            estNeg.innerText = "Negociación Conservadora";
-            estRisk.innerText = "Mitigación Activa";
+            indCap.innerText = "ALERTA DE LIQUIDEZ";
+            indCap.style.color = "var(--alert)"; // Se pone rojo
             
+            estNeg.innerText = "Negociación Conservadora";
+            indNeg.innerText = "ALTA FRICCIÓN";
+            indNeg.style.color = "var(--alert)";
+            
+            estRisk.innerText = "Mitigación Activa";
         } else {
             pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los ciclos confirman una <strong>SINCRONÍA ÓPTIMA</strong>. <br><br><strong>ACCIÓN SUGERIDA:</strong> Es un momento ideal para el escalamiento agresivo de capital y la expansión operativa. Se recomienda adelantar firmas de contratos y despliegue de presupuestos. El clima favorece la aceptación de sus términos comerciales.`;
             pTexto.style.color = "#ccc";
             
-            // Ajustar la tabla para modo expansión
             estCap.innerText = "Inversión Agresiva";
+            indCap.innerText = "OPORTUNIDAD VIGENTE";
+            indCap.style.color = "var(--safe)"; // Se pone verde
+            
             estNeg.innerText = "Aceleración de Cierres";
+            indNeg.innerText = "FLUCTUACIÓN MODERADA";
+            indNeg.style.color = "var(--gold)";
+            
             estRisk.innerText = "Asunción Controlada";
         }
     } else {
