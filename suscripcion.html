@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Vault Logic | Protocolos de Acceso</title>
+    <title>Vault Logic | Autorización de Acceso</title>
     <script>
         (function() {
+            // Nota de Seguridad: El client-id de PayPal está ofuscado.
             const _c = "QVZ0aE9vMG4wbWpGLXliSUsyeFJteEtBTU5MUHVtRFJZWHhlUVBnZDBTMTNLNWVYTkNnYzQ1OHpqdmhkQXJ6RkZnam1HTWNENVF4d1Y2WEM=";
             const s = document.createElement('script');
             s.src = `https://www.paypal.com/sdk/js?client-id=${atob(_c)}&currency=USD&components=buttons&vault=true`;
@@ -14,89 +15,136 @@
     </script>
     
     <style>
-        :root { --gold: #d4af37; --dark-bg: #050505; --mate-card: rgba(12, 12, 12, 0.99); --white-text: #ffffff; }
-        body { background: radial-gradient(circle at center, #111 0%, var(--dark-bg) 100%); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .security-bar { font-size: 0.7rem; color: var(--white-text); letter-spacing: 0.4em; margin-bottom: 50px; border: 1px solid var(--gold); padding: 12px 35px; border-radius: 50px; background: rgba(0,0,0,0.8); }
-        header { text-align: center; margin-bottom: 70px; }
-        header h1 { letter-spacing: 0.8em; font-size: 1.6rem; font-weight: 300; margin-bottom: 15px; }
-        header p { color: #fff; font-size: 0.8rem; letter-spacing: 0.3em; font-weight: bold; }
+        :root { --gold: #d4af37; --dark-bg: #050505; --mate-card: rgba(12, 12, 12, 0.95); --white-text: #ffffff; --alert: #ff4d4d;}
+        body { background: radial-gradient(circle at top, #151515 0%, var(--dark-bg) 100%); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        .subscription-container { display: flex; flex-direction: column; gap: 25px; width: 100%; max-width: 800px; }
+        .security-bar { font-size: 0.65rem; color: #00ff88; letter-spacing: 0.3em; margin-bottom: 40px; border: 1px solid #00ff88; padding: 8px 20px; background: rgba(0, 255, 136, 0.05); display: inline-block;}
+        
+        header { text-align: center; margin-bottom: 50px; max-width: 800px; }
+        header h1 { letter-spacing: 0.5em; font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; color: var(--white-text); text-transform: uppercase;}
+        header p { color: #888; font-size: 0.85rem; letter-spacing: 0.1em; line-height: 1.6; }
+        
+        .subscription-container { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 900px; }
         
         .tier-card { 
-            background: var(--mate-card); border: 1px solid #222; padding: 45px; 
-            display: grid; grid-template-columns: 1fr 220px; gap: 35px; 
-            transition: all 0.4s ease; position: relative; cursor: default;
+            background: var(--mate-card); border: 1px solid #222; padding: 0; 
+            display: flex; flex-direction: row; align-items: stretch;
+            transition: all 0.3s ease; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .tier-card:hover { 
-            border-color: var(--gold); 
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
-            transform: translateY(-5px);
+        
+        .tier-card:hover { border-color: #444; transform: translateY(-3px); }
+        .tier-card.genesis:hover { border-color: var(--gold); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15); }
+
+        .tier-card.genesis { border: 1px solid var(--gold); }
+        
+        .badge-recomendado {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--gold); color: #000; font-size: 0.65rem; font-weight: bold;
+            padding: 4px 15px; letter-spacing: 2px; text-transform: uppercase;
         }
 
-        .tier-card.genesis { border: 2px solid var(--gold); background: linear-gradient(150deg, #0a0a0a 0%, #1a180a 100%); }
-        .tier-info h3 { margin: 0 0 15px 0; letter-spacing: 0.4em; font-size: 1.25rem; color: var(--white-text); }
-        .tier-description { font-size: 0.9rem; color: #ccc; line-height: 1.8; margin-bottom: 30px; text-align: justify; }
-        .price-section { display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 1px solid #222; padding-left: 35px; }
-        .price { font-size: 2.6rem; color: var(--white-text); font-weight: 200; }
-        .paypal-button-container { margin-top: 20px; width: 100%; min-height: 150px; z-index: 100; }
+        .tier-info { padding: 40px; flex-grow: 1; border-right: 1px solid #222; }
+        .tier-info h3 { margin: 0 0 10px 0; letter-spacing: 0.3em; font-size: 1.4rem; color: var(--white-text); }
+        .tier-subtitle { color: var(--gold); font-size: 0.75rem; margin-bottom: 20px; letter-spacing: 1px; display: block;}
         
-        footer { margin-top: 100px; padding: 40px; text-align: center; border-top: 1px solid #222; width: 100%; max-width: 800px; }
-        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
-        .footer-links a { color: #fff; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
+        .features-list { list-style: none; padding: 0; margin: 0; }
+        .features-list li { color: #ccc; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: flex-start; }
+        .features-list li::before { content: '■'; color: var(--gold); margin-right: 12px; font-size: 0.6rem; margin-top: 3px; }
+        .features-list.limited li::before { color: #444; }
+
+        .price-section { width: 280px; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); }
+        .price { font-size: 3rem; color: var(--white-text); font-weight: bold; margin-bottom: 5px;}
+        .price-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; text-align: center;}
+        
+        .paypal-button-container { width: 100%; min-height: 45px; z-index: 10; }
+        .secure-checkout { font-size: 0.6rem; color: #555; margin-top: 15px; display: flex; align-items: center; gap: 5px; }
+        
+        footer { margin-top: 60px; padding: 30px; text-align: center; border-top: 1px solid #222; width: 100%; max-width: 800px; }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; }
+        .footer-links a { color: #888; text-decoration: none; font-size: 0.75rem; letter-spacing: 1px; transition: 0.3s; }
         .footer-links a:hover { color: var(--gold); }
-        .copyright { color: #444; font-size: 0.6rem; letter-spacing: 4px; }
+        .copyright { color: #444; font-size: 0.6rem; letter-spacing: 3px; }
+
+        @media (max-width: 768px) {
+            .tier-card { flex-direction: column; }
+            .tier-info { border-right: none; border-bottom: 1px solid #222; padding: 30px; }
+            .price-section { width: 100%; padding: 30px; box-sizing: border-box; }
+        }
     </style>
 </head>
 <body>
 
-<div class="security-bar">AES-256 ENCRYPTED // END-TO-END CHECKOUT ACTIVE</div>
+<div class="security-bar">🔒 CONEXIÓN ENCRIPTADA // PASARELA SEGURA</div>
 
 <header>
-    <h1>MATRIZ DE ACCESO</h1>
-    <p>SELECCIONE NIVEL DE INTEGRACIÓN GXP</p>
+    <h1>Desbloquee su Ventaja Operativa</h1>
+    <p>La inteligencia de ciclos no es predicción, es matemática orbital. Seleccione su nivel de acceso al núcleo JPL y tome el control de su horizonte financiero antes de su próxima decisión crítica.</p>
 </header>
 
 <div class="subscription-container">
-    <div class="tier-card">
+    
+    <div class="tier-card genesis">
+        <div class="badge-recomendado">Nivel Director / CEO</div>
         <div class="tier-info">
-            <h3>SENTINEL</h3>
-            <p class="tier-description">Monitoreo activo de vectores diarios. El primer paso para asegurar la estabilidad operativa de su capital bajo protocolo NASA JPL.</p>
+            <h3>GÉNESIS</h3>
+            <span class="tier-subtitle">ARQUITECTURA DE ORIGEN // TERMINAL DE ESCRITORIO (.EXE)</span>
+            <ul class="features-list">
+                <li><strong>Terminal Estratégica Offline:</strong> Descarga del software ejecutable encriptado en AES-256.</li>
+                <li><strong>Dossier Executive Ilimitado:</strong> Exportación de reportes PDF para reuniones de junta.</li>
+                <li><strong>Traductor Operativo:</strong> Directivas claras (ej. "Congele contrataciones", "Acelere ventas").</li>
+                <li><strong>Proyección Decenal:</strong> Visualización de tendencias globales a 10 años.</li>
+            </ul>
         </div>
         <div class="price-section">
-            <span class="price">$15</span>
-            <div id="paypal-button-sentinel" class="paypal-button-container"></div>
+            <span class="price">$297</span>
+            <span class="price-sub">USD / Pago Único<br>(Licencia Vitalicia)</span>
+            <div id="paypal-button-genesis" class="paypal-button-container"></div>
+            <div class="secure-checkout">🛡️ Transacción protegida por PayPal</div>
         </div>
     </div>
 
     <div class="tier-card">
         <div class="tier-info">
             <h3>EXECUTIVE</h3>
-            <p class="tier-description">Inteligencia avanzada de tránsitos. Diseñado para optimizar flujos de capital mediante geometría predictiva y simulaciones.</p>
+            <span class="tier-subtitle" style="color:#888;">INTELIGENCIA AVANZADA DE TRÁNSITOS (ONLINE)</span>
+            <ul class="features-list">
+                <li><strong>Simulador Web a 30 días:</strong> Detección de ventanas de oportunidad a corto plazo.</li>
+                <li><strong>Matriz de Impacto:</strong> Visualización de Volatilidad, Negociación y Capital.</li>
+                <li>Actualización en tiempo real de cuadrantes.</li>
+            </ul>
         </div>
         <div class="price-section">
             <span class="price">$45</span>
+            <span class="price-sub">USD / Mensual</span>
             <div id="paypal-button-executive" class="paypal-button-container"></div>
         </div>
     </div>
 
-    <div class="tier-card genesis">
+    <div class="tier-card">
         <div class="tier-info">
-            <h3>GENESIS</h3>
-            <p class="tier-description">Arquitectura de Origen. Desbloqueo total del motor de simulación histórico y proyecciones a 10 años.</p>
+            <h3 style="color:#888;">SENTINEL</h3>
+            <span class="tier-subtitle" style="color:#555;">MONITOREO ACTIVO BÁSICO (ONLINE)</span>
+            <ul class="features-list limited">
+                <li>Lectura de vectores natales estáticos.</li>
+                <li>Alertas tempranas de anomalías en el sistema.</li>
+                <li>Acceso a telemetría base a través de la Bóveda.</li>
+            </ul>
         </div>
         <div class="price-section">
-            <span class="price">$150</span>
-            <div id="paypal-button-genesis" class="paypal-button-container"></div>
+            <span class="price" style="color:#888;">$15</span>
+            <span class="price-sub">USD / Mensual</span>
+            <div id="paypal-button-sentinel" class="paypal-button-container"></div>
         </div>
     </div>
+
 </div>
 
 <footer>
     <div class="footer-links">
         <a href="privacidad.html">PRIVACIDAD</a>
         <a href="terminos.html">TÉRMINOS</a>
-        <a href="soporte.html">SOPORTE</a>
+        <a href="#">SOPORTE AL CLIENTE</a>
     </div>
     <div class="copyright">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
 </footer>
@@ -104,7 +152,7 @@
 <script>
     window.onload = function() {
         const _d = (s) => atob(s);
-        const userEmail = new URLSearchParams(window.location.search).get('email') || "test_user@gmail.com";
+        const userEmail = localStorage.getItem('vault_user_email') || "operador@gxp.com";
         
         const checkPayPal = setInterval(() => {
             if (typeof paypal !== 'undefined') {
@@ -119,23 +167,40 @@
                 'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
             };
 
-            // SENTINEL
+            // GENESIS (Botón Dorado - Pago Único con Descarga)
             paypal.Buttons({
-                style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        'plan_id': _p['sentinel'],
-                        'subscriber': { 'email_address': userEmail }
+                style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'checkout', height: 45 },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: "LICENCIA GÉNESIS GXP (Terminal .EXE)",
+                            amount: { currency_code: 'USD', value: '297.00' }
+                        }],
+                        application_context: { shipping_preference: 'NO_SHIPPING' }
                     });
                 },
                 onApprove: function(data, actions) {
-                    window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
-                }
-            }).render('#paypal-button-sentinel');
+                    return actions.order.capture().then(function(details) {
+                        
+                        // 1. Mensaje visual de éxito para el comprador
+                        const btnContainer = document.getElementById('paypal-button-genesis');
+                        btnContainer.innerHTML = "<div style='color:#00ff88; font-weight:bold; text-align:center; padding: 20px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); margin-top: 10px;'>PAGO APROBADO.<br><span style='font-size:0.7rem; color:#fff;'>Iniciando descarga segura de Terminal...</span></div>";
 
-            // EXECUTIVE - CORREGIDO
+                        // 2. Forzar descarga con asignación de URL (evita bloqueos de popup)
+                        window.location.assign('Vault-Logic-Terminal-v1.zip');
+
+                        // 3. Redirigir al panel online tras 4 segundos para dar tiempo a la descarga
+                        setTimeout(() => {
+                            window.location.href = `genesis-live.html`; 
+                        }, 4000);
+                        
+                    });
+                }
+            }).render('#paypal-button-genesis');
+
+            // EXECUTIVE (Suscripción Mensual Online)
             paypal.Buttons({
-                style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+                style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'subscribe', height: 40 },
                 createSubscription: function(data, actions) {
                     return actions.subscription.create({
                         'plan_id': _p['executive'],
@@ -143,28 +208,23 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=SUCCESS`;
+                    window.location.href = `genesis-live.html`;
                 }
             }).render('#paypal-button-executive');
 
-            // GENESIS
+            // SENTINEL (Suscripción Mensual Online)
             paypal.Buttons({
-                style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'buynow' },
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            description: "NIVEL GÉNESIS GXP",
-                            amount: { currency_code: 'USD', value: '150.00' }
-                        }],
-                        application_context: { shipping_preference: 'NO_SHIPPING' }
+                style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'subscribe', height: 40 },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': _p['sentinel'],
+                        'subscriber': { 'email_address': userEmail }
                     });
                 },
                 onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        window.location.href = `genesis-live.html?email=${encodeURIComponent(userEmail)}&auth=GENESIS_ACTIVE&id=${details.id}`;
-                    });
+                    window.location.href = `genesis-live.html`;
                 }
-            }).render('#paypal-button-genesis');
+            }).render('#paypal-button-sentinel');
         }
     };
 </script>
