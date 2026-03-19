@@ -34,7 +34,6 @@
         
         .tooltip-text { font-size: 0.55rem; color: #555; letter-spacing: 1px; line-height: 1.4; margin-top: -10px; margin-bottom: 15px; display: block; }
 
-        /* RADAR TIPO MILITAR/FINANCIERO */
         .radar-container { 
             background: var(--panel-bg); border: 1px solid #1a1a1a; 
             display: flex; align-items: center; justify-content: center; 
@@ -42,7 +41,6 @@
             box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
         }
         
-        /* SECCIÓN FOMO (LOCKED) */
         .premium-teaser {
             margin-top: 20px; background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.3);
             padding: 40px; text-align: center; position: relative;
@@ -131,12 +129,9 @@
 </footer>
 
 <script>
-// Algoritmo matemático para generar datos únicos basados en el email (Soluciona el bug de datos clonados)
 function generarHashUsuario(str) {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
+    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
     return Math.abs(hash);
 }
 
@@ -155,25 +150,34 @@ async function conectar() {
         if (res.status === "success" && res.datos) {
             const d = res.datos;
             
-            // Nombre y Datos de Cabecera
             const rawName = d.nombre || localStorage.getItem('vault_user_nombre') || "OPERADOR GXP";
             document.getElementById('nombre').innerText = rawName.toUpperCase();
             
             let fecha = "PARÁMETRO NO DEFINIDO", hora = "--:--", lugar = "COORDENADAS PENDIENTES";
             let hasGeo = false;
 
+            // 1. Extraer datos básicos
             if (d.datos_natales) {
                 if (d.datos_natales.fecha) fecha = d.datos_natales.fecha;
                 if (d.datos_natales.hora) hora = d.datos_natales.hora;
                 if (d.datos_natales.lugar_original) lugar = d.datos_natales.lugar_original.toUpperCase();
                 
+                // Buscar Geo en datos_natales primero
                 if (d.datos_natales.lat && d.datos_natales.lon) {
-                    document.getElementById('geo-lat').innerText = parseFloat(d.datos_natales.lat).toFixed(4);
-                    document.getElementById('geo-lon').innerText = parseFloat(d.datos_natales.lon).toFixed(4);
-                    document.getElementById('geo-estado').innerText = "VERIFICADO";
-                    document.getElementById('geo-estado').style.color = "#00ff88";
+                    mostrarGeo(d.datos_natales.lat, d.datos_natales.lon);
                     hasGeo = true;
                 }
+            }
+            
+            // 2. Si es formato antiguo, buscar Geo en mapatotal.geo
+            if (!hasGeo && d.mapatotal && typeof d.mapatotal === 'string') {
+                try {
+                    const mapaParsed = JSON.parse(d.mapatotal);
+                    if (mapaParsed.geo && mapaParsed.geo.lat) {
+                        mostrarGeo(mapaParsed.geo.lat, mapaParsed.geo.lon);
+                        hasGeo = true;
+                    }
+                } catch(e) { console.error("Error parseando mapatotal", e); }
             }
             
             if (!hasGeo) {
@@ -184,29 +188,27 @@ async function conectar() {
             document.getElementById('datos-origen').innerText = `${fecha} // ${hora} // ${lugar}`;
             document.getElementById('auth-status').innerText = (d.nivel_suscripcion || "LIMITADO").toUpperCase();
 
-            // Botón de Pago
-            document.getElementById('btn-action').onclick = () => { 
-                window.location.href = 'suscripcion.html'; 
-            };
+            document.getElementById('btn-action').onclick = () => { window.location.href = 'suscripcion.html'; };
 
-            // Mostrar Interfaz
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('reporte').style.display = 'block';
             document.getElementById('main-footer').style.display = 'block';
             
-            // Generación de vectores ÚNICOS por usuario si no vienen de la BD
-            let vectores = d.vectores_eclipticos;
+            // 3. Extraer Vectores Reales (Si existen en mapatotal)
+            let vectores = null;
+            if (d.mapatotal && typeof d.mapatotal === 'string') {
+                try {
+                    const mapaParsed = JSON.parse(d.mapatotal);
+                    if (mapaParsed.vectores_eclipticos) {
+                        vectores = mapaParsed.vectores_eclipticos;
+                    }
+                } catch(e) {}
+            }
+
+            // Si no hay vectores reales, usar el generador basado en Hash
             if (!vectores) {
                 const seed = generarHashUsuario(email);
-                vectores = { 
-                    "SOL": (seed % 360), 
-                    "LUNA": ((seed * 2) % 360), 
-                    "MARTE": ((seed * 3) % 360), 
-                    "VENUS": ((seed * 5) % 360), 
-                    "JUPITER": ((seed * 7) % 360), 
-                    "SATURNO": ((seed * 11) % 360), 
-                    "MERCURIO": ((seed * 13) % 360) 
-                };
+                vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
             }
             
             dibujar(vectores);
@@ -215,49 +217,65 @@ async function conectar() {
              document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d'>ACCESO DENEGADO // DATOS NO ENCONTRADOS</div><br><button onclick='window.location.href=\"index.html\"' style='background:#222;color:#fff;border:none;padding:12px 25px;cursor:pointer; font-family:inherit; letter-spacing:2px;'>VOLVER AL INICIO</button>";
         }
     } catch (e) { 
-        console.error("Fallo de enlace", e); 
         document.getElementById('loading-screen').innerText = "ERROR CRÍTICO DE CONEXIÓN AL NÚCLEO";
     }
+}
+
+function mostrarGeo(lat, lon) {
+    document.getElementById('geo-lat').innerText = parseFloat(lat).toFixed(4);
+    document.getElementById('geo-lon').innerText = parseFloat(lon).toFixed(4);
+    document.getElementById('geo-estado').innerText = "VERIFICADO";
+    document.getElementById('geo-estado').style.color = "#00ff88";
 }
 
 function llenarListado(vectores) {
     const lista = document.getElementById('listado-planetas');
     lista.innerHTML = '';
     Object.entries(vectores).forEach(([nom, grad]) => {
-        // Formatear grados con decimales para parecer más técnico
-        const precision = (grad + (Math.random() * 0.9)).toFixed(2);
+        const precision = parseFloat(grad).toFixed(2);
         lista.innerHTML += `<div class="list-item">${nom} <b>${precision}°</b></div>`;
     });
 }
 
 function dibujar(vectores) {
-    // SVGs con diseño de radar de precisión (Bloomberg style)
+    // Diseño del radar con ejes polares (cuadrantes) e indicadores numéricos
     let svg = `<svg viewBox="0 0 400 400" style="width:100%; height:100%; filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));">
-        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1"/>
-        <circle cx="200" cy="200" r="135" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
-        <circle cx="200" cy="200" r="90" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
-        <circle cx="200" cy="200" r="45" fill="none" stroke="rgba(212,175,55,0.08)" stroke-dasharray="2 4"/>
+        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(212,175,55,0.1)" stroke-dasharray="2 4"/>
+        <circle cx="200" cy="200" r="60" fill="none" stroke="rgba(212,175,55,0.1)" stroke-dasharray="2 4"/>
         
-        <line x1="20" y1="200" x2="380" y2="200" stroke="rgba(212,175,55,0.15)" stroke-width="0.5"/>
-        <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(212,175,55,0.15)" stroke-width="0.5"/>
+        <line x1="20" y1="200" x2="380" y2="200" stroke="rgba(212,175,55,0.2)" stroke-width="0.5"/>
+        <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(212,175,55,0.2)" stroke-width="0.5"/>
+        
         <line x1="72" y1="72" x2="328" y2="328" stroke="rgba(212,175,55,0.05)" stroke-width="0.5"/>
         <line x1="72" y1="328" x2="328" y2="72" stroke="rgba(212,175,55,0.05)" stroke-width="0.5"/>
+
+        <text x="200" y="15" fill="rgba(212,175,55,0.5)" font-size="8" text-anchor="middle">0°</text>
+        <text x="390" y="203" fill="rgba(212,175,55,0.5)" font-size="8" text-anchor="end">90°</text>
+        <text x="200" y="392" fill="rgba(212,175,55,0.5)" font-size="8" text-anchor="middle">180°</text>
+        <text x="10" y="203" fill="rgba(212,175,55,0.5)" font-size="8" text-anchor="start">270°</text>
     `;
     
     let offsetAlt = 0; 
     Object.entries(vectores).forEach(([nom, grad]) => {
+        // En una carta real el 0° está a la izquierda (Ascendente) o arriba (Medio Cielo). 
+        // Aquí alineamos el 0° arriba (-90 grados para SVG)
         const rad = (grad - 90) * Math.PI / 180;
-        const radioDinamico = 100 + (Math.random() * 60); // Los puntos no están todos en el mismo borde
-        const x = 200 + radioDinamico * Math.cos(rad); 
-        const y = 200 + radioDinamico * Math.sin(rad);
+        
+        // Colocamos los planetas en una órbita fija cerca del borde para simular una carta astral clásica
+        const radioFijo = 150; 
+        const x = 200 + radioFijo * Math.cos(rad); 
+        const y = 200 + radioFijo * Math.sin(rad);
         
         offsetAlt = offsetAlt === 12 ? -12 : 12; 
         
         svg += `
-        <line x1="200" y1="200" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.4)" stroke-width="1" />
-        <circle cx="${x}" cy="${y}" r="3" fill="#fff" />
-        <circle cx="${x}" cy="${y}" r="6" fill="none" stroke="rgba(212,175,55,0.8)" stroke-width="0.5" />
-        <text x="${x + 10}" y="${y + 3 + offsetAlt}" fill="#d4af37" font-size="9" font-weight="bold" letter-spacing="1">${nom}</text>
+        <line x1="200" y1="200" x2="${x}" y2="${y}" stroke="rgba(212,175,55,0.5)" stroke-width="1.5" />
+        
+        <circle cx="${x}" cy="${y}" r="4" fill="#fff" />
+        <circle cx="${x}" cy="${y}" r="8" fill="none" stroke="rgba(212,175,55,0.8)" stroke-width="1" />
+        
+        <text x="${x + 12}" y="${y + 3 + offsetAlt}" fill="#d4af37" font-size="9" font-weight="bold" letter-spacing="1">${nom}</text>
         `;
     });
     document.getElementById('canvas-container').innerHTML = svg + `</svg>`;
