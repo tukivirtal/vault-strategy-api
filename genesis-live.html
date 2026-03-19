@@ -174,7 +174,7 @@ function sincronizarPanel() {
     document.getElementById('executive-translation').style.display = 'none';
 
     setTimeout(() => {
-        // Lógica de simulación (puedes reemplazarla con llamadas reales a tu API luego)
+        // Lógica de simulación
         const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
         let currentData = {};
         let translation = "";
@@ -188,9 +188,11 @@ function sincronizarPanel() {
                 risk: (-(Math.random() * 10 + 35).toFixed(1)) + "%",
                 estado: "RIESGO ESTRUCTURAL // POSICIÓN DEFENSIVA",
                 rango: `${startInput} A ${endInput}`,
-                estrategia: "Posición Defensiva" // Dato para el Dossier
+                estrategia: "Posición Defensiva" 
             };
-            mainChart.updateSeries([{ data: [40, 30, 22, 18, 12, 8, 15] }]);
+            
+            // ¡AQUÍ ESTÁ LA CORRECCIÓN! Le agregamos el 'name'
+            mainChart.updateSeries([{ name: 'Índice de Riesgo', data: [40, 30, 22, 18, 12, 8, 15] }]);
             
             // Traducción Operativa para el Ejecutivo
             translation = "Los ciclos indican alta volatilidad en este periodo. <b>Acción sugerida:</b> Congele contrataciones agresivas, evite lanzamientos de nuevos productos y céntrese en fidelizar a sus clientes actuales. Las negociaciones serán tensas; no ceda margen de ganancia.";
@@ -204,9 +206,11 @@ function sincronizarPanel() {
                 risk: "-" + (Math.random() * 2 + 17).toFixed(1) + "%",
                 estado: "SINCRONÍA ÓPTIMA // ESCALABILIDAD",
                 rango: `${startInput} A ${endInput}`,
-                estrategia: "Inversión Agresiva" // Dato para el Dossier
+                estrategia: "Inversión Agresiva" 
             };
-            mainChart.updateSeries([{ data: [35, 48, 62, 98, 75, 82, 125] }]);
+            
+            // ¡AQUÍ ESTÁ LA OTRA CORRECCIÓN! Le agregamos el 'name'
+            mainChart.updateSeries([{ name: 'Fuerza de Sincronía', data: [35, 48, 62, 98, 75, 82, 125] }]);
             
             // Traducción Operativa para el Ejecutivo
             translation = "Ventana de sincronicidad excepcional. <b>Acción sugerida:</b> Acelere cierres de ventas, asigne presupuesto adicional a campañas de marketing y firme alianzas estratégicas. El clima de negociación favorece acuerdos de alto valor a largo plazo.";
@@ -225,7 +229,6 @@ function sincronizarPanel() {
 
     }, 800);
 }
-
     function descargarDossier() {
         // El Dossier ahora leerá el nombre desde localStorage y los datos desde 'ultimo_reporte'
         window.location.href = `dossier-final.html`; 
