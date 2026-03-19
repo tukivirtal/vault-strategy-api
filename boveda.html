@@ -156,15 +156,22 @@ async function conectar() {
             let fecha = "PARÁMETRO NO DEFINIDO", hora = "--:--", lugar = "COORDENADAS PENDIENTES";
             let hasGeo = false;
 
-            // 1. Extraer datos básicos
-            if (d.datos_natales) {
-                if (d.datos_natales.fecha) fecha = d.datos_natales.fecha;
-                if (d.datos_natales.hora) hora = d.datos_natales.hora;
-                if (d.datos_natales.lugar_original) lugar = d.datos_natales.lugar_original.toUpperCase();
+            // 1. Extraer datos básicos (con Desempaquetado de String)
+            let datosNatalesObj = d.datos_natales;
+            
+            // Si Supabase lo mandó como texto, lo convertimos a objeto real
+            if (typeof datosNatalesObj === 'string') {
+                try { datosNatalesObj = JSON.parse(datosNatalesObj); } catch(e) {}
+            }
+
+            if (datosNatalesObj) {
+                if (datosNatalesObj.fecha) fecha = datosNatalesObj.fecha;
+                if (datosNatalesObj.hora) hora = datosNatalesObj.hora;
+                if (datosNatalesObj.lugar_original) lugar = datosNatalesObj.lugar_original.toUpperCase();
                 
-                // Buscar Geo en datos_natales primero
-                if (d.datos_natales.lat && d.datos_natales.lon) {
-                    mostrarGeo(d.datos_natales.lat, d.datos_natales.lon);
+                // Buscar Geo en datos_natales
+                if (datosNatalesObj.lat && datosNatalesObj.lon) {
+                    mostrarGeo(datosNatalesObj.lat, datosNatalesObj.lon);
                     hasGeo = true;
                 }
             }
@@ -238,7 +245,6 @@ function llenarListado(vectores) {
 }
 
 function dibujar(vectores) {
-    // Diseño del radar con ejes polares (cuadrantes) e indicadores numéricos
     let svg = `<svg viewBox="0 0 400 400" style="width:100%; height:100%; filter: drop-shadow(0 0 10px rgba(212,175,55,0.2));">
         <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="1"/>
         <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(212,175,55,0.1)" stroke-dasharray="2 4"/>
@@ -258,11 +264,8 @@ function dibujar(vectores) {
     
     let offsetAlt = 0; 
     Object.entries(vectores).forEach(([nom, grad]) => {
-        // En una carta real el 0° está a la izquierda (Ascendente) o arriba (Medio Cielo). 
-        // Aquí alineamos el 0° arriba (-90 grados para SVG)
         const rad = (grad - 90) * Math.PI / 180;
         
-        // Colocamos los planetas en una órbita fija cerca del borde para simular una carta astral clásica
         const radioFijo = 150; 
         const x = 200 + radioFijo * Math.cos(rad); 
         const y = 200 + radioFijo * Math.sin(rad);
