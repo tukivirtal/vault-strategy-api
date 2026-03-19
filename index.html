@@ -184,9 +184,14 @@ async function consultar() {
         return;
     }
 
+   
     btn.disabled = true;
     btn.innerText = "AUTENTICANDO...";
     resContainer.classList.remove('hidden');
+
+    // 🧹 LIMPIEZA DE MEMORIA: Borrar cualquier usuario anterior
+    localStorage.removeItem('vault_user_email');
+    localStorage.removeItem('vault_user_nombre');
 
     try {
         const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
