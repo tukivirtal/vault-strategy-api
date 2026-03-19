@@ -62,13 +62,15 @@ async def consultar(data: LoginData):
         else:
             # Lógica de Registro
             nuevo_usuario = {
-                "email": data.email,
+               "email": data.email,
                 "password": data.password, 
                 "nombre": data.nombre,
                 "datos_natales": {
                     "fecha": data.fecha,
                     "hora": data.hora,
-                    "lugar_original": data.lugar
+                    "lugar_original": data.lugar,
+                    "lat": data.lat,  # <--- ESTO FALTABA
+                    "lon": data.lon   # <--- ESTO FALTABA
                 },
                 "nivel_suscripcion": "free"
             }
