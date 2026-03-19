@@ -77,7 +77,7 @@ async def consultar(data: LoginData):
             supabase.table("clientes_vip").insert(nuevo_usuario).execute()
             
             # Al registrarse, por defecto es free
-            return {"status": "success", "nivel_suscripcion": "free"}
+            return {"status": "success", "nombre", "nivel_suscripcion": "free"}
             
     except Exception as e:
         print(f"🚨 ERROR CRÍTICO DETECTADO: {str(e)}")
