@@ -29,6 +29,8 @@ class LoginData(BaseModel):
     lugar: str = None
     fecha: str = None
     hora: str = None
+    lat: str = None
+    lon: str = None
 
 class PerfilRequest(BaseModel):
     email: str
