@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vault Logic | Análisis Competitivo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root { --oro: #d4af37; --fondo-oscuro: #050505; --tarjeta: rgba(12, 12, 12, 0.95); --texto-blanco: #ffffff; --alerta: #ff4d4d; --gris: #888;}
+        body { background: radial-gradient(circle at top, #151515 0%, var(--fondo-oscuro) 100%); color: var(--oro); font-family: 'Inter', sans-serif; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .barra-seguridad { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #00ff88; letter-spacing: 0.3em; margin-bottom: 50px; border: 1px solid #00ff88; padding: 8px 20px; background: rgba(0, 255, 136, 0.05); border-radius: 2px; text-transform: uppercase;}
+        
+        header { text-align: center; margin-bottom: 60px; max-width: 800px; }
+        header h1 { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2em; font-size: 2rem; font-weight: bold; margin-bottom: 20px; color: var(--texto-blanco); text-transform: uppercase;}
+        header p { color: var(--gris); font-size: 1rem; line-height: 1.6; font-weight: 300;}
+        
+        .contenedor-comparativa { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 900px; }
+        
+        .fila-comparativa { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .columna { background: var(--tarjeta); border: 1px solid #222; padding: 40px; border-radius: 4px; position: relative; }
+        
+        .columna.competencia { border-top: 3px solid #444; }
+        .columna.vault-logic { border-top: 3px solid var(--oro); background: linear-gradient(145deg, rgba(15,15,15,1) 0%, rgba(20,18,10,1) 100%); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.05); }
+        
+        .etiqueta-superior { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; display: block; }
+        .competencia .etiqueta-superior { color: var(--gris); }
+        .vault-logic .etiqueta-superior { color: var(--oro); font-weight: bold;}
+        
+        .lista-puntos { list-style: none; padding: 0; margin: 0; }
+        .lista-puntos li { margin-bottom: 25px; }
+        .lista-puntos h4 { margin: 0 0 10px 0; color: var(--texto-blanco); font-size: 1.05rem; font-weight: 600; }
+        .lista-puntos p { margin: 0; color: #aaa; font-size: 0.9rem; line-height: 1.5; font-weight: 300; }
+        
+        .icono-cruz { color: var(--alerta); font-weight: bold; margin-right: 8px; font-family: 'JetBrains Mono', monospace;}
+        .icono-check { color: var(--oro); font-weight: bold; margin-right: 8px; font-family: 'JetBrains Mono', monospace;}
+
+        .seccion-accion { margin-top: 60px; text-align: center; }
+        .boton-principal { display: inline-block; background: var(--oro); color: #000; padding: 18px 45px; font-family: 'JetBrains Mono', monospace; font-weight: bold; text-decoration: none; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; border-radius: 2px; }
+        .boton-principal:hover { background: #fff; box-shadow: 0 0 25px rgba(212,175,55,0.4); transform: translateY(-2px); }
+
+        @media (max-width: 768px) {
+            .fila-comparativa { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="barra-seguridad">DOCUMENTO DESCLASIFICADO // ANÁLISIS DE MERCADO</div>
+
+<header>
+    <h1>La Diferencia Estructural</h1>
+    <p>¿Por qué los ejecutivos de alto nivel abandonan el software financiero tradicional y migran al protocolo cerrado de Vault Logic?</p>
+</header>
+
+<div class="contenedor-comparativa">
+    
+    <div class="fila-comparativa">
+        <div class="columna competencia">
+            <span class="etiqueta-superior">El Estándar de la Industria</span>
+            <ul class="lista-puntos">
+                <li>
+                    <h4><span class="icono-cruz">X</span> Complejidad Visual</h4>
+                    <p>Entregan gráficos abrumadores llenos de líneas, ángulos y símbolos astronómicos que requieren meses de estudio para ser interpretados.</p>
+                </li>
+                <li>
+                    <h4><span class="icono-cruz">X</span> Sobrecarga de Datos</h4>
+                    <p>Proporcionan estadísticas crudas sobre el mercado, obligando al directivo a deducir por su cuenta qué decisión tomar.</p>
+                </li>
+                <li>
+                    <h4><span class="icono-cruz">X</span> Curva de Aprendizaje Lenta</h4>
+                    <p>Software diseñado para analistas técnicos de bolsa, no para directores ejecutivos que necesitan respuestas en cinco minutos.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="columna vault-logic">
+            <span class="etiqueta-superior">Vault Logic (Nivel Génesis)</span>
+            <ul class="lista-puntos">
+                <li>
+                    <h4><span class="icono-check">✓</span> Traducción Operativa Directa</h4>
+                    <p>El sistema procesa la matemática orbital en segundo plano y le entrega instrucciones en texto claro (ej. "Congele contrataciones hoy").</p>
+                </li>
+                <li>
+                    <h4><span class="icono-check">✓</span> Matriz de Impacto Ejecutivo</h4>
+                    <p>Visualización inmediata de las tres áreas críticas: Liquidez, Clima de Negociación y Nivel de Riesgo Estructural.</p>
+                </li>
+                <li>
+                    <h4><span class="icono-check">✓</span> Implementación Inmediata</h4>
+                    <p>Diseño militar de alta eficiencia. Sin manuales complejos. Su equipo directivo puede usar el panel y descargar el Dossier desde el primer segundo.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="seccion-accion">
+    <a href="suscripcion.html" class="boton-principal">Autorizar Acceso a la Matriz</a>
+</div>
+
+</body>
+</html>
