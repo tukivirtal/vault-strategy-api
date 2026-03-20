@@ -60,20 +60,19 @@
         .tier-subtitle { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 0.7rem; margin-bottom: 25px; letter-spacing: 1px; display: block; text-transform: uppercase;}
         
         .features-list { list-style: none; padding: 0; margin: 0; }
-        .features-list li { color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: flex-start; line-height: 1.5; }
-        .features-list li::before { content: '✓'; color: var(--gold); margin-right: 12px; font-size: 1rem; font-weight: bold; }
-        .features-list.limited li::before { color: #555; content: '■'; font-size: 0.6rem; margin-top: 5px;}
+        .features-list li { color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: flex-start; line-height: 1.6; }
+        .features-list li::before { content: '✓'; color: var(--gold); margin-right: 12px; font-size: 1.1rem; font-weight: bold; line-height: 1.2;}
+        .features-list.limited li::before { color: #555; content: '■'; font-size: 0.6rem; margin-top: 6px;}
         
-        .feature-title { color: #fff; font-weight: 600; margin-right: 5px; }
-
         .price-section { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); }
         .price { font-family: 'JetBrains Mono', monospace; font-size: 3.2rem; color: var(--white-text); font-weight: bold; margin-bottom: 5px; line-height: 1;}
         .price-sub { font-size: 0.75rem; color: var(--gray); letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; text-align: center; line-height: 1.4;}
         
         .paypal-button-container { width: 100%; min-height: 45px; z-index: 10; margin-bottom: 10px;}
         
-        .trust-shield { font-size: 0.65rem; color: #888; text-align: center; line-height: 1.5; border-top: 1px solid #333; padding-top: 15px; margin-top: 5px;}
-        .trust-shield strong { color: var(--gold); }
+        .trust-shield { font-size: 0.7rem; color: #888; text-align: center; line-height: 1.5; border-top: 1px solid #333; padding-top: 15px; margin-top: 5px;}
+        .trust-shield a { color: var(--gold); text-decoration: none; font-weight: bold; transition: 0.3s;}
+        .trust-shield a:hover { text-decoration: underline; color: #fff; }
         
         footer { margin-top: 60px; padding: 30px; text-align: center; border-top: 1px solid #222; width: 100%; max-width: 800px; }
         .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; font-family: 'JetBrains Mono', monospace;}
@@ -110,17 +109,17 @@
             <div class="inclusion-text">Incluye todo lo de Executive, más:</div>
             
             <ul class="features-list">
-                <li><span class="feature-title">Terminal Offline Encriptada:</span> Descarga del software ejecutable blindado en AES-256 para máxima privacidad.</li>
-                <li><span class="feature-title">Dossier Executive Ilimitado:</span> Exportación de reportes PDF de alto impacto para reuniones de junta.</li>
-                <li><span class="feature-title">Traductor Operativo:</span> Directivas de acción claras (ej. "Congele contrataciones", "Acelere ventas").</li>
-                <li><span class="feature-title">Proyección a 10 Años:</span> Visualización de tendencias macroeconómicas globales a una década.</li>
+                <li><strong>Terminal Estratégica Offline</strong> descargable y blindada con encriptación militar AES-256.</li>
+                <li><strong>Dossier Executive Ilimitado</strong> para exportar de forma privada reportes PDF de alto impacto.</li>
+                <li><strong>Traductor Operativo</strong> que decodifica datos complejos en directivas de acción claras (ej. "Congele contrataciones").</li>
+                <li><strong>Proyección Decenal</strong> para visualizar ciclos y tendencias macroeconómicas globales a una década.</li>
             </ul>
         </div>
         <div class="price-section">
             <span class="price">$297</span>
             <span class="price-sub">USD / Pago Único<br><strong style="color:var(--gold)">Licencia Vitalicia</strong></span>
             <div id="paypal-button-genesis" class="paypal-button-container"></div>
-            <div class="trust-shield">🛡️ <strong>Garantía de Acceso:</strong> Transacción protegida. Si el sistema falla, le devolvemos el acceso.</div>
+            <div class="trust-shield">🛡️ Compra protegida. Respaldado por nuestra <a href="garantia.html">Garantía Executive</a>.</div>
         </div>
     </div>
 
@@ -130,9 +129,9 @@
             <h3>EXECUTIVE</h3>
             <span class="tier-subtitle" style="color:var(--gray);">INTELIGENCIA AVANZADA DE TRÁNSITOS (ONLINE)</span>
             <ul class="features-list">
-                <li><span class="feature-title">Simulador Web a 30 días:</span> Detección de ventanas de oportunidad y riesgo a corto plazo.</li>
-                <li><span class="feature-title">Matriz de Impacto:</span> Visualización precisa de Volatilidad, Negociación y Capital.</li>
-                <li><span class="feature-title">Datos en Tiempo Real:</span> Actualización constante de cuadrantes y efemérides.</li>
+                <li><strong>Simulador Web a 30 días</strong> para la detección temprana de ventanas de oportunidad y riesgo.</li>
+                <li><strong>Matriz de Impacto</strong> con visualización precisa de Volatilidad, Clima de Negociación y Capital.</li>
+                <li><strong>Datos en Tiempo Real</strong> con actualización constante de cuadrantes y efemérides.</li>
             </ul>
         </div>
         <div class="price-section">
@@ -165,7 +164,7 @@
     <div class="footer-links">
         <a href="privacidad.html">PRIVACIDAD</a>
         <a href="terminos.html">TÉRMINOS</a>
-        <a href="#">SOPORTE AL CLIENTE</a>
+        <a href="garantia.html">GARANTÍA</a>
     </div>
     <div class="copyright">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
 </footer>
@@ -188,7 +187,7 @@
                 'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
             };
 
-            // GENESIS (Botón de Pago Único con Descarga)
+            // GENESIS
             paypal.Buttons({
                 style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'checkout', height: 45 },
                 createOrder: function(data, actions) {
@@ -202,7 +201,6 @@
                 },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
-                        
                         const btnContainer = document.getElementById('paypal-button-genesis');
                         btnContainer.innerHTML = `
                             <div style='color:#00ff88; text-align:center; padding: 15px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); border-radius: 4px;'>
@@ -213,10 +211,7 @@
                                 </span>
                             </div>
                         `;
-
-                        // Forzar descarga del ZIP alojado en GitHub (sin tocar el JSON ni re-compilar)
                         window.location.assign('Vault-Logic-Terminal-v1.zip');
-                        
                     });
                 }
             }).render('#paypal-button-genesis');
