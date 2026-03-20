@@ -5,7 +5,6 @@
     <title>Vault Logic | Autorización de Acceso</title>
     <script>
         (function() {
-            // Nota de Seguridad: El client-id de PayPal está ofuscado.
             const _c = "QVZ0aE9vMG4wbWpGLXliSUsyeFJteEtBTU5MUHVtRFJZWHhlUVBnZDBTMTNLNWVYTkNnYzQ1OHpqdmhkQXJ6RkZnam1HTWNENVF4d1Y2WEM=";
             const s = document.createElement('script');
             s.src = `https://www.paypal.com/sdk/js?client-id=${atob(_c)}&currency=USD&components=buttons&vault=true`;
@@ -15,14 +14,17 @@
     </script>
     
     <style>
-        :root { --gold: #d4af37; --dark-bg: #050505; --mate-card: rgba(12, 12, 12, 0.95); --white-text: #ffffff; --alert: #ff4d4d;}
-        body { background: radial-gradient(circle at top, #151515 0%, var(--dark-bg) 100%); color: var(--gold); font-family: 'JetBrains Mono', monospace; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root { --gold: #d4af37; --dark-bg: #050505; --mate-card: rgba(12, 12, 12, 0.95); --white-text: #ffffff; --alert: #ff4d4d; --gray: #888;}
+        body { background: radial-gradient(circle at top, #151515 0%, var(--dark-bg) 100%); color: var(--gold); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        .security-bar { font-size: 0.65rem; color: #00ff88; letter-spacing: 0.3em; margin-bottom: 40px; border: 1px solid #00ff88; padding: 8px 20px; background: rgba(0, 255, 136, 0.05); display: inline-block;}
+        .security-bar { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #00ff88; letter-spacing: 0.3em; margin-bottom: 40px; border: 1px solid #00ff88; padding: 8px 20px; background: rgba(0, 255, 136, 0.05); display: inline-block; border-radius: 2px;}
         
         header { text-align: center; margin-bottom: 50px; max-width: 800px; }
-        header h1 { letter-spacing: 0.5em; font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; color: var(--white-text); text-transform: uppercase;}
-        header p { color: #888; font-size: 0.85rem; letter-spacing: 0.1em; line-height: 1.6; }
+        header h1 { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3em; font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; color: var(--white-text); text-transform: uppercase;}
+        header p { color: var(--gray); font-size: 0.95rem; line-height: 1.6; font-weight: 300;}
+        header p strong { color: var(--gold); font-weight: 600; }
         
         .subscription-container { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 900px; }
         
@@ -31,40 +33,55 @@
             display: flex; flex-direction: row; align-items: stretch;
             transition: all 0.3s ease; position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 4px;
         }
         
         .tier-card:hover { border-color: #444; transform: translateY(-3px); }
         .tier-card.genesis:hover { border-color: var(--gold); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15); }
 
-        .tier-card.genesis { border: 1px solid var(--gold); }
+        .tier-card.genesis { border: 1px solid var(--gold); background: linear-gradient(145deg, rgba(12,12,12,1) 0%, rgba(20,18,10,1) 100%); }
         
         .badge-recomendado {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             background: var(--gold); color: #000; font-size: 0.65rem; font-weight: bold;
             padding: 4px 15px; letter-spacing: 2px; text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace; border-radius: 2px;
+        }
+
+        .badge-popular {
+            position: absolute; top: -10px; left: 20px;
+            background: #333; color: #fff; font-size: 0.6rem; font-weight: bold;
+            padding: 3px 10px; letter-spacing: 1px; text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace; border-radius: 2px;
         }
 
         .tier-info { padding: 40px; flex-grow: 1; border-right: 1px solid #222; }
-        .tier-info h3 { margin: 0 0 10px 0; letter-spacing: 0.3em; font-size: 1.4rem; color: var(--white-text); }
-        .tier-subtitle { color: var(--gold); font-size: 0.75rem; margin-bottom: 20px; letter-spacing: 1px; display: block;}
+        .tier-info h3 { font-family: 'JetBrains Mono', monospace; margin: 0 0 5px 0; letter-spacing: 0.3em; font-size: 1.5rem; color: var(--white-text); }
+        .tier-subtitle { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 0.7rem; margin-bottom: 25px; letter-spacing: 1px; display: block; text-transform: uppercase;}
         
         .features-list { list-style: none; padding: 0; margin: 0; }
-        .features-list li { color: #ccc; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: flex-start; }
-        .features-list li::before { content: '■'; color: var(--gold); margin-right: 12px; font-size: 0.6rem; margin-top: 3px; }
-        .features-list.limited li::before { color: #444; }
-
-        .price-section { width: 280px; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); }
-        .price { font-size: 3rem; color: var(--white-text); font-weight: bold; margin-bottom: 5px;}
-        .price-sub { font-size: 0.7rem; color: #666; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; text-align: center;}
+        .features-list li { color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: flex-start; line-height: 1.5; }
+        .features-list li::before { content: '✓'; color: var(--gold); margin-right: 12px; font-size: 1rem; font-weight: bold; }
+        .features-list.limited li::before { color: #555; content: '■'; font-size: 0.6rem; margin-top: 5px;}
         
-        .paypal-button-container { width: 100%; min-height: 45px; z-index: 10; }
-        .secure-checkout { font-size: 0.6rem; color: #555; margin-top: 15px; display: flex; align-items: center; gap: 5px; }
+        .feature-title { color: #fff; font-weight: 600; margin-right: 5px; }
+
+        .price-section { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); }
+        .price { font-family: 'JetBrains Mono', monospace; font-size: 3.2rem; color: var(--white-text); font-weight: bold; margin-bottom: 5px; line-height: 1;}
+        .price-sub { font-size: 0.75rem; color: var(--gray); letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; text-align: center; line-height: 1.4;}
+        
+        .paypal-button-container { width: 100%; min-height: 45px; z-index: 10; margin-bottom: 10px;}
+        
+        .trust-shield { font-size: 0.65rem; color: #888; text-align: center; line-height: 1.5; border-top: 1px solid #333; padding-top: 15px; margin-top: 5px;}
+        .trust-shield strong { color: var(--gold); }
         
         footer { margin-top: 60px; padding: 30px; text-align: center; border-top: 1px solid #222; width: 100%; max-width: 800px; }
-        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; }
-        .footer-links a { color: #888; text-decoration: none; font-size: 0.75rem; letter-spacing: 1px; transition: 0.3s; }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; font-family: 'JetBrains Mono', monospace;}
+        .footer-links a { color: #666; text-decoration: none; font-size: 0.7rem; letter-spacing: 1px; transition: 0.3s; }
         .footer-links a:hover { color: var(--gold); }
-        .copyright { color: #444; font-size: 0.6rem; letter-spacing: 3px; }
+        .copyright { color: #333; font-size: 0.6rem; letter-spacing: 3px; font-family: 'JetBrains Mono', monospace; }
+
+        .inclusion-text { font-size: 0.8rem; color: #a1a1aa; font-style: italic; margin-bottom: 15px; border-bottom: 1px dashed #333; padding-bottom: 10px;}
 
         @media (max-width: 768px) {
             .tier-card { flex-direction: column; }
@@ -75,55 +92,59 @@
 </head>
 <body>
 
-<div class="security-bar">🔒 CONEXIÓN ENCRIPTADA // PASARELA SEGURA</div>
+<div class="security-bar">CONEXIÓN ENCRIPTADA // PASARELA SEGURA</div>
 
 <header>
     <h1>Desbloquee su Ventaja Operativa</h1>
-    <p>La inteligencia de ciclos no es predicción, es matemática orbital. Seleccione su nivel de acceso al núcleo JPL y tome el control de su horizonte financiero antes de su próxima decisión crítica.</p>
+    <p>La inteligencia de ciclos no es predicción, <strong>es matemática orbital</strong>. Seleccione su nivel de acceso al núcleo JPL y tome el control de su horizonte financiero antes de su próxima decisión crítica.</p>
 </header>
 
 <div class="subscription-container">
     
     <div class="tier-card genesis">
-        <div class="badge-recomendado">Nivel Director / CEO</div>
+        <div class="badge-recomendado">NIVEL DIRECTOR / CEO</div>
         <div class="tier-info">
             <h3>GÉNESIS</h3>
             <span class="tier-subtitle">ARQUITECTURA DE ORIGEN // TERMINAL DE ESCRITORIO (.EXE)</span>
+            
+            <div class="inclusion-text">Incluye todo lo de Executive, más:</div>
+            
             <ul class="features-list">
-                <li><strong>Terminal Estratégica Offline:</strong> Descarga del software ejecutable encriptado en AES-256.</li>
-                <li><strong>Dossier Executive Ilimitado:</strong> Exportación de reportes PDF para reuniones de junta.</li>
-                <li><strong>Traductor Operativo:</strong> Directivas claras (ej. "Congele contrataciones", "Acelere ventas").</li>
-                <li><strong>Proyección Decenal:</strong> Visualización de tendencias globales a 10 años.</li>
+                <li><span class="feature-title">Terminal Offline Encriptada:</span> Descarga del software ejecutable blindado en AES-256 para máxima privacidad.</li>
+                <li><span class="feature-title">Dossier Executive Ilimitado:</span> Exportación de reportes PDF de alto impacto para reuniones de junta.</li>
+                <li><span class="feature-title">Traductor Operativo:</span> Directivas de acción claras (ej. "Congele contrataciones", "Acelere ventas").</li>
+                <li><span class="feature-title">Proyección a 10 Años:</span> Visualización de tendencias macroeconómicas globales a una década.</li>
             </ul>
         </div>
         <div class="price-section">
             <span class="price">$297</span>
-            <span class="price-sub">USD / Pago Único<br>(Licencia Vitalicia)</span>
+            <span class="price-sub">USD / Pago Único<br><strong style="color:var(--gold)">Licencia Vitalicia</strong></span>
             <div id="paypal-button-genesis" class="paypal-button-container"></div>
-            <div class="secure-checkout">🛡️ Transacción protegida por PayPal</div>
+            <div class="trust-shield">🛡️ <strong>Garantía de Acceso:</strong> Transacción protegida. Si el sistema falla, le devolvemos el acceso.</div>
         </div>
     </div>
 
     <div class="tier-card">
+        <div class="badge-popular">MÁS ELEGIDO</div>
         <div class="tier-info">
             <h3>EXECUTIVE</h3>
-            <span class="tier-subtitle" style="color:#888;">INTELIGENCIA AVANZADA DE TRÁNSITOS (ONLINE)</span>
+            <span class="tier-subtitle" style="color:var(--gray);">INTELIGENCIA AVANZADA DE TRÁNSITOS (ONLINE)</span>
             <ul class="features-list">
-                <li><strong>Simulador Web a 30 días:</strong> Detección de ventanas de oportunidad a corto plazo.</li>
-                <li><strong>Matriz de Impacto:</strong> Visualización de Volatilidad, Negociación y Capital.</li>
-                <li>Actualización en tiempo real de cuadrantes.</li>
+                <li><span class="feature-title">Simulador Web a 30 días:</span> Detección de ventanas de oportunidad y riesgo a corto plazo.</li>
+                <li><span class="feature-title">Matriz de Impacto:</span> Visualización precisa de Volatilidad, Negociación y Capital.</li>
+                <li><span class="feature-title">Datos en Tiempo Real:</span> Actualización constante de cuadrantes y efemérides.</li>
             </ul>
         </div>
         <div class="price-section">
             <span class="price">$45</span>
-            <span class="price-sub">USD / Mensual</span>
+            <span class="price-sub">USD / Mensual<br>Cancele cuando quiera</span>
             <div id="paypal-button-executive" class="paypal-button-container"></div>
         </div>
     </div>
 
     <div class="tier-card">
         <div class="tier-info">
-            <h3 style="color:#888;">SENTINEL</h3>
+            <h3 style="color:var(--gray);">SENTINEL</h3>
             <span class="tier-subtitle" style="color:#555;">MONITOREO ACTIVO BÁSICO (ONLINE)</span>
             <ul class="features-list limited">
                 <li>Lectura de vectores natales estáticos.</li>
@@ -132,7 +153,7 @@
             </ul>
         </div>
         <div class="price-section">
-            <span class="price" style="color:#888;">$15</span>
+            <span class="price" style="color:var(--gray);">$15</span>
             <span class="price-sub">USD / Mensual</span>
             <div id="paypal-button-sentinel" class="paypal-button-container"></div>
         </div>
@@ -167,7 +188,7 @@
                 'executive': _d('UC04RFM2OTU2NjZSNDA5Njk2MTFOR1ZEUk9R')
             };
 
-            // GENESIS (Botón Dorado - Pago Único con Descarga)
+            // GENESIS (Botón de Pago Único con Descarga)
             paypal.Buttons({
                 style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'checkout', height: 45 },
                 createOrder: function(data, actions) {
@@ -182,23 +203,25 @@
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
                         
-                        // 1. Mensaje visual de éxito para el comprador
                         const btnContainer = document.getElementById('paypal-button-genesis');
-                        btnContainer.innerHTML = "<div style='color:#00ff88; font-weight:bold; text-align:center; padding: 20px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); margin-top: 10px;'>PAGO APROBADO.<br><span style='font-size:0.7rem; color:#fff;'>Iniciando descarga segura de Terminal...</span></div>";
+                        btnContainer.innerHTML = `
+                            <div style='color:#00ff88; text-align:center; padding: 15px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); border-radius: 4px;'>
+                                <strong style='font-family: "JetBrains Mono", monospace; font-size:1rem; letter-spacing:1px;'>PAGO APROBADO</strong><br><br>
+                                <span style='font-size:0.8rem; color:#fff; line-height:1.4; display:block;'>
+                                    Descarga de Terminal Iniciada.<br>
+                                    Abra el archivo .ZIP descargado y ejecute <b>boot-sequence.html</b> para iniciar su sesión GÉNESIS.
+                                </span>
+                            </div>
+                        `;
 
-                        // 2. Forzar descarga con asignación de URL (evita bloqueos de popup)
+                        // Forzar descarga del ZIP alojado en GitHub (sin tocar el JSON ni re-compilar)
                         window.location.assign('Vault-Logic-Terminal-v1.zip');
-
-                        // 3. Redirigir al panel online tras 4 segundos para dar tiempo a la descarga
-                        setTimeout(() => {
-                            window.location.href = `genesis-live.html`; 
-                        }, 4000);
                         
                     });
                 }
             }).render('#paypal-button-genesis');
 
-            // EXECUTIVE (Suscripción Mensual Online)
+            // EXECUTIVE
             paypal.Buttons({
                 style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'subscribe', height: 40 },
                 createSubscription: function(data, actions) {
@@ -212,7 +235,7 @@
                 }
             }).render('#paypal-button-executive');
 
-            // SENTINEL (Suscripción Mensual Online)
+            // SENTINEL
             paypal.Buttons({
                 style: { shape: 'rect', color: 'white', layout: 'vertical', label: 'subscribe', height: 40 },
                 createSubscription: function(data, actions) {
@@ -222,26 +245,7 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        
-                        // 1. Mensaje visual para el comprador indicando qué hacer
-                        const btnContainer = document.getElementById('paypal-button-genesis');
-                        btnContainer.innerHTML = `
-                            <div style='color:#00ff88; text-align:center; padding: 20px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); margin-top: 10px;'>
-                                <strong style='font-size:1.1rem; letter-spacing:1px;'>PAGO APROBADO</strong><br><br>
-                                <span style='font-size:0.75rem; color:#fff; line-height:1.5;'>
-                                    Descarga de Terminal Iniciada.<br>
-                                    Abra el archivo .ZIP descargado y ejecute <b>boot-sequence.html</b> para iniciar su sesión GÉNESIS.
-                                </span>
-                            </div>
-                        `;
-
-                        // 2. Forzar descarga del ZIP que acabas de subir a GitHub
-                        window.location.assign('Vault-Logic-Terminal-v1.zip');
-                        
-                        // Eliminamos el setTimeout() que redirigía, porque ahora
-                        // el boot-sequence.html se encarga de llevarlo a la terminal.
-                    });
+                    window.location.href = `genesis-live.html`;
                 }
             }).render('#paypal-button-sentinel');
         }
