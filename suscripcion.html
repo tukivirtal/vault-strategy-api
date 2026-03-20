@@ -222,7 +222,26 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    window.location.href = `genesis-live.html`;
+                    return actions.order.capture().then(function(details) {
+                        
+                        // 1. Mensaje visual para el comprador indicando qué hacer
+                        const btnContainer = document.getElementById('paypal-button-genesis');
+                        btnContainer.innerHTML = `
+                            <div style='color:#00ff88; text-align:center; padding: 20px; border: 1px solid #00ff88; background: rgba(0,255,138,0.1); margin-top: 10px;'>
+                                <strong style='font-size:1.1rem; letter-spacing:1px;'>PAGO APROBADO</strong><br><br>
+                                <span style='font-size:0.75rem; color:#fff; line-height:1.5;'>
+                                    Descarga de Terminal Iniciada.<br>
+                                    Abra el archivo .ZIP descargado y ejecute <b>boot-sequence.html</b> para iniciar su sesión GÉNESIS.
+                                </span>
+                            </div>
+                        `;
+
+                        // 2. Forzar descarga del ZIP que acabas de subir a GitHub
+                        window.location.assign('Vault-Logic-Terminal-v1.zip');
+                        
+                        // Eliminamos el setTimeout() que redirigía, porque ahora
+                        // el boot-sequence.html se encarga de llevarlo a la terminal.
+                    });
                 }
             }).render('#paypal-button-sentinel');
         }
