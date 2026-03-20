@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Logic | Inteligencia de Ciclos Ejecutivos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --oro: #d4af37;
+            --oro-hover: #f5d463;
+            --fondo-oscuro: #050505;
+            --superficie: rgba(15, 15, 15, 0.95);
+            --borde: rgba(212, 175, 55, 0.15);
+            --texto-principal: #ffffff;
+            --texto-secundario: #a1a1aa;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--fondo-oscuro);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, var(--fondo-oscuro) 70%);
+            color: var(--texto-principal);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 5%;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--texto-principal);
+            text-decoration: none;
+        }
+        .logo span { color: var(--oro); }
+        .btn-login {
+            color: var(--texto-secundario);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid #333;
+            padding: 8px 20px;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .btn-login:hover { color: var(--oro); border-color: var(--oro); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .badge-top {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+            padding: 6px 15px;
+            border-radius: 50px;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0 0 25px 0;
+            letter-spacing: -1px;
+        }
+        .hero h1 span { color: var(--oro); }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--texto-secundario);
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 40px;
+            max-width: 700px;
+        }
+        .btn-cta {
+            background: var(--oro);
+            color: #000;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 18px 40px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        .btn-cta:hover { background: #fff; box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); transform: translateY(-2px); }
+
+        /* --- BARRAS DE AUTORIDAD --- */
+        .authority-bar {
+            background: #0a0a0a;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .authority-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: #555;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* --- CARACTERÍSTICAS (3 COLUMNAS) --- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+        .feature-card {
+            background: var(--superficie);
+            border: 1px solid #1a1a1a;
+            padding: 40px 30px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .feature-card:hover { border-color: var(--borde); transform: translateY(-5px); }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--texto-principal);
+            font-size: 1.1rem;
+            margin: 0 0 15px 0;
+            letter-spacing: 1px;
+        }
+        .feature-card p {
+            color: var(--texto-secundario);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        /* --- SECCIÓN DESCRIPTIVA (DIFERENCIADOR) --- */
+        .showcase {
+            background: linear-gradient(180deg, var(--fondo-oscuro) 0%, #0a0a0a 100%);
+            padding: 100px 20px;
+            text-align: center;
+            border-top: 1px solid #111;
+        }
+        .showcase h2 {
+            font-size: 2.2rem;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+        .showcase p {
+            color: var(--texto-secundario);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        .link-comparativa {
+            color: var(--oro);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed var(--oro);
+            padding-bottom: 5px;
+            transition: 0.3s;
+        }
+        .link-comparativa:hover { color: #fff; border-color: #fff; }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid #111;
+        }
+        .footer-links { margin-bottom: 20px; }
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin: 0 15px;
+            transition: 0.3s;
+        }
+        .footer-links a:hover { color: var(--oro); }
+        .copyright { color: #333; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;}
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero { padding: 80px 20px 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">VAULT<span>LOGIC</span></a>
+        <a href="portal.html" class="btn-login">Acceso Clientes</a>
+    </nav>
+
+    <section class="hero">
+        <div class="badge-top">Protocolo de Alta Precisión Activo</div>
+        <h1>No prediga el mercado.<br><span>Sincronícelo.</span></h1>
+        <p>Los líderes corporativos no dependen de la intuición. Vault Logic decodifica la matemática orbital de la NASA para entregarle directivas tácticas claras antes de su próxima decisión crítica.</p>
+        <a href="suscripcion.html" class="btn-cta">Autorizar Acceso</a>
+    </section>
+
+    <div class="authority-bar">
+        <span class="authority-text">Motor alimentado por Efemérides NASA JPL DE441</span>
+    </div>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Mitigación de Riesgos</h3>
+            <p>Identifique ventanas temporales de alta volatilidad estructural. El sistema le avisará exactamente cuándo adoptar una postura defensiva y congelar operaciones agresivas.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Expansión Acelerada</h3>
+            <p>Conozca sus ciclos de sincronía óptima. Despliegue capital agresivo y acelere cierres de ventas cuando la fricción del mercado sea matemáticamente nula.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📄</div>
+            <h3>Traducción Operativa</h3>
+            <p>Olvídese de gráficos incomprensibles. Nuestra terminal procesa millones de puntos de datos y le entrega un Dossier PDF con órdenes claras y ejecutables.</p>
+        </div>
+    </section>
+
+    <section class="showcase">
+        <h2>La Ventaja Asimétrica</h2>
+        <p>A diferencia del software financiero tradicional que le entrega datos crudos para que usted adivine el futuro, Vault Logic le entrega certezas operativas.</p>
+        <br>
+        <a href="comparativa.html" class="link-comparativa">Ver Análisis Competitivo vs. Estándar de la Industria ➔</a>
+    </section>
+
+    <footer>
+        <div class="footer-links">
+            <a href="privacidad.html">PRIVACIDAD</a>
+            <a href="terminos.html">TÉRMINOS</a>
+            <a href="garantia.html">GARANTÍA</a>
+            <a href="comparativa.html">COMPARATIVA</a>
+        </div>
+        <div class="copyright">VAULT LOGIC SYSTEMS // GLOBAL COMPLIANCE 2026</div>
+    </footer>
+
+</body>
+</html>
