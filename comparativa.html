@@ -13,7 +13,7 @@
         
         header { text-align: center; margin-bottom: 60px; max-width: 800px; }
         header h1 { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2em; font-size: 2rem; font-weight: bold; margin-bottom: 20px; color: var(--texto-blanco); text-transform: uppercase;}
-        header p { color: var(--gris); font-size: 1rem; line-height: 1.6; font-weight: 300;}
+        header p { color: var(--gris); font-size: 1.05rem; line-height: 1.6; font-weight: 300;}
         
         .contenedor-comparativa { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 900px; }
         
@@ -24,17 +24,18 @@
         .columna.competencia { border-top: 3px solid #444; }
         .columna.vault-logic { border-top: 3px solid var(--oro); background: linear-gradient(145deg, rgba(15,15,15,1) 0%, rgba(20,18,10,1) 100%); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.05); }
         
-        .etiqueta-superior { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; display: block; }
+        .etiqueta-superior { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 35px; display: block; }
         .competencia .etiqueta-superior { color: var(--gris); }
         .vault-logic .etiqueta-superior { color: var(--oro); font-weight: bold;}
         
         .lista-puntos { list-style: none; padding: 0; margin: 0; }
-        .lista-puntos li { margin-bottom: 25px; }
-        .lista-puntos h4 { margin: 0 0 10px 0; color: var(--texto-blanco); font-size: 1.05rem; font-weight: 600; }
-        .lista-puntos p { margin: 0; color: #aaa; font-size: 0.9rem; line-height: 1.5; font-weight: 300; }
+        .lista-puntos li { margin-bottom: 30px; display: flex; flex-direction: column;}
         
-        .icono-cruz { color: var(--alerta); font-weight: bold; margin-right: 8px; font-family: 'JetBrains Mono', monospace;}
-        .icono-check { color: var(--oro); font-weight: bold; margin-right: 8px; font-family: 'JetBrains Mono', monospace;}
+        .titulo-punto { display: flex; align-items: center; color: var(--texto-blanco); font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace;}
+        .texto-punto { color: #ccc; font-size: 0.95rem; line-height: 1.6; font-weight: 300; padding-left: 28px;}
+        
+        .icono-cruz { color: var(--alerta); font-weight: bold; margin-right: 12px; font-size: 1.2rem;}
+        .icono-check { color: var(--oro); font-weight: bold; margin-right: 12px; font-size: 1.2rem;}
 
         .seccion-accion { margin-top: 60px; text-align: center; }
         .boton-principal { display: inline-block; background: var(--oro); color: #000; padding: 18px 45px; font-family: 'JetBrains Mono', monospace; font-weight: bold; text-decoration: none; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; border-radius: 2px; }
@@ -51,7 +52,7 @@
 
 <header>
     <h1>La Diferencia Estructural</h1>
-    <p>¿Por qué los ejecutivos de alto nivel abandonan el software financiero tradicional y migran al protocolo cerrado de Vault Logic?</p>
+    <p>Descubra por qué los ejecutivos de alto nivel abandonan el software financiero tradicional y migran al protocolo cerrado de Vault Logic.</p>
 </header>
 
 <div class="contenedor-comparativa">
@@ -61,16 +62,16 @@
             <span class="etiqueta-superior">El Estándar de la Industria</span>
             <ul class="lista-puntos">
                 <li>
-                    <h4><span class="icono-cruz">X</span> Complejidad Visual</h4>
-                    <p>Entregan gráficos abrumadores llenos de líneas, ángulos y símbolos astronómicos que requieren meses de estudio para ser interpretados.</p>
+                    <div class="titulo-punto"><span class="icono-cruz">✗</span> Complejidad Visual</div>
+                    <div class="texto-punto">Entregan gráficos abrumadores llenos de líneas y símbolos astronómicos que requieren meses de estudio para ser interpretados.</div>
                 </li>
                 <li>
-                    <h4><span class="icono-cruz">X</span> Sobrecarga de Datos</h4>
-                    <p>Proporcionan estadísticas crudas sobre el mercado, obligando al directivo a deducir por su cuenta qué decisión tomar.</p>
+                    <div class="titulo-punto"><span class="icono-cruz">✗</span> Sobrecarga de Datos</div>
+                    <div class="texto-punto">Proporcionan estadísticas crudas, obligando al directivo a deducir por su cuenta qué decisión estratégica debe tomar.</div>
                 </li>
                 <li>
-                    <h4><span class="icono-cruz">X</span> Curva de Aprendizaje Lenta</h4>
-                    <p>Software diseñado para analistas técnicos de bolsa, no para directores ejecutivos que necesitan respuestas en cinco minutos.</p>
+                    <div class="titulo-punto"><span class="icono-cruz">✗</span> Curva de Aprendizaje</div>
+                    <div class="texto-punto">Software diseñado para analistas técnicos de bolsa, no para directores ejecutivos que necesitan respuestas claras en cinco minutos.</div>
                 </li>
             </ul>
         </div>
@@ -79,16 +80,16 @@
             <span class="etiqueta-superior">Vault Logic (Nivel Génesis)</span>
             <ul class="lista-puntos">
                 <li>
-                    <h4><span class="icono-check">✓</span> Traducción Operativa Directa</h4>
-                    <p>El sistema procesa la matemática orbital en segundo plano y le entrega instrucciones en texto claro (ej. "Congele contrataciones hoy").</p>
+                    <div class="titulo-punto"><span class="icono-check">✓</span> Traducción Operativa Directa</div>
+                    <div class="texto-punto">El sistema procesa la matemática orbital y le entrega instrucciones en texto claro (ej. "Congele contrataciones agresivas").</div>
                 </li>
                 <li>
-                    <h4><span class="icono-check">✓</span> Matriz de Impacto Ejecutivo</h4>
-                    <p>Visualización inmediata de las tres áreas críticas: Liquidez, Clima de Negociación y Nivel de Riesgo Estructural.</p>
+                    <div class="titulo-punto"><span class="icono-check">✓</span> Matriz de Impacto Ejecutivo</div>
+                    <div class="texto-punto">Visualización inmediata y jerarquizada de sus tres áreas críticas: Liquidez, Clima de Negociación y Nivel de Riesgo.</div>
                 </li>
                 <li>
-                    <h4><span class="icono-check">✓</span> Implementación Inmediata</h4>
-                    <p>Diseño militar de alta eficiencia. Sin manuales complejos. Su equipo directivo puede usar el panel y descargar el Dossier desde el primer segundo.</p>
+                    <div class="titulo-punto"><span class="icono-check">✓</span> Implementación Inmediata</div>
+                    <div class="texto-punto">Diseño de alta eficiencia sin manuales complejos. Su equipo directivo puede operar la terminal desde el primer segundo.</div>
                 </li>
             </ul>
         </div>
