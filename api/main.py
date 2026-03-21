@@ -1,7 +1,10 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import datetime
+import os
 
 app = Flask(__name__)
+CORS(app) # Esto es vital para que el Frontend pueda hablar con el Backend
 
 @app.route('/api/health')
 def health():
@@ -15,7 +18,6 @@ def health():
 
 @app.route('/api/orbital-data')
 def orbital_data():
-    # Simulador de cálculos orbitales NASA JPL DE441
     return jsonify({
         "epoch": "J2000.0",
         "reference": "DE441",
@@ -26,3 +28,8 @@ def orbital_data():
         },
         "market_sync_score": 0.9847
     })
+
+if __name__ == "__main__":
+    # Esto permite que corra localmente y en Render usando el puerto que ellos asignen
+    port = int(os.environ.get("PORT", 3000))
+    app.run(host='0.0.0.0', port=port)
