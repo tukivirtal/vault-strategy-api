@@ -39,7 +39,7 @@ class PerfilRequest(BaseModel):
 async def read_index():
     return FileResponse('index.html')
 
-@app.post("/consultar")
+@app.post("/api/consultar")
 async def consultar(data: LoginData):
     try:
         if data.login_only:
@@ -98,7 +98,7 @@ async def consultar(data: LoginData):
         return {"status": "error", "analisis_ejecutivo": f"Fallo en el núcleo: {str(e)}"}
 
 # === NUEVA RUTA PARA REVIVIR BOVEDA.HTML ===
-@app.post("/obtener_perfil")
+@app.post("/api/obtener_perfil")
 async def obtener_perfil(req: PerfilRequest):
     try:
         res = supabase.table("clientes_vip").select("*").eq("email", req.email).execute()
