@@ -6,9 +6,18 @@ import { defineConfig, loadEnv } from 'vite';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
-    root: './', // <--- Añade esto para forzar la raíz
-    base: './',
+    base: '/', // <--- Cambiado a '/'
     plugins: [react(), tailwindcss()],
-    // ... resto del archivo igual
+    define: {
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'), // <--- Alias corregido a ./src
+      },
+    },
+    server: {
+      hmr: process.env.DISABLE_HMR !== 'true',
+    },
   };
 });
