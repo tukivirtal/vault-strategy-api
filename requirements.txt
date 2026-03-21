@@ -7,3 +7,5 @@ pyswisseph
 geopy
 httpx
 pydantic
+flask
+flask-cors
