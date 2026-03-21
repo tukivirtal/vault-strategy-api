@@ -1,37 +1,5 @@
-{
-  "name": "vault-logic-executive",
-  "version": "1.0.0",
-  "description": "Terminal de Inteligencia Estratégica Génesis",
-  "main": "main.js",
-  "author": "Vault Logic",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "electron:start": "electron .",
-    "electron:build": "electron-builder"
-  },
-  "build": {
-    "appId": "com.vaultlogic.executive",
-    "productName": "Vault Logic Executive",
-    "win": {
-      "target": "nsis"
-    }
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "motion": "^12.23.24",
-    "lucide-react": "^0.546.0",
-    "tailwindcss": "^4.1.14",
-    "@tailwindcss/vite": "^4.1.14"
-  },
-  "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.13.3",
-    "vite": "^6.2.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.7.2"
-  }
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
 }
