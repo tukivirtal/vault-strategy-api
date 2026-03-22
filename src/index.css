@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --gold: #D4AF37;
+  --gold-glow: rgba(212, 175, 55, 0.3);
+}
+
+body {
+  margin: 0;
+  background-color: #000000; /* Negro puro para máximo impacto */
+  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; /* Tipografía nítida estilo Apple/Hostinger */
+  overflow-x: hidden;
+}
+
+/* El degradado metálico de ai.studio */
 .text-gradient-gold {
-  background: linear-gradient(to bottom, #E6C27A 0%, #D4AF37 50%, #B8860B 100%);
+  background: linear-gradient(135deg, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
