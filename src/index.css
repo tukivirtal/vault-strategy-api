@@ -2,21 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --gold: #D4AF37;
-}
-
-body {
-  margin: 0;
-  background-color: #000000; /* Negro profundo para el estilo moderno */
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Efecto de texto dorado que viste en la captura */
 .text-gradient-gold {
-  background: linear-gradient(to bottom, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
+  background: linear-gradient(to bottom, #E6C27A 0%, #D4AF37 50%, #B8860B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+}
+
+.font-terminal {
+  font-family: 'JetBrains Mono', monospace;
 }
