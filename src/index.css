@@ -4,25 +4,19 @@
 
 :root {
   --gold: #D4AF37;
-  --gold-glow: rgba(212, 175, 55, 0.3);
 }
 
 body {
   margin: 0;
-  background-color: #000000;
+  background-color: #000000; /* Negro profundo para el estilo moderno */
   color: #ffffff;
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
 }
 
+/* Efecto de texto dorado que viste en la captura */
 .text-gradient-gold {
   background: linear-gradient(to bottom, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.glass-vault {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  display: inline-block;
 }
