@@ -4,49 +4,41 @@
 
 :root {
   --gold: #D4AF37;
-  --gold-glow: rgba(212, 175, 55, 0.3);
+  --gold-light: #FFF5D1;
+  --gold-dark: #A67C00;
 }
 
 body {
+  @apply bg-black text-white antialiased selection:bg-gold/30;
   margin: 0;
-  background-color: #020202;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Tipografía para la Terminal */
-.font-mono {
+.font-terminal {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Efecto de Texto Dorado Premium */
-.text-gradient-gold {
-  background: linear-gradient(135deg, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
+/* El degradado masivo de tu captura */
+.hero-title-gold {
+  @apply uppercase font-black tracking-tighter leading-none;
+  background: linear-gradient(to bottom, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-size: clamp(3rem, 10vw, 8rem);
 }
 
-/* Tarjetas Estilo Cristal (Glassmorphism) */
-.glass-card {
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: all 0.4s ease;
+.hero-title-white {
+  @apply uppercase font-black italic tracking-tighter leading-none text-white;
+  font-size: clamp(3rem, 10vw, 8rem);
 }
 
-.glass-card:hover {
-  border-color: var(--gold);
-  box-shadow: 0 0 25px var(--gold-glow);
+/* Efecto cristal para la navegación y tarjetas */
+.glass-vault {
+  @apply bg-white/5 backdrop-blur-xl border border-gold/10;
 }
 
-/* Capa de Ruido (Textura) */
-.noise {
-  position: fixed;
-  inset: 0;
+/* Capa de textura sutil */
+.noise-overlay {
+  @apply fixed inset-0 pointer-events-none opacity-[0.03] z-[9999];
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.04;
-  pointer-events: none;
-  z-index: 50;
 }
