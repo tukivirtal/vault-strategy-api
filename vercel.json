@@ -1,8 +1,9 @@
 {
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "api/main.py"
+      "destination": "/api/main.py"
     },
     {
       "source": "/(.*)",
