@@ -1,38 +1,59 @@
-@import "tailwindcss";
+/* 1. Importaciones estándar de Tailwind (Compatibilidad Total) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* 2. Variables de Marca */
 :root {
   --gold: #D4AF37;
-  --gold-glow: rgba(212, 175, 55, 0.5);
+  --gold-glow: rgba(212, 175, 55, 0.4);
+  --gold-gradient: linear-gradient(135deg, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
 }
 
+/* 3. Reset y Tipografía Global */
 body {
   margin: 0;
-  background-color: black;
-  color: white;
+  background-color: #050505; /* Un negro más profundo y elegante */
+  color: #ffffff;
   overflow-x: hidden;
+  /* Forzamos las fuentes que definimos en el HTML */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* 4. Clases de Diseño Premium */
+
+/* Degradado de texto para títulos "Hook" */
 .text-gradient-gold {
-  background: linear-gradient(to bottom, #FFF5D1 0%, #D4AF37 50%, #A67C00 100%);
+  background: var(--gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
+/* Efecto Cristal (Glassmorphism) para tarjetas */
 .glass-gold {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
-.hover\:glow-gold-strong:hover {
-  box-shadow: 0 0 30px var(--gold-glow);
+/* Brillo al pasar el mouse (Efecto Elementor Pro) */
+.hover-glow-gold:hover {
+  box-shadow: 0 0 40px var(--gold-glow);
+  border-color: var(--gold);
+  transition: all 0.4s ease;
 }
 
+/* 5. Capa de Ruido Visual (Textura Cinematográfica) */
 .noise-overlay {
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.05;
-  pointer-events: none;
-  z-index: 1;
+  /* SVG de ruido más sutil */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.03; /* Bajamos la opacidad para que no "ensucie" el diseño */
+  pointer-events: none; /* CRÍTICO: Permite hacer clic a través del ruido */
+  z-index: 9999; /* Lo ponemos arriba de todo, pero sin bloquear clics */
 }
