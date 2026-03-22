@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Shield, X, Activity, ChevronRight, Lock, User, AlertCircle, Loader2 } from "lucide-react";
 
 // --- COMPONENTE: FONDO ORBITAL ---
