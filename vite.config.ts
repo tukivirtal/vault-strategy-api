@@ -1,23 +1,40 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// 1. Solución para __dirname en entornos modernos (ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  // Carga variables de entorno de forma segura
+  const env = loadEnv(mode, process.cwd(), '');
+  
   return {
-    base: '/', // <--- Cambiado a '/'
-    plugins: [react(), tailwindcss()],
+    // 2. Base corregida para despliegue en raíz
+    base: '/',
+    plugins: [
+      react(),
+      tailwindcss(), // Plugin para Tailwind v4
+    ],
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      // Inyecta la API Key solo si existe en el entorno
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'), // <--- Alias corregido a ./src
+        // 3. Alias configurado correctamente sin errores de ruta
+        '@': path.resolve(__dirname, './src'),
       },
     },
+    build: {
+      outDir: 'dist',
+      emptyOutDir: true,
+    },
     server: {
-      hmr: process.env.DISABLE_HMR !== 'true',
+      hmr: true,
     },
   };
 });
