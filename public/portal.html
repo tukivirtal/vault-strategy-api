@@ -30,11 +30,9 @@
         /* LOGO */
         .logo-group { display: flex; align-items: center; gap: 16px; text-decoration: none; cursor: pointer; }
         .logo-box { 
-            width: 48px; height: 48px; 
-            background: rgba(212, 175, 55, 0.1); 
-            border: 1px solid rgba(212, 175, 55, 0.2); 
-            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
-            transition: all 0.3s ease; 
+            width: 48px; height: 48px; background: rgba(212, 175, 55, 0.1); 
+            border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; 
         }
         .logo-text-col { display: flex; flex-direction: column; }
         .logo-title { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; color: #fff; letter-spacing: -0.05em; transition: all 0.3s ease; }
@@ -49,7 +47,7 @@
         .logo-group:hover .logo-subtitle { opacity: 1; }
         
         .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { color: #888; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
+        .nav-links a { color: #888; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; cursor: pointer; }
         .nav-links a:hover { color: #D4AF37; }
         .nav-links a.vip { color: #000; background-color: #D4AF37; padding: 10px 24px; border-radius: 4px; font-weight: bold; }
         .nav-links a.vip:hover { background-color: #FFF5D1; }
@@ -64,25 +62,40 @@
         .form-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.15); padding: 40px; border-radius: 8px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .form-header { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #aaa; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         
-        /* CORRECCIÓN DE CAMPOS DE TEXTO: Se quita la mayúscula forzada global */
-        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; transition: all 0.3s; }
+        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; transition: all 0.3s; color-scheme: dark; }
         input:focus { outline: none; border-color: #D4AF37; background: #000; }
         input::placeholder { color: #555; text-transform: uppercase; }
         
-        /* Reglas específicas de mayúsculas/minúsculas */
         input[type="email"] { text-transform: lowercase; }
         input[type="text"] { text-transform: uppercase; }
-        /* input[type="password"] se deja intacto para respetar mayúsculas/minúsculas de la contraseña real */
         
         .row { display: flex; gap: 15px; }
         .row input { flex: 1; }
 
         button { width: 100%; background: #D4AF37; color: #000; padding: 16px; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: all 0.3s; }
         button:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
 
         .login-link { text-align: center; margin-top: 25px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #666; letter-spacing: 0.1em; text-transform: uppercase; }
         .login-link a { color: #D4AF37; text-decoration: none; font-weight: bold; margin-left: 5px; transition: color 0.3s; cursor: pointer; }
         .login-link a:hover { color: #FFF5D1; }
+
+        /* ESTILOS DEL AUTOCOMPLETADO (Tu lógica original adaptada al diseño oscuro) */
+        .autocomplete-items {
+            position: absolute; border: 1px solid rgba(212,175,55,0.2); background-color: #0a0a0a;
+            z-index: 99; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8); border-radius: 0 0 4px 4px;
+        }
+        .autocomplete-item {
+            padding: 12px; cursor: pointer; font-size: 10px; color: #aaa;
+            border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+        }
+        .autocomplete-item:hover { background-color: rgba(212,175,55,0.1); color: #D4AF37; }
+        
+        /* ESTILOS DEL RESULTADO */
+        #resultado { margin-top: 20px; padding: 15px; border-left: 2px solid #D4AF37; background: rgba(15,15,15,0.8); font-family: 'JetBrains Mono', monospace; display: none; }
+        #res-titulo { color: #D4AF37; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+        #res-cuerpo { color: #aaa; font-size: 10px; line-height: 1.4; text-transform: uppercase;}
 
         /* FOOTER MARCADO */
         footer { 
@@ -117,8 +130,8 @@
             </div>
         </a>
         <div class="nav-links">
-            <a href="/">Volver a la Terminal</a>
-            <a href="#" class="vip" id="nav-vip-btn">Acceso VIP</a>
+            <a href="/">Volver a la Portada</a>
+            <a onclick="toggleModo(true)" class="vip" id="nav-vip-btn">Acceso VIP</a>
         </div>
     </nav>
 
@@ -129,25 +142,35 @@
         <div class="form-box">
             <div class="form-header" id="form-title">Registro de Nueva Terminal</div>
             
-            <form id="auth-form">
-                <input type="email" placeholder="Email Corporativo / VIP" required>
-                <input type="password" placeholder="Contraseña Estratégica" required>
+            <div class="space-y-4">
+                <input type="email" id="email" placeholder="Email Corporativo / VIP">
+                <input type="password" id="password" placeholder="Contraseña Estratégica">
                 
-                <div id="extra-fields">
-                    <input type="text" placeholder="Nombre Completo" required class="extra-input">
+                <div id="campos-registro">
+                    <input type="text" id="nombre" placeholder="Nombre Completo">
                     <div class="row">
-                        <input type="text" placeholder="DD/MM/AAAA" required class="extra-input">
-                        <input type="text" placeholder="--:--" required class="extra-input">
+                        <input type="date" id="fecha" style="color: #aaa;">
+                        <input type="time" id="hora" style="color: #aaa;">
                     </div>
-                    <input type="text" placeholder="Ciudad de Nacimiento" required class="extra-input">
+                    <div style="position: relative;">
+                        <input type="text" id="lugar" placeholder="Ciudad de Nacimiento" autocomplete="off">
+                        <div id="lugar-list" class="autocomplete-items hidden"></div>
+                    </div>
+                    <input type="hidden" id="lat">
+                    <input type="hidden" id="lon">
                 </div>
 
-                <button type="submit" id="submit-btn">Iniciar Secuencia de Cálculo</button>
-            </form>
-            
-            <div class="login-link">
-                <span id="toggle-desc">¿Ya tiene una terminal?</span> 
-                <a href="#" id="toggle-btn">Acceso VIP</a>
+                <button onclick="consultar()" id="btn-submit">Iniciar Secuencia de Cálculo</button>
+
+                <div id="resultado">
+                    <div id="res-titulo"></div>
+                    <div id="res-cuerpo"></div>
+                </div>
+                
+                <div class="login-link">
+                    <span id="toggle-desc">¿Ya tiene una terminal?</span> 
+                    <a onclick="toggleModo()" id="toggle-link">Acceso VIP</a>
+                </div>
             </div>
         </div>
     </main>
@@ -160,59 +183,163 @@
     </footer>
 
     <script>
-        const extraFields = document.getElementById('extra-fields');
-        const extraInputs = document.querySelectorAll('.extra-input');
-        const formTitle = document.getElementById('form-title');
-        const submitBtn = document.getElementById('submit-btn');
-        const toggleDesc = document.getElementById('toggle-desc');
-        const toggleBtn = document.getElementById('toggle-btn');
-        const navVipBtn = document.getElementById('nav-vip-btn');
-        const authForm = document.getElementById('auth-form');
+        let modoVIP = false;
 
-        let isLoginMode = false;
+        function toggleModo(forzarVIP = false) {
+            if (forzarVIP) modoVIP = true;
+            else modoVIP = !modoVIP;
 
-        // 1. LÓGICA DE CAMBIO DE MODO
-        function toggleMode(event) {
-            if(event) event.preventDefault();
-            isLoginMode = !isLoginMode;
+            const campos = document.getElementById('campos-registro');
+            const titulo = document.getElementById('form-title');
+            const btn = document.getElementById('btn-submit');
+            const text = document.getElementById('toggle-desc');
+            const link = document.getElementById('toggle-link');
+            const navVipBtn = document.getElementById('nav-vip-btn');
+            const resContainer = document.getElementById('resultado');
 
-            if (isLoginMode) {
-                extraFields.classList.add('hidden');
-                extraInputs.forEach(input => input.required = false);
-                
-                formTitle.innerText = "Autorización de Terminal";
-                submitBtn.innerText = "Autorizar Acceso";
-                toggleDesc.innerText = "¿Aún no tiene una terminal?";
-                toggleBtn.innerText = "Solicitar Registro";
+            // Limpiamos errores previos al cambiar de modo
+            resContainer.style.display = 'none';
+
+            if (modoVIP) {
+                campos.classList.add('hidden');
+                titulo.innerText = "Autorización de Terminal";
+                btn.innerText = "Autorizar Acceso";
+                text.innerText = "¿Aún no tiene una terminal?";
+                link.innerText = "Solicitar Registro";
                 navVipBtn.innerText = "Registrarse";
             } else {
-                extraFields.classList.remove('hidden');
-                extraInputs.forEach(input => input.required = true);
-                
-                formTitle.innerText = "Registro de Nueva Terminal";
-                submitBtn.innerText = "Iniciar Secuencia de Cálculo";
-                toggleDesc.innerText = "¿Ya tiene una terminal?";
-                toggleBtn.innerText = "Acceso VIP";
+                campos.classList.remove('hidden');
+                titulo.innerText = "Registro de Nueva Terminal";
+                btn.innerText = "Iniciar Secuencia de Cálculo";
+                text.innerText = "¿Ya tiene una terminal?";
+                link.innerText = "Acceso VIP";
                 navVipBtn.innerText = "Acceso VIP";
             }
         }
 
-        toggleBtn.addEventListener('click', toggleMode);
-        navVipBtn.addEventListener('click', toggleMode);
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
 
-        // 2. LÓGICA DE REDIRECCIÓN A LA BÓVEDA
-        authForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita recargar la página
+        async function consultar() {
+            const resContainer = document.getElementById('resultado');
+            const resTitulo = document.getElementById('res-titulo');
+            const resCuerpo = document.getElementById('res-cuerpo');
+            const btn = document.getElementById('btn-submit');
+            
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const passInput = document.getElementById('password').value.trim();
 
-            // Efecto visual de carga
-            submitBtn.innerText = "Sincronizando...";
-            submitBtn.style.opacity = "0.7";
+            if (!validarEmail(emailInput)) {
+                resContainer.style.display = 'block';
+                resTitulo.innerText = "ERROR DE IDENTIDAD:";
+                resCuerpo.innerText = "Ingrese un formato de email válido.";
+                return;
+            }
+            if (passInput.length < 4) {
+                resContainer.style.display = 'block';
+                resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
+                resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
+                return;
+            }
 
-            // Simula 1 segundo de "cálculo" y redirige a la bóveda
-            setTimeout(() => {
-                window.location.href = "boveda.html";
-            }, 1000);
+            const payload = modoVIP ? { 
+                email: emailInput, 
+                password: passInput, 
+                login_only: true 
+            } : {
+                nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+                email: emailInput,
+                password: passInput,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+                lat: document.getElementById('lat').value,
+                lon: document.getElementById('lon').value
+            };
+
+            if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+                resContainer.style.display = 'block';
+                resTitulo.innerText = "DATOS INCOMPLETOS:";
+                resCuerpo.innerText = "Complete los parámetros de nacimiento.";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "AUTENTICANDO...";
+            resContainer.style.display = 'block';
+            resTitulo.innerHTML = "SISTEMA";
+            resCuerpo.innerHTML = "Conectando con servidor seguro. Esto puede demorar unos segundos...";
+
+            try {
+                // ENVIAMOS LOS DATOS A TU SERVIDOR SEGURO (RENDER)
+                const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await respuesta.json();
+                
+                if (data.status === "success" || data.status === "exists") {
+                    resTitulo.innerHTML = "ACCESO AUTORIZADO";
+                    resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
+                    
+                    // Guardamos el email en la memoria local para que la Bóveda sepa quién entra
+                    localStorage.setItem('vault_user_email', emailInput);
+                    if(!modoVIP) {
+                        localStorage.setItem('vault_user_nombre', payload.nombre);
+                    }
+
+                    // Redirigimos a la bóveda. Allí actuará tu Controlador de Tráfico VIP
+                    setTimeout(() => {
+                        window.location.href = "boveda.html";
+                    }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
+                    resTitulo.innerHTML = "ACCESO DENEGADO";
+                    resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
+                }
+            } catch (error) {
+                btn.disabled = false;
+                btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
+                resTitulo.innerHTML = "ERROR CRÍTICO";
+                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+            }
+        }
+
+        // LÓGICA ORIGINAL DE AUTOCOMPLETADO PHOTON (Para el Registro de ciudad)
+        const lugarInput = document.getElementById('lugar');
+        const lugarList = document.getElementById('lugar-list');
+
+        lugarInput.addEventListener('input', async (e) => {
+            const val = e.target.value;
+            if (val.length < 3) { lugarList.classList.add('hidden'); return; }
+            try {
+                const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+                const data = await res.json();
+                lugarList.innerHTML = '';
+                lugarList.classList.remove('hidden');
+                data.features.forEach(feat => {
+                    const prop = feat.properties;
+                    const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerText = label.toUpperCase();
+                    item.onclick = () => {
+                        lugarInput.value = label.toUpperCase();
+                        document.getElementById('lat').value = feat.geometry.coordinates[1];
+                        document.getElementById('lon').value = feat.geometry.coordinates[0];
+                        lugarList.classList.add('hidden');
+                    };
+                    lugarList.appendChild(item);
+                });
+            } catch (err) { console.error(err); }
         });
+
+        // Ocultar la lista si haces clic afuera
+        document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
 </html>
