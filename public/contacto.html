@@ -13,38 +13,24 @@
         button:hover { background: #FFF5D1; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
         a { color: #888; text-decoration: none; margin-top: 30px; display: block; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
         a:hover { color: #fff; }
-        
-        /* Estilos para el mensaje de éxito */
-        #success-message { display: none; text-align: center; color: #10B981; font-family: monospace; line-height: 1.6; }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h1>Soporte Ejecutivo</h1>
         
-        <form id="vaultForm">
-            <input type="email" placeholder="SU CORREO CORPORATIVO" required>
-            <textarea rows="4" placeholder="MENSAJE / SOLICITUD DE ACCESO" required></textarea>
+        <form action="TU_ENLACE_DE_FORMSPREE" method="POST">
+            
+            <input type="hidden" name="_next" value="https://vault-strategy-api.vercel.app/">
+            <input type="hidden" name="_subject" value="Nueva Directiva desde Vault Logic">
+            
+            <input type="email" name="email" placeholder="SU CORREO CORPORATIVO" required>
+            <textarea rows="4" name="message" placeholder="MENSAJE / SOLICITUD DE ACCESO" required></textarea>
+            
             <button type="submit">Enviar Directiva</button>
         </form>
 
-        <div id="success-message">
-            <br>
-            <strong style="font-size: 18px;">✓ PROTOCOLO COMPLETADO</strong><br><br>
-            Directiva enviada con éxito.<br>
-            Un oficial de enlace responderá a su correo en las próximas 24 horas.
-        </div>
-
         <a href="/">Volver a la Terminal</a>
     </div>
-
-    <script>
-        // Esta función intercepta el envío para que Vercel no lance el Error 405
-        document.getElementById('vaultForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Detiene el POST real
-            this.style.display = 'none'; // Oculta el formulario
-            document.getElementById('success-message').style.display = 'block'; // Muestra el mensaje verde
-        });
-    </script>
 </body>
 </html>
