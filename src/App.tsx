@@ -52,8 +52,8 @@ export default function App() {
               </div>
             </div>
 
-    {/* TÍTULO CORREGIDO: Espaciado natural (sin apretar) y sin puntos finales */}
-            <h1 className="text-6xl md:text-8xl lg:text-[8.5rem] font-sans font-black leading-[0.95] mb-12 flex flex-col items-center text-center">
+       {/* TÍTULO CORREGIDO: Forzamos el espaciado natural anulando el "tighter" global */}
+            <h1 className="text-6xl md:text-8xl lg:text-[8.5rem] font-sans font-black tracking-normal leading-[0.95] mb-12 flex flex-col items-center text-center">
               <motion.span
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ export default function App() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8, duration: 1 }}
-                className="text-white italic mt-2 md:mt-4"
+                className="text-white italic mt-2 md:mt-4 tracking-wide"
               >
                 SINCRONÍCELO
               </motion.span>
