@@ -195,24 +195,21 @@
             const text = document.getElementById('toggle-desc');
             const link = document.getElementById('toggle-link');
             const navVipBtn = document.getElementById('nav-vip-btn');
-            const resContainer = document.getElementById('resultado');
-
-            resContainer.style.display = 'none';
 
             if (modoVIP) {
                 campos.classList.add('hidden');
-                titulo.innerText = "Autorización de Terminal";
-                btn.innerText = "Autorizar Acceso";
-                text.innerText = "¿Aún no tiene una terminal?";
-                link.innerText = "Solicitar Registro";
-                navVipBtn.innerText = "Registrarse";
+                titulo.innerText = "Acceso VIP Autorizado";
+                btn.innerText = "Vincular con el Núcleo";
+                text.innerText = "¿NUEVA TERMINAL?";
+                link.innerText = "Registrarse";
+                if(navVipBtn) navVipBtn.innerText = "Registrarse";
             } else {
                 campos.classList.remove('hidden');
                 titulo.innerText = "Registro de Nueva Terminal";
                 btn.innerText = "Iniciar Secuencia de Cálculo";
-                text.innerText = "¿Ya tiene una terminal?";
+                text.innerText = "¿YA TIENE UNA TERMINAL?";
                 link.innerText = "Acceso VIP";
-                navVipBtn.innerText = "Acceso VIP";
+                if(navVipBtn) navVipBtn.innerText = "Acceso VIP";
             }
         }
 
@@ -242,7 +239,7 @@
                 return;
             }
 
-            // Datos exactos de tu código original
+            // EL PAYLOAD EXACTO DE TU CÓDIGO ORIGINAL
             const payload = modoVIP ? { 
                 email: emailInput, 
                 password: passInput, 
@@ -268,20 +265,16 @@
             btn.disabled = true;
             btn.innerText = "AUTENTICANDO...";
             resContainer.style.display = 'block';
-            resTitulo.innerHTML = "SISTEMA CONECTANDO";
-            resCuerpo.innerHTML = "Estableciendo enlace con el núcleo. Si Render se está reiniciando, esto puede demorar unos segundos...";
+            resTitulo.innerHTML = "SISTEMA";
+            resCuerpo.innerHTML = "Conectando con servidor seguro...";
 
             try {
+                // LA CONEXIÓN ORIGINAL A RENDER SIN CÓDIGO EXTRA
                 const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-
-                // RAYOS X: Verificamos si Render nos tiró un error antes de intentar leer los datos
-                if (!respuesta.ok) {
-                    throw new Error(`Render respondió con error ${respuesta.status}. El servidor aún se está reiniciando o bloqueó la petición.`);
-                }
 
                 const data = await respuesta.json();
                 
@@ -289,29 +282,28 @@
                     resTitulo.innerHTML = "ACCESO AUTORIZADO";
                     resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
                     
+                    // Solo agregamos esto para que la bóveda sepa quién eres
                     localStorage.setItem('vault_user_email', emailInput);
-                    if(!modoVIP) {
-                        localStorage.setItem('vault_user_nombre', payload.nombre);
-                    }
+                    if(!modoVIP) localStorage.setItem('vault_user_nombre', payload.nombre);
 
                     setTimeout(() => {
                         window.location.href = "boveda.html";
                     }, 1200);
                 } else {
                     btn.disabled = false;
-                    btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
+                    btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
                     resTitulo.innerHTML = "ACCESO DENEGADO";
                     resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
                 }
             } catch (error) {
                 btn.disabled = false;
-                btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR DE CONEXIÓN";
-                // Mostramos el error EXACTO para no adivinar más
-                resCuerpo.innerHTML = `<b>Detalle técnico:</b> ${error.message}`;
+                btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
+                resTitulo.innerHTML = "ERROR CRÍTICO";
+                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
             }
         }
 
+        // AUTOCOMPLETADO EXACTO DE PHOTON
         const lugarInput = document.getElementById('lugar');
         const lugarList = document.getElementById('lugar-list');
 
