@@ -52,24 +52,23 @@ export default function App() {
               </div>
             </div>
 
-       {/* TÍTULO CORREGIDO: Quitamos el degradado del h1 para que no contamine la segunda línea */}
-            <h1 className="text-6xl md:text-9xl font-sans font-black leading-[0.9] tracking-tighter mb-12">
+    {/* TÍTULO CORREGIDO: Permite saltos de línea naturales sin achicar la fuente */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-sans font-black leading-[0.95] tracking-tighter mb-12 flex flex-col items-center text-center">
               <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                className="inline-block overflow-hidden whitespace-nowrap border-r-4 border-gold pr-2 text-gradient-gold"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="text-gradient-gold pb-2"
               >
-                NO PREDIGA EL MERCADO
+                NO PREDIGA EL MERCADO.
               </motion.span>
-              <br />
               <motion.span
-                initial={{ opacity: 0, x: 50 }} /* x: 50 hace que entre de derecha a izquierda */
+                initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 2, duration: 0.8 }}
-                className="text-white italic inline-block"
+                transition={{ delay: 0.8, duration: 1 }}
+                className="text-white italic mt-2 md:mt-4"
               >
-                SINCRONÍCELO
+                SINCRONÍCELO.
               </motion.span>
             </h1>
 
