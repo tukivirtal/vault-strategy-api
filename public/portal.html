@@ -5,41 +5,49 @@
     <title>Registro | Vault Logic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos Base idénticos a la portada */
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
-        /* Textura de ruido fotográfico */
         .noise-overlay {
             position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
         
-        /* Brillo dorado de fondo */
         .glow-bg {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 800px; height: 800px; background: rgba(212, 175, 55, 0.03);
             filter: blur(150px); border-radius: 50%; z-index: 0; pointer-events: none;
         }
 
-        /* Navegación Superior Limpia */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; position: relative; z-index: 10; }
-        .logo { color: #D4AF37; font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 0.2em; text-decoration: none; font-size: 18px; transition: opacity 0.3s; }
-        .logo:hover { opacity: 0.8; }
+        /* HEADER MARCADO */
+        nav { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 25px 50px; position: relative; z-index: 10; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+        }
+        
+        /* ESCUDO EN EL LOGO */
+        .logo-container { display: flex; align-items: center; gap: 15px; text-decoration: none; transition: opacity 0.3s; }
+        .logo-container:hover { opacity: 0.8; }
+        .logo-icon { border: 1px solid #D4AF37; color: #D4AF37; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .logo-text { color: #fff; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; letter-spacing: -0.05em; text-transform: uppercase; }
         
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-links a { color: #888; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
         .nav-links a:hover { color: #D4AF37; }
-        .nav-links a.vip { color: #000; background-color: #D4AF37; padding: 8px 20px; border-radius: 4px; font-weight: bold; }
+        .nav-links a.vip { color: #000; background-color: #D4AF37; padding: 10px 24px; border-radius: 4px; font-weight: bold; }
         .nav-links a.vip:hover { background-color: #FFF5D1; }
 
-        /* Contenido Principal */
-        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; padding: 40px 20px; }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; padding: 60px 20px; }
         
-        h1 { font-size: 42px; font-weight: 300; text-align: center; margin-bottom: 10px; letter-spacing: -0.02em; }
+        /* TÍTULOS SIN PUNTOS */
+        h1 { font-size: 46px; font-weight: 300; text-align: center; margin-bottom: 15px; letter-spacing: -0.02em; line-height: 1.2; }
         h1 span { font-weight: 900; font-style: italic; color: #D4AF37; }
-        .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 50px; max-width: 600px; line-height: 1.6; }
+        
+        /* SUBTÍTULO BLANCO */
+        .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 50px; max-width: 600px; line-height: 1.6; opacity: 0.9; }
 
-        /* Caja del Formulario */
         .form-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.15); padding: 40px; border-radius: 8px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .form-header { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #aaa; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         
@@ -57,8 +65,14 @@
         .login-link a { color: #D4AF37; text-decoration: none; font-weight: bold; margin-left: 5px; transition: color 0.3s; }
         .login-link a:hover { color: #FFF5D1; }
 
-        /* Footer */
-        footer { text-align: center; padding: 40px; position: relative; z-index: 10; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.2em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); }
+        /* FOOTER MARCADO */
+        footer { 
+            text-align: center; padding: 40px; position: relative; z-index: 10; 
+            font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; 
+            letter-spacing: 0.2em; text-transform: uppercase; 
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0, 0, 0, 0.6);
+        }
         .footer-links { margin-top: 15px; }
         .footer-links a { color: #666; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
         .footer-links a:hover { color: #D4AF37; }
@@ -69,7 +83,12 @@
     <div class="glow-bg"></div>
 
     <nav>
-        <a href="/" class="logo">VAULT LOGIC</a>
+        <a href="/" class="logo-container">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.89 0 5.13 1 6.9 2a1 1 0 0 1 .1 1z"/></svg>
+            </div>
+            <span class="logo-text">VAULT LOGIC</span>
+        </a>
         <div class="nav-links">
             <a href="/">Volver a la Terminal</a>
             <a href="#" class="vip">Acceso VIP</a>
@@ -77,8 +96,8 @@
     </nav>
 
     <main>
-        <h1>Los líderes no esperan a la suerte.<br><span>Dominan el timing.</span></h1>
-        <p class="subtitle">Inteligencia estratégica basada en ciclos planetarios de precisión.</p>
+        <h1>Los líderes no esperan a la suerte<br><span>Dominan el timing</span></h1>
+        <p class="subtitle">Inteligencia estratégica basada en ciclos planetarios de precisión</p>
 
         <div class="form-box">
             <div class="form-header">Registro de Nueva Terminal</div>
