@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro | Vault Logic</title>
+    <title>Terminal | Vault Logic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
@@ -27,7 +27,7 @@
             backdrop-filter: blur(12px);
         }
         
-        /* LOGO ORIGINAL RECREADO EN HTML/CSS */
+        /* LOGO */
         .logo-group { display: flex; align-items: center; gap: 16px; text-decoration: none; cursor: pointer; }
         .logo-box { 
             width: 48px; height: 48px; 
@@ -37,37 +37,17 @@
             transition: all 0.3s ease; 
         }
         .logo-text-col { display: flex; flex-direction: column; }
-        .logo-title { 
-            font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; 
-            color: #fff; letter-spacing: -0.05em; transition: all 0.3s ease; 
-        }
-        .logo-subtitle { 
-            display: flex; align-items: center; gap: 6px; 
-            opacity: 0.4; transition: opacity 0.3s ease; margin-top: 2px; 
-        }
-        .logo-subtitle span { 
-            font-family: 'JetBrains Mono', monospace; font-size: 10px; 
-            color: #fff; text-transform: uppercase; letter-spacing: 0.2em; 
-        }
+        .logo-title { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; color: #fff; letter-spacing: -0.05em; transition: all 0.3s ease; }
+        .logo-subtitle { display: flex; align-items: center; gap: 6px; opacity: 0.4; transition: opacity 0.3s ease; margin-top: 2px; }
+        .logo-subtitle span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.2em; }
         .pulse-icon { animation: pulse-anim 2s infinite; }
         
-        @keyframes pulse-anim {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+        @keyframes pulse-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* EFECTOS DE BRILLO (HOVER) DEL LOGO */
-        .logo-group:hover .logo-box { 
-            background: rgba(212, 175, 55, 0.2); 
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); 
-        }
-        .logo-group:hover .logo-title { 
-            color: #D4AF37; 
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-        }
+        .logo-group:hover .logo-box { background: rgba(212, 175, 55, 0.2); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+        .logo-group:hover .logo-title { color: #D4AF37; text-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
         .logo-group:hover .logo-subtitle { opacity: 1; }
         
-        /* ENLACES DE NAVEGACIÓN */
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-links a { color: #888; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
         .nav-links a:hover { color: #D4AF37; }
@@ -95,7 +75,7 @@
         button:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
 
         .login-link { text-align: center; margin-top: 25px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #666; letter-spacing: 0.1em; text-transform: uppercase; }
-        .login-link a { color: #D4AF37; text-decoration: none; font-weight: bold; margin-left: 5px; transition: color 0.3s; }
+        .login-link a { color: #D4AF37; text-decoration: none; font-weight: bold; margin-left: 5px; transition: color 0.3s; cursor: pointer; }
         .login-link a:hover { color: #FFF5D1; }
 
         /* FOOTER MARCADO */
@@ -109,6 +89,9 @@
         .footer-links { margin-top: 15px; }
         .footer-links a { color: #666; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
         .footer-links a:hover { color: #D4AF37; }
+        
+        /* Ocultar elementos dinámicamente */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -128,10 +111,9 @@
                 </div>
             </div>
         </a>
-
         <div class="nav-links">
             <a href="/">Volver a la Terminal</a>
-            <a href="#" class="vip">Acceso VIP</a>
+            <a href="#" class="vip" id="nav-vip-btn">Acceso VIP</a>
         </div>
     </nav>
 
@@ -140,20 +122,27 @@
         <p class="subtitle">Inteligencia estratégica basada en ciclos planetarios de precisión</p>
 
         <div class="form-box">
-            <div class="form-header">Registro de Nueva Terminal</div>
+            <div class="form-header" id="form-title">Registro de Nueva Terminal</div>
+            
             <form action="#">
                 <input type="email" placeholder="Email Corporativo / VIP" required>
                 <input type="password" placeholder="Contraseña Estratégica" required>
-                <input type="text" placeholder="Nombre Completo" required>
-                <div class="row">
-                    <input type="text" placeholder="DD/MM/AAAA" required>
-                    <input type="text" placeholder="--:--" required>
+                
+                <div id="extra-fields">
+                    <input type="text" placeholder="Nombre Completo" required class="extra-input">
+                    <div class="row">
+                        <input type="text" placeholder="DD/MM/AAAA" required class="extra-input">
+                        <input type="text" placeholder="--:--" required class="extra-input">
+                    </div>
+                    <input type="text" placeholder="Ciudad de Nacimiento" required class="extra-input">
                 </div>
-                <input type="text" placeholder="Ciudad de Nacimiento" required>
-                <button type="submit">Iniciar Secuencia de Cálculo</button>
+
+                <button type="submit" id="submit-btn">Iniciar Secuencia de Cálculo</button>
             </form>
+            
             <div class="login-link">
-                ¿Ya tiene una terminal? <a href="#">Acceso VIP</a>
+                <span id="toggle-desc">¿Ya tiene una terminal?</span> 
+                <a href="#" id="toggle-btn">Acceso VIP</a>
             </div>
         </div>
     </main>
@@ -164,5 +153,54 @@
             <a href="privacidad.html">Privacidad</a> <span style="color:#333;">|</span> <a href="terminos.html">Términos</a>
         </div>
     </footer>
+
+    <script>
+        const extraFields = document.getElementById('extra-fields');
+        const extraInputs = document.querySelectorAll('.extra-input');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleDesc = document.getElementById('toggle-desc');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const navVipBtn = document.getElementById('nav-vip-btn');
+
+        let isLoginMode = false;
+
+        function toggleMode(event) {
+            if(event) event.preventDefault();
+            isLoginMode = !isLoginMode;
+
+            if (isLoginMode) {
+                // CAMBIAR A MODO "LOGIN" (Solo Email y Contraseña)
+                extraFields.classList.add('hidden');
+                // Quitamos el 'required' para que deje enviar el formulario sin llenar la fecha
+                extraInputs.forEach(input => input.required = false);
+                
+                formTitle.innerText = "Autorización de Terminal";
+                submitBtn.innerText = "Autorizar Acceso";
+                toggleDesc.innerText = "¿Aún no tiene una terminal?";
+                toggleBtn.innerText = "Solicitar Registro";
+                navVipBtn.innerText = "Registrarse";
+            } else {
+                // CAMBIAR A MODO "REGISTRO" (Con todos los campos de nacimiento)
+                extraFields.classList.remove('hidden');
+                // Volvemos a exigir que llenen la fecha
+                extraInputs.forEach(input => input.required = true);
+                
+                formTitle.innerText = "Registro de Nueva Terminal";
+                submitBtn.innerText = "Iniciar Secuencia de Cálculo";
+                toggleDesc.innerText = "¿Ya tiene una terminal?";
+                toggleBtn.innerText = "Acceso VIP";
+                navVipBtn.innerText = "Acceso VIP";
+            }
+        }
+
+        // Conectar los botones al script
+        toggleBtn.addEventListener('click', toggleMode);
+        
+        navVipBtn.addEventListener('click', (event) => {
+            // Si le dan al botón VIP de arriba, nos aseguramos de que cambie el modo
+            toggleMode(event);
+        });
+    </script>
 </body>
 </html>
