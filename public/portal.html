@@ -182,7 +182,7 @@
         </div>
     </footer>
 
-    <script>
+ <script>
         let modoVIP = false;
 
         function toggleModo(forzarVIP = false) {
@@ -197,7 +197,7 @@
             const navVipBtn = document.getElementById('nav-vip-btn');
             const resContainer = document.getElementById('resultado');
 
-            // Limpiamos errores previos al cambiar de modo
+            // Limpiamos la caja de mensajes
             resContainer.style.display = 'none';
 
             if (modoVIP) {
@@ -243,17 +243,7 @@
                 return;
             }
 
-            // BLINDAJE 1: Obligar al usuario a seleccionar una ciudad del autocompletado
-            if (!modoVIP) {
-                const lat = document.getElementById('lat').value;
-                if (!lat) {
-                    resContainer.style.display = 'block';
-                    resTitulo.innerText = "COORDENADAS FALTANTES:";
-                    resCuerpo.innerText = "Por favor, busque su ciudad de nacimiento y SELECCIONE una opción de la lista desplegable.";
-                    return;
-                }
-            }
-
+            // ARMADO DE DATOS CON SALVAVIDAS ANTI-CRASH
             const payload = modoVIP ? { 
                 email: emailInput, 
                 password: passInput, 
@@ -265,44 +255,39 @@
                 fecha: document.getElementById('fecha').value,
                 hora: document.getElementById('hora').value,
                 lugar: document.getElementById('lugar').value.trim().toUpperCase(),
-                lat: document.getElementById('lat').value,
-                lon: document.getElementById('lon').value
+                // Si la coordenada está vacía (porque el usuario no hizo clic en la lista), enviamos un 0 para que Python no falle.
+                lat: document.getElementById('lat').value || 0,
+                lon: document.getElementById('lon').value || 0
             };
 
             if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
                 resContainer.style.display = 'block';
                 resTitulo.innerText = "DATOS INCOMPLETOS:";
-                resCuerpo.innerText = "Complete todos los parámetros de nacimiento.";
+                resCuerpo.innerText = "Complete los parámetros de nacimiento.";
                 return;
             }
 
-            // BLINDAJE 2: Avisar al usuario que el servidor podría tardar
             btn.disabled = true;
-            btn.innerText = "SINCRONIZANDO...";
+            btn.innerText = "AUTENTICANDO...";
             resContainer.style.display = 'block';
             resTitulo.innerHTML = "ESTABLECIENDO ENLACE SEGURO";
-            resCuerpo.innerHTML = "Los núcleos estratégicos pueden tardar hasta 50 segundos en salir del modo reposo. Por favor, mantenga esta ventana abierta...";
+            resCuerpo.innerHTML = "Conectando con el servidor. Si el sistema estaba en reposo (Render), esto puede demorar hasta 50 segundos...";
 
             try {
+                // LA CONEXIÓN EXACTA A TU SERVIDOR
                 const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
 
-                // BLINDAJE 3: Si Render devuelve un error HTML en lugar de datos, lo detectamos sin romper la página
-                const textResponse = await respuesta.text();
-                let data;
-                try {
-                    data = JSON.parse(textResponse);
-                } catch (err) {
-                    throw new Error("El núcleo está en proceso de arranque (Cold Start). Por favor, espere 15 segundos y vuelva a presionar el botón.");
-                }
+                const data = await respuesta.json();
                 
                 if (data.status === "success" || data.status === "exists") {
                     resTitulo.innerHTML = "ACCESO AUTORIZADO";
                     resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
                     
+                    // Guardamos la llave para la bóveda
                     localStorage.setItem('vault_user_email', emailInput);
                     if(!modoVIP) {
                         localStorage.setItem('vault_user_nombre', payload.nombre);
@@ -320,11 +305,12 @@
             } catch (error) {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ALERTA DE SISTEMA";
-                resCuerpo.innerHTML = error.message || "Fallo de conexión. Verifique su red o intente nuevamente en unos segundos.";
+                resTitulo.innerHTML = "ERROR CRÍTICO (FAILED TO FETCH)";
+                resCuerpo.innerHTML = "Fallo de conexión. El servidor en Render está inactivo o bloqueó la petición. Espere 1 minuto y presione el botón nuevamente.";
             }
         }
 
+        // LÓGICA DE AUTOCOMPLETADO (Photon)
         const lugarInput = document.getElementById('lugar');
         const lugarList = document.getElementById('lugar-list');
 
@@ -353,6 +339,7 @@
             } catch (err) { console.error(err); }
         });
 
+        // Ocultar la lista si se hace clic afuera
         document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
