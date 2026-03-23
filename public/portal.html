@@ -1,1 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Astro Logic | Strategic Timing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+        .gold-gradient {
+            background: linear-gradient(90deg, #d4af37 0%, #f9e29d 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card { background: #111; border: 1px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-gold { background: #d4af37; color: #0a0a0a; font-weight: bold; transition: 0.3s; letter-spacing: 0.1em; }
+        .btn-gold:hover { background: #f9e29d; transform: translateY(-1px); }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        input:focus { border-color: #d4af37 !important; }
 
+        /* Estilos Autocompletado */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #333;
+            background-color: #111;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .autocomplete-item {
+            padding: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #ccc;
+            border-bottom: 1px solid #222;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .autocomplete-item:hover { background-color: #1a1a1a; color: #d4af37; }
+    </style>
+</head>
+<body class="p-4 md:p-10 text-white">
+    <header class="flex justify-between items-center mb-16">
+        <h1 class="text-2xl font-bold tracking-[0.2em] gold-gradient">VAULT LOGIC</h1>
+        <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest text-gray-400">
+            <span class="cursor-pointer hover:text-white transition">Análisis</span>
+            <span class="cursor-pointer hover:text-white transition">Pricing</span>
+            <button onclick="toggleModo(true)" class="text-yellow-600 font-bold hover:text-yellow-500 transition">Acceso VIP</button>
+        </nav>
+    </header>
+
+<main class="flex-grow flex flex-col items-center justify-center">
+    <div class="text-center mb-10 px-4">
+        <h2 class="text-4xl md:text-5xl font-light mb-4">Los líderes no esperan a la suerte.<br><span class="font-bold gold-gradient italic">Dominan el timing.</span></h2>
+        <p class="text-gray-400 max-w-xl mx-auto text-sm leading-relaxed uppercase tracking-widest">
+            Inteligencia estratégica basada en ciclos planetarios de precisión.
+        </p>
+    </div>
+
+    <div id="acceso-boveda" class="card p-8 w-full max-w-md">
+        <h3 id="form-title" class="text-xs mb-6 uppercase tracking-[0.3em] text-center text-gray-400 border-b border-gray-800 pb-4">Registro de Nueva Terminal</h3>
+
+        <div class="space-y-4">
+            <input type="email" id="email" placeholder="EMAIL CORPORATIVO / VIP" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono lowercase placeholder-gray-600">
+            <input type="password" id="password" placeholder="CONTRASEÑA ESTRATÉGICA" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono placeholder-gray-600">
+
+            <div id="campos-registro" class="space-y-4">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono uppercase placeholder-gray-600">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="date" id="fecha" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
+                    <input type="time" id="hora" class="p-3 bg-black border border-gray-800 rounded-sm text-gray-300 outline-none text-xs mono">
+                </div>
+                <div class="relative">
+                    <input type="text" id="lugar" placeholder="CIUDAD DE NACIMIENTO" autocomplete="off" class="w-full p-3 bg-black border border-gray-800 rounded-sm outline-none text-white text-xs mono uppercase placeholder-gray-600">
+                    <div id="lugar-list" class="autocomplete-items hidden"></div>
+                </div>
+            </div>
+
+            <input type="hidden" id="lat"><input type="hidden" id="lon">
+            
+            <button onclick="consultar()" id="btn-submit" class="w-full btn-gold py-4 rounded-sm uppercase text-[10px] tracking-[0.2em] mt-4">
+                Iniciar Secuencia de Cálculo
+            </button>
+
+            <p class="text-[9px] text-center text-gray-600 tracking-widest mt-4">
+                <span id="toggle-text">¿YA TIENE UNA TERMINAL?</span> 
+                <button onclick="toggleModo()" id="toggle-link" class="text-yellow-700 font-bold ml-1 hover:text-yellow-500 uppercase">Acceso VIP</button>
+            </p>
+        </div>
+        
+        <div id="resultado" class="mt-8 hidden">
+            <div class="p-5 border-l-2 border-yellow-600 bg-[#0d0d0d] space-y-3 font-mono">
+                <div id="res-titulo" class="gold-gradient font-bold uppercase text-xs tracking-widest"></div>
+                <div id="res-cuerpo" class="text-gray-300 text-sm leading-relaxed"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="mt-20 py-8 border-t border-gray-900 text-center text-[10px] text-gray-600 tracking-[0.4em] uppercase">
+    <p class="mb-2">© 2026 VAULT LOGIC - Executive Intelligence Suite</p>
+    <p>
+        <a href="privacidad.html" class="hover:text-yellow-600 transition mx-2">Privacidad</a> | 
+        <a href="terminos.html" class="hover:text-yellow-600 transition mx-2">Términos</a>
+    </p>
+</footer>
+
+<script>
+let modoVIP = false;
+
+function toggleModo(forzarVIP = false) {
+    if (forzarVIP) modoVIP = true;
+    else modoVIP = !modoVIP;
+
+    const campos = document.getElementById('campos-registro');
+    const titulo = document.getElementById('form-title');
+    const btn = document.getElementById('btn-submit');
+    const text = document.getElementById('toggle-text');
+    const link = document.getElementById('toggle-link');
+
+    if (modoVIP) {
+        campos.classList.add('hidden');
+        titulo.innerText = "Acceso VIP Autorizado";
+        btn.innerText = "Vincular con el Núcleo";
+        text.innerText = "¿NUEVA TERMINAL?";
+        link.innerText = "Registrarse";
+    } else {
+        campos.classList.remove('hidden');
+        titulo.innerText = "Registro de Nueva Terminal";
+        btn.innerText = "Iniciar Secuencia de Cálculo";
+        text.innerText = "¿YA TIENE UNA TERMINAL?";
+        link.innerText = "Acceso VIP";
+    }
+}
+
+function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function consultar() {
+    const resContainer = document.getElementById('resultado');
+    const resTitulo = document.getElementById('res-titulo');
+    const resCuerpo = document.getElementById('res-cuerpo');
+    const btn = document.getElementById('btn-submit');
+    
+    const emailInput = document.getElementById('email').value.trim().toLowerCase();
+    const passInput = document.getElementById('password').value.trim();
+
+    if (!validarEmail(emailInput)) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "ERROR DE IDENTIDAD:";
+        resCuerpo.innerText = "Ingrese un formato de email válido.";
+        return;
+    }
+    if (passInput.length < 4) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
+        resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
+        return;
+    }
+
+    const payload = modoVIP ? { 
+        email: emailInput, 
+        password: passInput, 
+        login_only: true 
+    } : {
+        nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+        email: emailInput,
+        password: passInput,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+        lat: document.getElementById('lat').value,
+        lon: document.getElementById('lon').value
+    };
+
+    if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+        resContainer.classList.remove('hidden');
+        resTitulo.innerText = "DATOS INCOMPLETOS:";
+        resCuerpo.innerText = "Complete los parámetros de nacimiento.";
+        return;
+    }
+
+   
+    btn.disabled = true;
+    btn.innerText = "AUTENTICANDO...";
+    resContainer.classList.remove('hidden');
+
+    // 🧹 LIMPIEZA DE MEMORIA: Borrar cualquier usuario anterior
+    localStorage.removeItem('vault_user_email');
+    localStorage.removeItem('vault_user_nombre');
+
+    try {
+        const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+
+        const data = await respuesta.json();
+        
+        if (data.status === "success" || data.status === "exists") {
+            resTitulo.innerHTML = "ACCESO AUTORIZADO";
+            resCuerpo.innerHTML = "Vínculo establecido. Redirigiendo...";
+            
+            // 🔒 SEGURIDAD: Guardamos el email en memoria local
+            localStorage.setItem('vault_user_email', emailInput);
+            
+            // 🧠 INTELIGENCIA: Guardamos el nombre real para que el panel lo use
+            if (data.nombre) {
+                localStorage.setItem('vault_user_nombre', data.nombre);
+            } else if (!modoVIP && document.getElementById('nombre').value) {
+                // Si es un registro nuevo, guardamos el nombre que acaba de escribir
+                localStorage.setItem('vault_user_nombre', document.getElementById('nombre').value.trim().toUpperCase());
+            }
+            
+            setTimeout(() => {
+                // Enrutamiento limpio (sin ?email=...)
+                if (data.nivel_suscripcion === "genesis") {
+                    window.location.href = 'genesis-live.html';
+                } else {
+                    window.location.href = 'boveda.html';
+                }
+            }, 1200);
+        } else {
+            btn.disabled = false;
+            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
+            resTitulo.innerHTML = "ACCESO DENEGADO";
+            resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
+        }
+    } catch (error) { 
+        btn.disabled = false;
+        btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia";
+        resTitulo.innerHTML = "ERROR CRÍTICO";
+        resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+        console.error(error);
+    }
+}
+
+// Lógica de Autocompletado Photon
+const lugarInput = document.getElementById('lugar');
+const lugarList = document.getElementById('lugar-list');
+
+lugarInput.addEventListener('input', async (e) => {
+    const val = e.target.value;
+    if (val.length < 3) { lugarList.classList.add('hidden'); return; }
+    try {
+        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+        const data = await res.json();
+        lugarList.innerHTML = '';
+        lugarList.classList.remove('hidden');
+        data.features.forEach(feat => {
+            const prop = feat.properties;
+            const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerText = label.toUpperCase();
+            item.onclick = () => {
+                lugarInput.value = label.toUpperCase();
+                document.getElementById('lat').value = feat.geometry.coordinates[1];
+                document.getElementById('lon').value = feat.geometry.coordinates[0];
+                lugarList.classList.add('hidden');
+            };
+            lugarList.appendChild(item);
+        });
+    } catch (err) { console.error(err); }
+});
+
+document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
+</script>
+
+</body>
+</html>
