@@ -7,22 +7,19 @@
   --color-gold-muted: rgba(212, 175, 55, 0.15);
   --color-gold-glow: rgba(212, 175, 55, 0.3);
 }
-
 @layer base {
   body {
     @apply bg-black text-white font-sans selection:bg-gold/30 selection:text-gold;
     cursor: default;
-    overflow-x: hidden;
-    /* Suavizado de fuentes para ese look premium/ejecutivo */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, .font-display {
-    @apply font-mono tracking-tight;
+    /* Aquí estaba el error del código de AI Studio. Cambiamos mono por sans */
+    @apply font-sans tracking-tighter;
   }
 }
-
 @layer utilities {
   .noise-overlay {
     position: fixed;
