@@ -52,19 +52,19 @@ export default function App() {
               </div>
             </div>
 
-            {/* TÍTULO CORREGIDO: Usando font-sans y font-black para tamaño masivo */}
-            <h1 className="text-6xl md:text-9xl font-sans font-black leading-[0.9] tracking-tighter mb-12 text-gradient-gold">
+       {/* TÍTULO CORREGIDO: Quitamos el degradado del h1 para que no contamine la segunda línea */}
+            <h1 className="text-6xl md:text-9xl font-sans font-black leading-[0.9] tracking-tighter mb-12">
               <motion.span
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 2, ease: "easeOut" }}
-                className="inline-block overflow-hidden whitespace-nowrap border-r-4 border-gold pr-2"
+                className="inline-block overflow-hidden whitespace-nowrap border-r-4 border-gold pr-2 text-gradient-gold"
               >
                 NO PREDIGA EL MERCADO
               </motion.span>
               <br />
               <motion.span
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: 50 }} /* x: 50 hace que entre de derecha a izquierda */
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 2, duration: 0.8 }}
                 className="text-white italic inline-block"
