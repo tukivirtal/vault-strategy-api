@@ -14,11 +14,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  h1, h2, h3, h4, .font-display {
-    /* Aquí estaba el error del código de AI Studio. Cambiamos mono por sans */
-    @apply font-sans tracking-tighter;
-  }
+}
 }
 @layer utilities {
   .noise-overlay {
