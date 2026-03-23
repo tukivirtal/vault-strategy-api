@@ -9,19 +9,22 @@
         :root { --gold: #d4af37; --dark-bg: #050505; }
         body { background: var(--dark-bg); color: #ccc; font-family: 'Inter', sans-serif; margin: 0; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; line-height: 1.8; }
         
-        .container { max-width: 700px; background: rgba(12, 12, 12, 0.95); border: 1px solid #222; padding: 50px; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .container { max-width: 800px; background: rgba(12, 12, 12, 0.95); border: 1px solid #222; padding: 50px; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         
-        h1 { font-family: 'JetBrains Mono', monospace; color: var(--gold); letter-spacing: 0.2em; font-size: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 20px; margin-top: 0; text-transform: uppercase;}
+        h1 { font-family: 'JetBrains Mono', monospace; color: var(--gold); letter-spacing: 0.1em; font-size: 1.8rem; border-bottom: 1px solid #333; padding-bottom: 20px; margin-top: 0; text-transform: uppercase; text-align: center; }
         
-        h2 { font-size: 1.1rem; color: #fff; margin-top: 40px; font-weight: 600; }
+        h2 { font-size: 1.3rem; color: #fff; margin-top: 40px; font-weight: 600; }
         
-        p { font-size: 0.95rem; font-weight: 300; }
+        p { font-size: 1.1rem; font-weight: 300; }
         
-        .shield-box { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); padding: 20px; margin: 30px 0; }
-        .shield-box p { margin: 0; color: #fff; font-weight: 400; }
+        .shield-box { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); padding: 25px; margin: 30px 0; }
+        .shield-box p { margin: 0; color: #fff; font-weight: 400; font-size: 1.1rem; }
         
-        .btn-back { display: inline-block; margin-top: 40px; padding: 12px 30px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; text-transform: uppercase;}
+        .btn-back { display: inline-block; margin-top: 40px; padding: 15px 35px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 1rem; letter-spacing: 1px; transition: 0.3s; text-transform: uppercase;}
         .btn-back:hover { background: var(--gold); color: #000; }
+        
+        ul { color: #ccc; font-weight: 300; font-size: 1.1rem; padding-left: 20px; }
+        li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -37,7 +40,7 @@
 
     <h2>Protocolo de Reembolso Sin Fricciones</h2>
     <p>No requerimos justificaciones extensas ni someteremos su solicitud a burocracia innecesaria. Si la herramienta no cumple con sus expectativas ejecutivas:</p>
-    <ul style="color: #ccc; font-weight: 300; font-size: 0.95rem;">
+    <ul>
         <li>Envíe un correo electrónico directo a su analista de cuenta o a nuestro canal de soporte técnico.</li>
         <li>Incluya el correo electrónico asociado a su cuenta VIP y su ID de transacción de PayPal.</li>
         <li>El reembolso será procesado hacia su método de pago original en un plazo máximo de 48 horas hábiles.</li>
@@ -46,7 +49,9 @@
     <h2>Seguridad de Transacción</h2>
     <p>Todos los pagos son procesados a través de la pasarela encriptada de PayPal. Vault Logic no almacena, procesa ni tiene acceso a los datos de su tarjeta de crédito. Su identidad y sus vectores natales permanecen estrictamente confidenciales y protegidos bajo protocolo AES-256.</p>
 
-    <a href="suscripcion.html" class="btn-back">← Retornar a la Matriz de Acceso</a>
+    <div style="text-align: center;">
+        <a href="/" class="btn-back">← Retornar a la Matriz de Acceso</a>
+    </div>
 </div>
 
 </body>
