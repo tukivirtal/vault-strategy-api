@@ -251,10 +251,12 @@ export default function App() {
       </main>
 
     {/* Footer Ampliado y Mejorado */}
+ {/* Footer Ampliado: Contacto y Enlaces Legales */}
       <footer className="relative py-32 px-8 md:px-16 border-t border-white/5 bg-black">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
-            <div className="col-span-2">
+          {/* Cambiamos la cuadrícula a 5 columnas para hacer espacio a "Contacto" */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16 mb-24">
+            <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-4 mb-10">
                 <Shield className="w-12 h-12 text-gold" />
                 <span className="font-sans font-black text-4xl tracking-tighter">VAULT LOGIC</span>
@@ -264,12 +266,26 @@ export default function App() {
               </p>
             </div>
             
+            {/* Columna Legal conectada a tus futuros archivos HTML */}
             <div>
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Legal</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Términos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Garantía</a></li>
+                <li><a href="privacidad.html" className="hover:text-white transition-colors">Privacidad</a></li>
+                <li><a href="terminos.html" className="hover:text-white transition-colors">Términos</a></li>
+                <li><a href="garantia.html" className="hover:text-white transition-colors">Garantía</a></li>
+              </ul>
+            </div>
+
+            {/* NUEVA COLUMNA DE CONTACTO */}
+            <div>
+              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Contacto</h5>
+              <ul className="space-y-6 text-white/50 font-mono text-sm">
+                <li>
+                  <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
+                  <a href="mailto:contact@emotionalvaults.com" className="hover:text-gold transition-colors break-words">
+                    contact@emotionalvaults.com
+                  </a>
+                </li>
               </ul>
             </div>
             
