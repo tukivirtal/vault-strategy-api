@@ -178,14 +178,19 @@
             return Math.abs(hash);
         }
 
-        async function conectar() {
+     async function conectar() {
             const email = localStorage.getItem('vault_user_email');
             
-            // Protección: Si el usuario llega sin email, lo devolvemos a que haga login
             if (!email) { 
                 window.location.href = 'portal.html'; 
                 return; 
             }
+
+            // Mensaje inteligente si Render está dormido
+            const loadingScreen = document.getElementById('loading-screen');
+            const wakeUpTimeout = setTimeout(() => {
+                loadingScreen.innerHTML += "<br><br><span style='color:#888; font-size:10px; font-family: \"JetBrains Mono\", monospace;'>INICIALIZANDO NÚCLEO FRÍO (RENDER)... ESTO PUEDE TOMAR HASTA 50 SEGUNDOS.</span>";
+            }, 5000);
             
             try {
                 const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
@@ -193,27 +198,24 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ email: email })
                 });
+                
+                clearTimeout(wakeUpTimeout); // Cancelamos el aviso si respondió rápido
                 const res = await response.json();
 
                 if (res.status === "success" && res.datos) {
                     const d = res.datos;
                     const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-                    // ==========================================
-                    // EL CONTROLADOR DE TRÁFICO VIP
-                    // ==========================================
+                    // Controlador de Tráfico VIP
                     if (nivelSuscripcion === "SENTINEL" || nivelSuscripcion === "EXECUTIVE" || nivelSuscripcion.includes("GENESIS")) {
-                        document.getElementById('loading-screen').innerHTML = `<div style='color: #D4AF37; margin-bottom: 15px; font-size: 1.5rem;'>🔒</div>REDIRECCIONANDO A TERMINAL ${nivelSuscripcion}...`;
+                        loadingScreen.innerHTML = `<div style='color: #D4AF37; margin-bottom: 15px; font-size: 1.5rem;'>🔒</div>REDIRECCIONANDO A TERMINAL ${nivelSuscripcion}...`;
                         setTimeout(() => {
-                            // REEMPLAZA "panel_vip.html" POR EL NOMBRE DE TU ARCHIVO REAL
                             window.location.href = 'panel_vip.html'; 
                         }, 1000);
-                        return; // Frenamos aquí, no le mostramos la bóveda free
+                        return; 
                     }
 
-                    // ==========================================
-                    // LÓGICA PARA USUARIOS GRATUITOS (FREE)
-                    // ==========================================
+                    // Lógica para usuarios FREE
                     const rawName = d.nombre || localStorage.getItem('vault_user_nombre') || email.split('@')[0];
                     document.getElementById('nombre').innerText = rawName.toUpperCase();
                     
@@ -259,8 +261,7 @@
                     document.getElementById('datos-origen').innerHTML = `${fecha}<br>${hora}<br>${lugar}`;
                     document.getElementById('auth-status').innerText = nivelSuscripcion;
 
-                    // Ocultar pantalla de carga y mostrar panel
-                    document.getElementById('loading-screen').style.display = 'none';
+                    loadingScreen.style.display = 'none';
                     document.getElementById('dashboard-content').style.display = 'flex';
                     
                     let vectores = null;
@@ -281,13 +282,13 @@
                     dibujar(vectores);
                     llenarListado(vectores);
                 } else {
-                     document.getElementById('loading-screen').innerHTML = `<div style='color:#D4AF37; margin-bottom: 20px; font-family: "JetBrains Mono", monospace;'>EL CORREO <b>${email}</b> NO ESTÁ REGISTRADO EN EL NÚCLEO.</div><button onclick='cerrarSesion()' style='background:#D4AF37;color:#000;border:none;padding:12px 25px;cursor:pointer; font-family:"JetBrains Mono", monospace; font-weight:bold; letter-spacing:1px;'>VOLVER AL REGISTRO</button>`;
+                     loadingScreen.innerHTML = `<div style='color:#D4AF37; margin-bottom: 20px; font-family: "JetBrains Mono", monospace;'>EL CORREO <b>${email}</b> NO ESTÁ REGISTRADO EN EL NÚCLEO.</div><button onclick='cerrarSesion()' style='background:#D4AF37;color:#000;border:none;padding:12px 25px;cursor:pointer; font-family:"JetBrains Mono", monospace; font-weight:bold; letter-spacing:1px;'>VOLVER AL REGISTRO</button>`;
                 }
             } catch (e) { 
-                document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d'>ERROR DE COMUNICACIÓN CON LA API</div><br><span style='font-size: 10px; color: #888;'>Render puede estar en reposo. Espere 30 segundos y reintente.</span><br><br><button onclick='cerrarSesion()' style='background:#222;color:#fff;border:none;padding:12px 25px;cursor:pointer; font-family:inherit;'>VOLVER AL INICIO</button>";
+                clearTimeout(wakeUpTimeout);
+                loadingScreen.innerHTML = "<div style='color:#ff4d4d'>ERROR DE COMUNICACIÓN CON LA API</div><br><span style='font-size: 10px; color: #888;'>Render no responde. Espere unos minutos y reintente.</span><br><br><button onclick='cerrarSesion()' style='background:#222;color:#fff;border:none;padding:12px 25px;cursor:pointer; font-family:inherit;'>VOLVER AL INICIO</button>";
             }
         }
-
         function mostrarGeo(lat, lon) {
             document.getElementById('geo-lat').innerText = parseFloat(lat).toFixed(4);
             document.getElementById('geo-lon').innerText = parseFloat(lon).toFixed(4);
