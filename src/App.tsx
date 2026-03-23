@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { 
   Shield, 
@@ -15,11 +15,8 @@ import { Navbar } from "./components/Navbar";
 import { OrbitalBackground } from "./components/OrbitalBackground";
 import { FeatureCard } from "./components/FeatureCard";
 import { TerminalLog } from "./components/TerminalLog";
-import { AccessModal } from "./components/AccessModal";
 
 export default function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
@@ -31,10 +28,9 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-black overflow-x-hidden">
-      {/* Texture Overlay */}
       <div className="noise-overlay" />
       
-      <Navbar onOpenModal={() => setIsModalOpen(true)} />
+      <Navbar />
 
       <main className="relative pt-24">
         {/* Hero Section */}
@@ -56,7 +52,8 @@ export default function App() {
               </div>
             </div>
 
-            <h1 className="text-6xl md:text-9xl font-mono font-bold leading-[0.9] tracking-tighter mb-12 text-gradient-gold">
+            {/* TÍTULO CORREGIDO: Usando font-sans y font-black para tamaño masivo */}
+            <h1 className="text-6xl md:text-9xl font-sans font-black leading-[0.9] tracking-tighter mb-12 text-gradient-gold">
               <motion.span
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
@@ -82,15 +79,16 @@ export default function App() {
             </p>
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-              <motion.button
+              {/* Botón convertido en enlace directo */}
+              <motion.a
+                href="portal.html"
                 whileHover={{ scale: 1.05, x: 5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setIsModalOpen(true)}
-                className="group px-12 py-6 bg-gold text-black font-mono font-bold text-xl uppercase tracking-widest rounded-xl flex items-center gap-4 hover:glow-gold-strong transition-all"
+                className="group px-12 py-6 bg-gold text-black font-sans font-black text-xl uppercase tracking-widest rounded-xl flex items-center gap-4 hover:glow-gold-strong transition-all inline-flex"
               >
                 Autorizar Acceso
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </motion.button>
+              </motion.a>
               
               <div className="flex flex-col items-start gap-1">
                 <span className="text-2xl font-mono font-bold text-white">+847</span>
@@ -130,21 +128,21 @@ export default function App() {
         <section id="advantage" className="relative py-32 px-8 md:px-16 bg-white/5 border-y border-white/5">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <div>
-              <h2 className="text-5xl md:text-7xl font-mono font-bold mb-12 leading-tight">
+              <h2 className="text-5xl md:text-7xl font-sans font-black mb-12 leading-tight tracking-tighter">
                 LA VENTAJA <span className="text-gold">ASIMÉTRICA</span>
               </h2>
               <div className="space-y-12">
                 <div className="flex gap-8">
-                  <div className="text-6xl font-mono font-bold text-gold/20">10</div>
+                  <div className="text-6xl font-sans font-black text-gold/20">10</div>
                   <div>
-                    <h4 className="text-2xl font-mono font-bold mb-2">AÑOS DE PROYECCIÓN</h4>
+                    <h4 className="text-2xl font-sans font-bold mb-2 tracking-tight">AÑOS DE PROYECCIÓN</h4>
                     <p className="text-white/60 text-lg">Historial calibrado por perfil ejecutivo individual, garantizando una alineación total con su estrategia.</p>
                   </div>
                 </div>
                 <div className="flex gap-8">
-                  <div className="text-6xl font-mono font-bold text-gold/20">01</div>
+                  <div className="text-6xl font-sans font-black text-gold/20">01</div>
                   <div>
-                    <h4 className="text-2xl font-mono font-bold mb-2">DIRECTIVA OPERATIVA</h4>
+                    <h4 className="text-2xl font-sans font-bold mb-2 tracking-tight">DIRECTIVA OPERATIVA</h4>
                     <p className="text-white/60 text-lg">No entregamos datos crudos. Entregamos directivas claras y accionables para su mesa de operaciones.</p>
                   </div>
                 </div>
@@ -156,7 +154,7 @@ export default function App() {
                 <Globe className="w-64 h-64 text-gold" />
               </div>
               
-              <h3 className="text-2xl font-mono font-bold mb-8 uppercase tracking-widest text-gold">Comparativa de Sistema</h3>
+              <h3 className="text-2xl font-sans font-bold mb-8 uppercase tracking-widest text-gold">Comparativa de Sistema</h3>
               <div className="space-y-6">
                 <div className="grid grid-cols-2 pb-4 border-b border-white/10 font-mono text-xs uppercase tracking-widest text-white/40">
                   <span>Métrica</span>
@@ -193,7 +191,7 @@ export default function App() {
 
         {/* Testimonials Section */}
         <section id="testimonials" className="relative py-32 px-8 md:px-16 max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-mono font-bold mb-24 text-center">
+          <h2 className="text-4xl md:text-6xl font-sans font-black mb-24 text-center tracking-tighter">
             LOGS DE <span className="text-gold">OPERADORES</span>
           </h2>
           
@@ -234,20 +232,21 @@ export default function App() {
             viewport={{ once: true }}
             className="relative z-10"
           >
-            <h2 className="text-6xl md:text-9xl font-mono font-bold mb-12 tracking-tighter">
+            <h2 className="text-6xl md:text-9xl font-sans font-black mb-12 tracking-tighter">
               ¿ESTÁ <span className="text-gold">LISTO?</span>
             </h2>
             <p className="text-2xl md:text-4xl text-white/40 font-light mb-16 max-w-4xl mx-auto">
               El mercado no espera. La sincronización orbital es ahora.
             </p>
-            <motion.button
+            {/* Botón CTA convertido en enlace directo */}
+            <motion.a
+              href="portal.html"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => setIsModalOpen(true)}
-              className="px-16 py-8 bg-white text-black font-mono font-bold text-2xl uppercase tracking-[0.2em] rounded-2xl hover:bg-gold hover:text-black hover:glow-gold-strong transition-all"
+              className="inline-block px-16 py-8 bg-white text-black font-sans font-black text-2xl uppercase tracking-[0.2em] rounded-2xl hover:bg-gold hover:text-black hover:glow-gold-strong transition-all"
             >
               Autorizar Acceso
-            </motion.button>
+            </motion.a>
           </motion.div>
         </section>
       </main>
@@ -259,7 +258,7 @@ export default function App() {
             <div className="col-span-2">
               <div className="flex items-center gap-4 mb-8">
                 <Shield className="w-10 h-10 text-gold" />
-                <span className="font-mono font-bold text-3xl tracking-tighter">VAULT LOGIC</span>
+                <span className="font-sans font-black text-3xl tracking-tighter">VAULT LOGIC</span>
               </div>
               <p className="text-white/40 text-lg max-w-md leading-relaxed">
                 Transformando matemática orbital en directivas operativas de alta precisión para el liderazgo global.
@@ -267,7 +266,7 @@ export default function App() {
             </div>
             
             <div>
-              <h5 className="font-mono font-bold text-sm uppercase tracking-widest text-gold mb-8">Legal</h5>
+              <h5 className="font-sans font-bold text-sm uppercase tracking-widest text-gold mb-8">Legal</h5>
               <ul className="space-y-4 text-white/40 font-mono text-sm">
                 <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Términos</a></li>
@@ -276,7 +275,7 @@ export default function App() {
             </div>
             
             <div>
-              <h5 className="font-mono font-bold text-sm uppercase tracking-widest text-gold mb-8">Sistema</h5>
+              <h5 className="font-sans font-bold text-sm uppercase tracking-widest text-gold mb-8">Sistema</h5>
               <ul className="space-y-4 text-white/40 font-mono text-sm">
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
@@ -325,8 +324,6 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none z-[9999] mix-blend-screen opacity-50">
         <div className="absolute w-64 h-64 bg-gold/10 blur-[100px] rounded-full -translate-x-1/2 -translate-y-1/2" style={{ left: 'var(--mouse-x, 50%)', top: 'var(--mouse-y, 50%)' }} />
       </div>
-
-      <AccessModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
