@@ -251,23 +251,23 @@ export default function App() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="relative py-24 px-8 md:px-16 border-t border-white/5 bg-black">
+    {/* Footer Ampliado y Mejorado */}
+      <footer className="relative py-32 px-8 md:px-16 border-t border-white/5 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
             <div className="col-span-2">
-              <div className="flex items-center gap-4 mb-8">
-                <Shield className="w-10 h-10 text-gold" />
-                <span className="font-sans font-black text-3xl tracking-tighter">VAULT LOGIC</span>
+              <div className="flex items-center gap-4 mb-10">
+                <Shield className="w-12 h-12 text-gold" />
+                <span className="font-sans font-black text-4xl tracking-tighter">VAULT LOGIC</span>
               </div>
-              <p className="text-white/40 text-lg max-w-md leading-relaxed">
+              <p className="text-white/40 text-xl md:text-2xl max-w-xl leading-relaxed font-light">
                 Transformando matemática orbital en directivas operativas de alta precisión para el liderazgo global.
               </p>
             </div>
             
             <div>
-              <h5 className="font-sans font-bold text-sm uppercase tracking-widest text-gold mb-8">Legal</h5>
-              <ul className="space-y-4 text-white/40 font-mono text-sm">
+              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Legal</h5>
+              <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Términos</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Garantía</a></li>
@@ -275,46 +275,45 @@ export default function App() {
             </div>
             
             <div>
-              <h5 className="font-sans font-bold text-sm uppercase tracking-widest text-gold mb-8">Sistema</h5>
-              <ul className="space-y-4 text-white/40 font-mono text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Sistema</h5>
+              <ul className="space-y-6 text-white/50 font-mono text-sm">
+                <li className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
                   NASA JPL DE441: ONLINE
                 </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                <li className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
                   LATENCIA: 12ms
                 </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                <li className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
                   ENCRIPTACIÓN: AES-256
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-12 border-t border-white/5 font-mono text-[10px] uppercase tracking-widest">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3 p-4 bg-gold/5 border border-gold/20 rounded-lg max-w-2xl">
-                <AlertCircle className="w-5 h-5 text-gold shrink-0" />
-                <p className="text-[9px] text-white/60 normal-case leading-relaxed">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-16 border-t border-white/5 font-mono text-xs uppercase tracking-widest">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-4 p-6 bg-gold/5 border border-gold/20 rounded-xl max-w-3xl">
+                <AlertCircle className="w-6 h-6 text-gold shrink-0" />
+                <p className="text-[10px] md:text-xs text-white/60 normal-case leading-relaxed">
                   <span className="text-gold font-bold uppercase tracking-widest mr-2">Advertencia de Riesgo:</span>
-                  La sincronización orbital y el uso de efemérides de la NASA JPL DE441 son herramientas de análisis técnico avanzado. El trading de activos financieros implica un riesgo sustancial de pérdida. Vault Logic no garantiza resultados específicos. Opere bajo su propia responsabilidad.
+                  La sincronización orbital y el uso de efemérides de la NASA JPL DE441 son herramientas de análisis técnico avanzado. El trading implica un riesgo sustancial de pérdida.
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 text-white/40">
                 <span>© 2026 VAULT LOGIC — TODOS LOS DERECHOS RESERVADOS</span>
-                <span className="hidden md:inline text-white/10">|</span>
-                <span className="text-gold">SISTEMA: OPERATIVO</span>
+                <span className="hidden md:inline">|</span>
+                <span className="text-gold font-bold">SISTEMA: OPERATIVO</span>
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-10 text-white/40">
               <span className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                 NASA SYNC: ACTIVO
               </span>
               <span>LATENCIA: 12ms</span>
-              <span>VERSIÓN: 4.2.1-GENESIS</span>
             </div>
           </div>
         </div>
