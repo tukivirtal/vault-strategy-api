@@ -182,7 +182,7 @@
         </div>
     </footer>
 
- <script>
+<script>
         let modoVIP = false;
 
         function toggleModo(forzarVIP = false) {
@@ -197,7 +197,6 @@
             const navVipBtn = document.getElementById('nav-vip-btn');
             const resContainer = document.getElementById('resultado');
 
-            // Limpiamos la caja de mensajes
             resContainer.style.display = 'none';
 
             if (modoVIP) {
@@ -243,7 +242,7 @@
                 return;
             }
 
-            // ARMADO DE DATOS CON SALVAVIDAS ANTI-CRASH
+            // Datos exactos de tu código original
             const payload = modoVIP ? { 
                 email: emailInput, 
                 password: passInput, 
@@ -255,9 +254,8 @@
                 fecha: document.getElementById('fecha').value,
                 hora: document.getElementById('hora').value,
                 lugar: document.getElementById('lugar').value.trim().toUpperCase(),
-                // Si la coordenada está vacía (porque el usuario no hizo clic en la lista), enviamos un 0 para que Python no falle.
-                lat: document.getElementById('lat').value || 0,
-                lon: document.getElementById('lon').value || 0
+                lat: document.getElementById('lat').value,
+                lon: document.getElementById('lon').value
             };
 
             if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
@@ -270,16 +268,20 @@
             btn.disabled = true;
             btn.innerText = "AUTENTICANDO...";
             resContainer.style.display = 'block';
-            resTitulo.innerHTML = "ESTABLECIENDO ENLACE SEGURO";
-            resCuerpo.innerHTML = "Conectando con el servidor. Si el sistema estaba en reposo (Render), esto puede demorar hasta 50 segundos...";
+            resTitulo.innerHTML = "SISTEMA CONECTANDO";
+            resCuerpo.innerHTML = "Estableciendo enlace con el núcleo. Si Render se está reiniciando, esto puede demorar unos segundos...";
 
             try {
-                // LA CONEXIÓN EXACTA A TU SERVIDOR
                 const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
+
+                // RAYOS X: Verificamos si Render nos tiró un error antes de intentar leer los datos
+                if (!respuesta.ok) {
+                    throw new Error(`Render respondió con error ${respuesta.status}. El servidor aún se está reiniciando o bloqueó la petición.`);
+                }
 
                 const data = await respuesta.json();
                 
@@ -287,7 +289,6 @@
                     resTitulo.innerHTML = "ACCESO AUTORIZADO";
                     resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
                     
-                    // Guardamos la llave para la bóveda
                     localStorage.setItem('vault_user_email', emailInput);
                     if(!modoVIP) {
                         localStorage.setItem('vault_user_nombre', payload.nombre);
@@ -305,12 +306,12 @@
             } catch (error) {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR CRÍTICO (FAILED TO FETCH)";
-                resCuerpo.innerHTML = "Fallo de conexión. El servidor en Render está inactivo o bloqueó la petición. Espere 1 minuto y presione el botón nuevamente.";
+                resTitulo.innerHTML = "ERROR DE CONEXIÓN";
+                // Mostramos el error EXACTO para no adivinar más
+                resCuerpo.innerHTML = `<b>Detalle técnico:</b> ${error.message}`;
             }
         }
 
-        // LÓGICA DE AUTOCOMPLETADO (Photon)
         const lugarInput = document.getElementById('lugar');
         const lugarList = document.getElementById('lugar-list');
 
@@ -339,7 +340,6 @@
             } catch (err) { console.error(err); }
         });
 
-        // Ocultar la lista si se hace clic afuera
         document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
