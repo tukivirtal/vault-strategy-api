@@ -11,26 +11,72 @@
         input:focus, textarea:focus { outline: none; border-color: #D4AF37; }
         button { width: 100%; background: #D4AF37; color: #000; padding: 15px; border: none; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 5px; letter-spacing: 0.1em; transition: all 0.3s; }
         button:hover { background: #FFF5D1; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
-        a { color: #888; text-decoration: none; margin-top: 30px; display: block; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
-        a:hover { color: #fff; }
+        a.back-link { color: #888; text-decoration: none; margin-top: 30px; display: block; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
+        a.back-link:hover { color: #fff; }
+        
+        /* Estilos para el mensaje de éxito */
+        #success-message { display: none; text-align: center; color: #10B981; font-family: monospace; line-height: 1.6; }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h1>Soporte Ejecutivo</h1>
+        <h1 id="form-title">Soporte Ejecutivo</h1>
         
-        <form action="https://formspree.io/f/xpqygjob" method="POST">
-            
-            <input type="hidden" name="_next" value="https://vault-strategy-api.vercel.app/">
+        <form id="vaultForm" action="TU_ENLACE_DE_FORMSPREE" method="POST">
             <input type="hidden" name="_subject" value="Nueva Directiva desde Vault Logic">
-            
             <input type="email" name="email" placeholder="SU CORREO CORPORATIVO" required>
             <textarea rows="4" name="message" placeholder="MENSAJE / SOLICITUD DE ACCESO" required></textarea>
-            
-            <button type="submit">Enviar Directiva</button>
+            <button type="submit" id="submit-button">Enviar Directiva</button>
         </form>
 
-        <a href="/">Volver a la Terminal</a>
+        <div id="success-message">
+            <br>
+            <strong style="font-size: 18px;">✓ PROTOCOLO COMPLETADO</strong><br><br>
+            Gracias por contactarnos.<br>
+            Directiva enviada con éxito. Un oficial de enlace responderá a su correo en las próximas 24 horas.
+        </div>
+
+        <a href="/" class="back-link">Volver a la Terminal</a>
     </div>
+
+    <script>
+        var form = document.getElementById("vaultForm");
+        var button = document.getElementById("submit-button");
+        var successMessage = document.getElementById("success-message");
+        var formTitle = document.getElementById("form-title");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault(); // Evita que el navegador cambie de página
+            button.innerText = "PROCESANDO..."; // Cambia el texto del botón
+            button.style.opacity = "0.7";
+            
+            var data = new FormData(form);
+            
+            try {
+                // Envia los datos a Formspree de forma invisible
+                const response = await fetch(event.target.action, {
+                    method: form.method,
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    // Si el correo se envía, ocultamos el formulario y mostramos el mensaje
+                    form.style.display = 'none';
+                    formTitle.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    form.reset(); // Limpiamos los campos
+                } else {
+                    alert("Hubo un problema al enviar su directiva. Intente nuevamente.");
+                    button.innerText = "ENVIAR DIRECTIVA";
+                    button.style.opacity = "1";
+                }
+            } catch (error) {
+                alert("Error de conexión. Verifique su red.");
+                button.innerText = "ENVIAR DIRECTIVA";
+                button.style.opacity = "1";
+            }
+        });
+    </script>
 </body>
 </html>
