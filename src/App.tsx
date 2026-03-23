@@ -222,7 +222,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* CTA Section */}
+      {/* CTA Section */}
         <section className="relative py-48 px-8 md:px-16 text-center">
           <div className="absolute inset-0 bg-gold/5 blur-[150px] rounded-full scale-50" />
           <motion.div
@@ -231,13 +231,13 @@ export default function App() {
             viewport={{ once: true }}
             className="relative z-10"
           >
-            <h2 className="text-6xl md:text-9xl font-sans font-black mb-12 tracking-tighter">
+            {/* ARREGLADO: Cambiamos a tracking-wide para separar las letras */}
+            <h2 className="text-6xl md:text-9xl font-sans font-black mb-12 tracking-wide">
               ¿ESTÁ <span className="text-gold">LISTO?</span>
             </h2>
             <p className="text-2xl md:text-4xl text-white/40 font-light mb-16 max-w-4xl mx-auto">
               El mercado no espera. La sincronización orbital es ahora.
             </p>
-            {/* Botón CTA convertido en enlace directo */}
             <motion.a
               href="portal.html"
               whileHover={{ scale: 1.1 }}
