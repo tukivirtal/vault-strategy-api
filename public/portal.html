@@ -64,9 +64,15 @@
         .form-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.15); padding: 40px; border-radius: 8px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .form-header { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #aaa; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         
-        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.3s; }
+        /* CORRECCIÓN DE CAMPOS DE TEXTO: Se quita la mayúscula forzada global */
+        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; transition: all 0.3s; }
         input:focus { outline: none; border-color: #D4AF37; background: #000; }
-        input::placeholder { color: #555; }
+        input::placeholder { color: #555; text-transform: uppercase; }
+        
+        /* Reglas específicas de mayúsculas/minúsculas */
+        input[type="email"] { text-transform: lowercase; }
+        input[type="text"] { text-transform: uppercase; }
+        /* input[type="password"] se deja intacto para respetar mayúsculas/minúsculas de la contraseña real */
         
         .row { display: flex; gap: 15px; }
         .row input { flex: 1; }
@@ -90,7 +96,6 @@
         .footer-links a { color: #666; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
         .footer-links a:hover { color: #D4AF37; }
         
-        /* Ocultar elementos dinámicamente */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -124,7 +129,7 @@
         <div class="form-box">
             <div class="form-header" id="form-title">Registro de Nueva Terminal</div>
             
-            <form action="#">
+            <form id="auth-form">
                 <input type="email" placeholder="Email Corporativo / VIP" required>
                 <input type="password" placeholder="Contraseña Estratégica" required>
                 
@@ -162,17 +167,17 @@
         const toggleDesc = document.getElementById('toggle-desc');
         const toggleBtn = document.getElementById('toggle-btn');
         const navVipBtn = document.getElementById('nav-vip-btn');
+        const authForm = document.getElementById('auth-form');
 
         let isLoginMode = false;
 
+        // 1. LÓGICA DE CAMBIO DE MODO
         function toggleMode(event) {
             if(event) event.preventDefault();
             isLoginMode = !isLoginMode;
 
             if (isLoginMode) {
-                // CAMBIAR A MODO "LOGIN" (Solo Email y Contraseña)
                 extraFields.classList.add('hidden');
-                // Quitamos el 'required' para que deje enviar el formulario sin llenar la fecha
                 extraInputs.forEach(input => input.required = false);
                 
                 formTitle.innerText = "Autorización de Terminal";
@@ -181,9 +186,7 @@
                 toggleBtn.innerText = "Solicitar Registro";
                 navVipBtn.innerText = "Registrarse";
             } else {
-                // CAMBIAR A MODO "REGISTRO" (Con todos los campos de nacimiento)
                 extraFields.classList.remove('hidden');
-                // Volvemos a exigir que llenen la fecha
                 extraInputs.forEach(input => input.required = true);
                 
                 formTitle.innerText = "Registro de Nueva Terminal";
@@ -194,12 +197,21 @@
             }
         }
 
-        // Conectar los botones al script
         toggleBtn.addEventListener('click', toggleMode);
-        
-        navVipBtn.addEventListener('click', (event) => {
-            // Si le dan al botón VIP de arriba, nos aseguramos de que cambie el modo
-            toggleMode(event);
+        navVipBtn.addEventListener('click', toggleMode);
+
+        // 2. LÓGICA DE REDIRECCIÓN A LA BÓVEDA
+        authForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita recargar la página
+
+            // Efecto visual de carga
+            submitBtn.innerText = "Sincronizando...";
+            submitBtn.style.opacity = "0.7";
+
+            // Simula 1 segundo de "cálculo" y redirige a la bóveda
+            setTimeout(() => {
+                window.location.href = "boveda.html";
+            }, 1000);
         });
     </script>
 </body>
