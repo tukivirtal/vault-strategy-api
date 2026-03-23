@@ -27,25 +27,58 @@
             backdrop-filter: blur(12px);
         }
         
-        /* ESCUDO EN EL LOGO */
-        .logo-container { display: flex; align-items: center; gap: 15px; text-decoration: none; transition: opacity 0.3s; }
-        .logo-container:hover { opacity: 0.8; }
-        .logo-icon { border: 1px solid #D4AF37; color: #D4AF37; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-        .logo-text { color: #fff; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; letter-spacing: -0.05em; text-transform: uppercase; }
+        /* LOGO ORIGINAL RECREADO EN HTML/CSS */
+        .logo-group { display: flex; align-items: center; gap: 16px; text-decoration: none; cursor: pointer; }
+        .logo-box { 
+            width: 48px; height: 48px; 
+            background: rgba(212, 175, 55, 0.1); 
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
+            transition: all 0.3s ease; 
+        }
+        .logo-text-col { display: flex; flex-direction: column; }
+        .logo-title { 
+            font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; 
+            color: #fff; letter-spacing: -0.05em; transition: all 0.3s ease; 
+        }
+        .logo-subtitle { 
+            display: flex; align-items: center; gap: 6px; 
+            opacity: 0.4; transition: opacity 0.3s ease; margin-top: 2px; 
+        }
+        .logo-subtitle span { 
+            font-family: 'JetBrains Mono', monospace; font-size: 10px; 
+            color: #fff; text-transform: uppercase; letter-spacing: 0.2em; 
+        }
+        .pulse-icon { animation: pulse-anim 2s infinite; }
         
+        @keyframes pulse-anim {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* EFECTOS DE BRILLO (HOVER) DEL LOGO */
+        .logo-group:hover .logo-box { 
+            background: rgba(212, 175, 55, 0.2); 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); 
+        }
+        .logo-group:hover .logo-title { 
+            color: #D4AF37; 
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+        .logo-group:hover .logo-subtitle { opacity: 1; }
+        
+        /* ENLACES DE NAVEGACIÓN */
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-links a { color: #888; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; }
         .nav-links a:hover { color: #D4AF37; }
         .nav-links a.vip { color: #000; background-color: #D4AF37; padding: 10px 24px; border-radius: 4px; font-weight: bold; }
         .nav-links a.vip:hover { background-color: #FFF5D1; }
 
+        /* CONTENIDO PRINCIPAL */
         main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; padding: 60px 20px; }
         
-        /* TÍTULOS SIN PUNTOS */
         h1 { font-size: 46px; font-weight: 300; text-align: center; margin-bottom: 15px; letter-spacing: -0.02em; line-height: 1.2; }
         h1 span { font-weight: 900; font-style: italic; color: #D4AF37; }
-        
-        /* SUBTÍTULO BLANCO */
         .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 50px; max-width: 600px; line-height: 1.6; opacity: 0.9; }
 
         .form-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.15); padding: 40px; border-radius: 8px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
@@ -83,12 +116,19 @@
     <div class="glow-bg"></div>
 
     <nav>
-        <a href="/" class="logo-container">
-            <div class="logo-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.89 0 5.13 1 6.9 2a1 1 0 0 1 .1 1z"/></svg>
+        <a href="/" class="logo-group">
+            <div class="logo-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.89 0 5.13 1 6.9 2a1 1 0 0 1 .1 1z"/></svg>
             </div>
-            <span class="logo-text">VAULT LOGIC</span>
+            <div class="logo-text-col">
+                <span class="logo-title">VAULT LOGIC</span>
+                <div class="logo-subtitle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pulse-icon"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    <span>NASA JPL SYNC: ACTIVE</span>
+                </div>
+            </div>
         </a>
+
         <div class="nav-links">
             <a href="/">Volver a la Terminal</a>
             <a href="#" class="vip">Acceso VIP</a>
