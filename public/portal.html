@@ -243,6 +243,17 @@
                 return;
             }
 
+            // BLINDAJE 1: Obligar al usuario a seleccionar una ciudad del autocompletado
+            if (!modoVIP) {
+                const lat = document.getElementById('lat').value;
+                if (!lat) {
+                    resContainer.style.display = 'block';
+                    resTitulo.innerText = "COORDENADAS FALTANTES:";
+                    resCuerpo.innerText = "Por favor, busque su ciudad de nacimiento y SELECCIONE una opción de la lista desplegable.";
+                    return;
+                }
+            }
+
             const payload = modoVIP ? { 
                 email: emailInput, 
                 password: passInput, 
@@ -261,37 +272,42 @@
             if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
                 resContainer.style.display = 'block';
                 resTitulo.innerText = "DATOS INCOMPLETOS:";
-                resCuerpo.innerText = "Complete los parámetros de nacimiento.";
+                resCuerpo.innerText = "Complete todos los parámetros de nacimiento.";
                 return;
             }
 
+            // BLINDAJE 2: Avisar al usuario que el servidor podría tardar
             btn.disabled = true;
-            btn.innerText = "AUTENTICANDO...";
+            btn.innerText = "SINCRONIZANDO...";
             resContainer.style.display = 'block';
-            resTitulo.innerHTML = "SISTEMA";
-            resCuerpo.innerHTML = "Conectando con servidor seguro. Esto puede demorar unos segundos...";
+            resTitulo.innerHTML = "ESTABLECIENDO ENLACE SEGURO";
+            resCuerpo.innerHTML = "Los núcleos estratégicos pueden tardar hasta 50 segundos en salir del modo reposo. Por favor, mantenga esta ventana abierta...";
 
             try {
-                // ENVIAMOS LOS DATOS A TU SERVIDOR SEGURO (RENDER)
                 const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
 
-                const data = await respuesta.json();
+                // BLINDAJE 3: Si Render devuelve un error HTML en lugar de datos, lo detectamos sin romper la página
+                const textResponse = await respuesta.text();
+                let data;
+                try {
+                    data = JSON.parse(textResponse);
+                } catch (err) {
+                    throw new Error("El núcleo está en proceso de arranque (Cold Start). Por favor, espere 15 segundos y vuelva a presionar el botón.");
+                }
                 
                 if (data.status === "success" || data.status === "exists") {
                     resTitulo.innerHTML = "ACCESO AUTORIZADO";
                     resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
                     
-                    // Guardamos el email en la memoria local para que la Bóveda sepa quién entra
                     localStorage.setItem('vault_user_email', emailInput);
                     if(!modoVIP) {
                         localStorage.setItem('vault_user_nombre', payload.nombre);
                     }
 
-                    // Redirigimos a la bóveda. Allí actuará tu Controlador de Tráfico VIP
                     setTimeout(() => {
                         window.location.href = "boveda.html";
                     }, 1200);
@@ -304,12 +320,11 @@
             } catch (error) {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Autorizar Acceso" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR CRÍTICO";
-                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+                resTitulo.innerHTML = "ALERTA DE SISTEMA";
+                resCuerpo.innerHTML = error.message || "Fallo de conexión. Verifique su red o intente nuevamente en unos segundos.";
             }
         }
 
-        // LÓGICA ORIGINAL DE AUTOCOMPLETADO PHOTON (Para el Registro de ciudad)
         const lugarInput = document.getElementById('lugar');
         const lugarList = document.getElementById('lugar-list');
 
@@ -338,7 +353,6 @@
             } catch (err) { console.error(err); }
         });
 
-        // Ocultar la lista si haces clic afuera
         document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
