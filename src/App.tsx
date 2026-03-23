@@ -251,23 +251,22 @@ export default function App() {
       </main>
 
     {/* Footer Ampliado y Mejorado */}
- {/* Footer Ampliado: Contacto y Enlaces Legales */}
+ {/* Footer Final: Grid ajustado y Enlace a Formulario */}
       <footer className="relative py-32 px-8 md:px-16 border-t border-white/5 bg-black">
         <div className="max-w-7xl mx-auto">
-          {/* Cambiamos la cuadrícula a 5 columnas para hacer espacio a "Contacto" */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16 mb-24">
-            <div className="col-span-1 md:col-span-2">
+          {/* Ajustamos a 12 columnas para distribuir el espacio perfectamente */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
+            <div className="md:col-span-5">
               <div className="flex items-center gap-4 mb-10">
                 <Shield className="w-12 h-12 text-gold" />
                 <span className="font-sans font-black text-4xl tracking-tighter">VAULT LOGIC</span>
               </div>
-              <p className="text-white/40 text-xl md:text-2xl max-w-xl leading-relaxed font-light">
+              <p className="text-white/40 text-xl max-w-md leading-relaxed font-light">
                 Transformando matemática orbital en directivas operativas de alta precisión para el liderazgo global.
               </p>
             </div>
             
-            {/* Columna Legal conectada a tus futuros archivos HTML */}
-            <div>
+            <div className="md:col-span-2">
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Legal</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li><a href="privacidad.html" className="hover:text-white transition-colors">Privacidad</a></li>
@@ -276,33 +275,29 @@ export default function App() {
               </ul>
             </div>
 
-            {/* NUEVA COLUMNA DE CONTACTO */}
-            <div>
+            <div className="md:col-span-3">
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Contacto</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li>
                   <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
-                  <a href="mailto:contact@emotionalvaults.com" className="hover:text-gold transition-colors break-words">
+                  {/* Ahora lleva a una página de formulario en lugar de abrir Outlook */}
+                  <a href="contacto.html" className="hover:text-gold transition-colors whitespace-nowrap">
                     contact@emotionalvaults.com
                   </a>
                 </li>
               </ul>
             </div>
             
-            <div>
+            <div className="md:col-span-2">
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Sistema</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
-                <li className="flex items-center gap-3">
+                <li className="flex items-center gap-3 whitespace-nowrap">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  NASA JPL DE441: ONLINE
+                  NASA JPL: ONLINE
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full" />
                   LATENCIA: 12ms
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  ENCRIPTACIÓN: AES-256
                 </li>
               </ul>
             </div>
