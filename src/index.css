@@ -3,19 +3,21 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --color-gold: #D4AF37; /* Dorado ajustado para máximo contraste */
+  --color-gold: #D4AF37;
   --color-gold-muted: rgba(212, 175, 55, 0.15);
   --color-gold-glow: rgba(212, 175, 55, 0.3);
 }
+
 @layer base {
   body {
     @apply bg-black text-white font-sans selection:bg-gold/30 selection:text-gold;
     cursor: default;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
-}
+
 @layer utilities {
   .noise-overlay {
     position: fixed;
@@ -34,7 +36,6 @@
     @apply bg-gold/5 backdrop-blur-md border border-gold/15;
   }
 
-  /* EL FIX CRÍTICO DEL DEGRADADO */
   .text-gradient-gold {
     background: linear-gradient(135deg, #FFF5D1 0%, var(--color-gold) 50%, #A67C00 100%);
     -webkit-background-clip: text;
