@@ -142,151 +142,165 @@
         </div>
     </footer>
 
-    <script>
-    let modoVIP = false;
+<script>
+        let modoVIP = false;
 
-    function toggleModo(forzarVIP = false) {
-        if (forzarVIP) modoVIP = true;
-        else modoVIP = !modoVIP;
+        function toggleModo(forzarVIP = false) {
+            if (forzarVIP) modoVIP = true;
+            else modoVIP = !modoVIP;
 
-        const campos = document.getElementById('campos-registro');
-        const titulo = document.getElementById('form-title');
-        const btn = document.getElementById('btn-submit');
-        const text = document.getElementById('toggle-text');
-        const link = document.getElementById('toggle-link');
+            const campos = document.getElementById('campos-registro');
+            const titulo = document.getElementById('form-title');
+            const btn = document.getElementById('btn-submit');
+            const text = document.getElementById('toggle-text');
+            const link = document.getElementById('toggle-link');
+            const resContainer = document.getElementById('resultado');
 
-        if (modoVIP) {
-            campos.classList.add('hidden');
-            titulo.innerText = "Acceso VIP Autorizado";
-            btn.innerText = "Vincular con el Núcleo";
-            text.innerText = "¿NUEVA TERMINAL?";
-            link.innerText = "Registrarse";
-        } else {
-            campos.classList.remove('hidden');
-            titulo.innerText = "Registro de Nueva Terminal";
-            btn.innerText = "Iniciar Secuencia de Cálculo";
-            text.innerText = "¿YA TIENE UNA TERMINAL?";
-            link.innerText = "Acceso VIP";
-        }
-    }
+            // 1. SOLUCIÓN UX: Ocultar cualquier error viejo al cambiar de pestaña
+            resContainer.classList.add('hidden');
 
-    function validarEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+            // 2. SOLUCIÓN UX: Limpiar la contraseña (y el correo si vamos a registro) para no heredar datos
+            document.getElementById('password').value = '';
+            if (!modoVIP) {
+                document.getElementById('email').value = '';
+            }
 
-    async function consultar() {
-        const resContainer = document.getElementById('resultado');
-        const resTitulo = document.getElementById('res-titulo');
-        const resCuerpo = document.getElementById('res-cuerpo');
-        const btn = document.getElementById('btn-submit');
-        
-        const emailInput = document.getElementById('email').value.trim().toLowerCase();
-        const passInput = document.getElementById('password').value.trim();
-
-        if (!validarEmail(emailInput)) {
-            resContainer.classList.remove('hidden');
-            resTitulo.innerText = "ERROR DE IDENTIDAD:";
-            resCuerpo.innerText = "Ingrese un formato de email válido.";
-            return;
-        }
-        if (passInput.length < 4) {
-            resContainer.classList.remove('hidden');
-            resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
-            resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
-            return;
-        }
-
-        const payload = modoVIP ? { 
-            email: emailInput, 
-            password: passInput, 
-            login_only: true 
-        } : {
-            nombre: document.getElementById('nombre').value.trim().toUpperCase(),
-            email: emailInput,
-            password: passInput,
-            fecha: document.getElementById('fecha').value,
-            hora: document.getElementById('hora').value,
-            lugar: document.getElementById('lugar').value.trim().toUpperCase(),
-            lat: document.getElementById('lat').value,
-            lon: document.getElementById('lon').value
-        };
-
-        if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
-            resContainer.classList.remove('hidden');
-            resTitulo.innerText = "DATOS INCOMPLETOS:";
-            resCuerpo.innerText = "Complete los parámetros de nacimiento.";
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "AUTENTICANDO...";
-        resContainer.classList.remove('hidden');
-        resTitulo.innerHTML = "SISTEMA";
-        resCuerpo.innerHTML = "Conectando con servidor seguro...";
-
-        try {
-            const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-
-            const data = await respuesta.json();
-            
-            if (data.status === "success" || data.status === "exists") {
-                resTitulo.innerHTML = "ACCESO AUTORIZADO";
-                resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
-                
-                // Aseguramos que la Bóveda sepa tu correo usando localStorage
-                localStorage.setItem('vault_user_email', emailInput);
-
-                setTimeout(() => {
-                    // Ahora redirige a boveda.html en lugar de genesis-live
-                    window.location.href = `boveda.html?email=${encodeURIComponent(emailInput)}`;
-                }, 1200);
+            if (modoVIP) {
+                campos.classList.add('hidden');
+                titulo.innerText = "Acceso VIP Autorizado";
+                btn.innerText = "Vincular con el Núcleo";
+                text.innerText = "¿NUEVA TERMINAL?";
+                link.innerText = "Registrarse";
             } else {
+                campos.classList.remove('hidden');
+                titulo.innerText = "Registro de Nueva Terminal";
+                btn.innerText = "Iniciar Secuencia de Cálculo";
+                text.innerText = "¿YA TIENE UNA TERMINAL?";
+                link.innerText = "Acceso VIP";
+            }
+        }
+
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        async function consultar() {
+            const resContainer = document.getElementById('resultado');
+            const resTitulo = document.getElementById('res-titulo');
+            const resCuerpo = document.getElementById('res-cuerpo');
+            const btn = document.getElementById('btn-submit');
+            
+            // SOLUCIÓN UX: Ocultar error previo al volver a intentar
+            resContainer.classList.add('hidden');
+            
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const passInput = document.getElementById('password').value.trim();
+
+            if (!validarEmail(emailInput)) {
+                resContainer.classList.remove('hidden');
+                resTitulo.innerText = "ERROR DE IDENTIDAD:";
+                resCuerpo.innerText = "Ingrese un formato de email válido.";
+                return;
+            }
+            if (passInput.length < 4) {
+                resContainer.classList.remove('hidden');
+                resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
+                resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
+                return;
+            }
+
+            const payload = modoVIP ? { 
+                email: emailInput, 
+                password: passInput, 
+                login_only: true 
+            } : {
+                nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+                email: emailInput,
+                password: passInput,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+                lat: document.getElementById('lat').value || "0", // Salvavidas silencioso
+                lon: document.getElementById('lon').value || "0"
+            };
+
+            if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+                resContainer.classList.remove('hidden');
+                resTitulo.innerText = "DATOS INCOMPLETOS:";
+                resCuerpo.innerText = "Complete los parámetros de nacimiento.";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "AUTENTICANDO...";
+            resContainer.classList.remove('hidden');
+            resTitulo.innerHTML = "SISTEMA";
+            resCuerpo.innerHTML = "Conectando con servidor seguro...";
+
+            try {
+                // LA CONEXIÓN ORIGINAL A RENDER EXACTA
+                const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await respuesta.json();
+                
+                if (data.status === "success" || data.status === "exists") {
+                    resTitulo.innerHTML = "ACCESO AUTORIZADO";
+                    resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
+                    
+                    localStorage.setItem('vault_user_email', emailInput);
+                    if(!modoVIP) localStorage.setItem('vault_user_nombre', payload.nombre);
+
+                    setTimeout(() => {
+                        window.location.href = "boveda.html";
+                    }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
+                    resTitulo.innerHTML = "ACCESO DENEGADO";
+                    resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
+                }
+            } catch (error) {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ACCESO DENEGADO";
-                resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
+                resTitulo.innerHTML = "ERROR CRÍTICO";
+                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
             }
-        } catch (error) {
-            btn.disabled = false;
-            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-            resTitulo.innerHTML = "ERROR CRÍTICO";
-            resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
         }
-    }
 
-    const lugarInput = document.getElementById('lugar');
-    const lugarList = document.getElementById('lugar-list');
+        // Lógica de Autocompletado Photon Original
+        const lugarInput = document.getElementById('lugar');
+        const lugarList = document.getElementById('lugar-list');
 
-    lugarInput.addEventListener('input', async (e) => {
-        const val = e.target.value;
-        if (val.length < 3) { lugarList.classList.add('hidden'); return; }
-        try {
-            const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
-            const data = await res.json();
-            lugarList.innerHTML = '';
-            lugarList.classList.remove('hidden');
-            data.features.forEach(feat => {
-                const prop = feat.properties;
-                const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item';
-                item.innerText = label.toUpperCase();
-                item.onclick = () => {
-                    lugarInput.value = label.toUpperCase();
-                    document.getElementById('lat').value = feat.geometry.coordinates[1];
-                    document.getElementById('lon').value = feat.geometry.coordinates[0];
-                    lugarList.classList.add('hidden');
-                };
-                lugarList.appendChild(item);
-            });
-        } catch (err) { console.error(err); }
-    });
+        lugarInput.addEventListener('input', async (e) => {
+            const val = e.target.value;
+            if (val.length < 3) { lugarList.classList.add('hidden'); return; }
+            try {
+                const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+                const data = await res.json();
+                lugarList.innerHTML = '';
+                lugarList.classList.remove('hidden');
+                data.features.forEach(feat => {
+                    const prop = feat.properties;
+                    const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerText = label.toUpperCase();
+                    item.onclick = () => {
+                        lugarInput.value = label.toUpperCase();
+                        document.getElementById('lat').value = feat.geometry.coordinates[1];
+                        document.getElementById('lon').value = feat.geometry.coordinates[0];
+                        lugarList.classList.add('hidden');
+                    };
+                    lugarList.appendChild(item);
+                });
+            } catch (err) { console.error(err); }
+        });
 
-    document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
+        document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
 </html>
