@@ -226,7 +226,8 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    window.location.href = `genesis-live.html`;
+                    // CORRECCIÓN: Envía a Executive y pasa el email para no perder la sesión
+                    window.location.href = `panel-executive.html?email=${encodeURIComponent(userEmail)}`;
                 }
             }).render('#paypal-button-executive');
 
@@ -240,7 +241,8 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    window.location.href = `genesis-live.html`;
+                    // CORRECCIÓN: Envía a Sentinel y pasa el email para no perder la sesión
+                    window.location.href = `panel-sentinel.html?email=${encodeURIComponent(userEmail)}`;
                 }
             }).render('#paypal-button-sentinel');
         }
