@@ -348,7 +348,7 @@ async function conectar() {
     if (!email) { window.location.href = '/portal.html'; return; } // Ruta absoluta
 
     // Le agregamos el email al botón por seguridad
-    document.getElementById('btn-upgrade').href = `/suscripcion.html?email=${encodeURIComponent(email)}`;
+    document.getElementById('btn-upgrade').href = `../suscripcion.html?email=${encodeURIComponent(email)}`;
 
     const hoy = new Date();
     document.getElementById('fecha-hoy').innerText = hoy.toLocaleDateString('es-ES');
@@ -365,10 +365,10 @@ async function conectar() {
             const d = res.datos;
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-            // RUTEO VIP con RUTAS ABSOLUTAS (/)
-            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `/genesis-live.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "SENTINEL") { window.location.href = `/panel-sentinel.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `/panel-executive.html?email=${encodeURIComponent(email)}`; return; }
+            // RUTEO VIP con RUTAS RELATIVAS (../ para salir de 'public')
+            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `../genesis-live.html?email=${encodeURIComponent(email)}`; return; } 
+            else if (nivelSuscripcion === "SENTINEL") { window.location.href = `../panel-sentinel.html?email=${encodeURIComponent(email)}`; return; } 
+            else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `../panel-executive.html?email=${encodeURIComponent(email)}`; return; }
 
             // LLENADO DEL PANEL FREE
             document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]);
