@@ -61,7 +61,7 @@ async def consultar(data: LoginData):
     try:
         # Buscamos si el usuario ya existe en Supabase (asumimos que la tabla se llama 'usuarios')
         # NOTA: Si tu tabla se llama distinto (ej. 'users'), cambia "usuarios" por tu nombre real
-        response = supabase.table("usuarios").select("*").eq("email", data.email).execute()
+        response = supabase.table("clientes_vip").select("*").eq("email", data.email).execute()
         user = response.data[0] if response.data else None
 
         # SI ES MODO VIP (SOLO LOGIN)
@@ -95,7 +95,7 @@ async def consultar(data: LoginData):
                 "nivel_suscripcion": "FREE"
             }
             
-            supabase.table("usuarios").insert(nuevo_usuario).execute()
+            supabase.table("clientes_vip").insert(nuevo_usuario).execute()
             return {"status": "success"}
             
     except Exception as e:
