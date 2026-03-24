@@ -14,7 +14,7 @@
     background: #0a0a0a; color: #e8e8e0;
     font-family: 'Share Tech Mono', monospace;
     min-height: 100vh; padding: 24px;
-    position: relative; overflow: hidden;
+    position: relative; overflow-x: hidden;
   }
 
   .vl-panel::before {
@@ -31,10 +31,17 @@
     background-size: 40px 40px; pointer-events: none;
   }
 
+  /* NUEVO: Contenedor para que no se estire en monitores grandes */
+  .panel-container {
+    max-width: 1200px; /* Límite de ancho */
+    margin: 0 auto; /* Centrado automático */
+    position: relative;
+    z-index: 2;
+  }
+
   .header {
     display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 20px; position: relative; z-index: 2;
-    border-bottom: 1px solid rgba(180,140,40,0.2); padding-bottom: 16px;
+    margin-bottom: 30px; border-bottom: 1px solid rgba(180,140,40,0.2); padding-bottom: 16px;
   }
 
   .header-left .label { font-size: 10px; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
@@ -53,72 +60,74 @@
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c864; animation: pulse-green 2s infinite; }
   @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  .status-grid { display: grid; grid-template-columns: auto auto; gap: 2px 16px; font-size: 10px; text-align: left; }
+  .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: left; }
   .status-grid .sk { color: #555; letter-spacing: 1px; }
   .status-grid .sv { color: #C9A84C; font-weight: bold; }
   .status-grid .sv.free { color: #888; }
   .status-grid .sv.stable { color: #00c864; }
 
+  /* AJUSTE: Columnas laterales más anchas y centro flexible */
   .main-grid {
-    display: grid; grid-template-columns: 200px 1fr 200px; gap: 16px;
-    position: relative; z-index: 2; margin-bottom: 16px;
+    display: grid; grid-template-columns: 260px 1fr 260px; gap: 24px;
+    margin-bottom: 24px; align-items: stretch;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1000px) {
       .main-grid { grid-template-columns: 1fr; }
       .header { flex-direction: column; gap: 20px; }
       .header-right { text-align: left; }
   }
 
-  .panel-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.15); padding: 14px; }
-  .box-title { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(180,140,40,0.1); padding-bottom: 6px; }
+  .panel-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.15); padding: 18px; display: flex; flex-direction: column;}
+  .box-title { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid rgba(180,140,40,0.1); padding-bottom: 6px; }
 
-  .vector-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .vector-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .vector-row:last-child { border-bottom: none; }
-  .vector-name { color: #777; letter-spacing: 1px; }
+  .vector-name { color: #777; letter-spacing: 1px; display: flex; align-items: center; }
+  .planet-dot { width: 6px; height: 6px; border-radius: 50%; background: #C9A84C; margin-right: 8px; }
   .vector-val { color: #C9A84C; font-weight: bold; }
 
-  .chart-container { display: flex; align-items: center; justify-content: center; position: relative; }
-  .chart-canvas-wrap { position: relative; width: 100%; max-width: 400px; }
-  .orbit-label { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 9px; color: #444; letter-spacing: 2px; white-space: nowrap; }
+  .chart-container { display: flex; align-items: center; justify-content: center; position: relative; padding: 20px 0;}
+  .chart-canvas-wrap { position: relative; width: 100%; max-width: 500px; display: flex; justify-content: center;}
+  .orbit-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #555; letter-spacing: 3px; white-space: nowrap; }
 
-  .right-col { display: flex; flex-direction: column; gap: 12px; }
-  .sync-index { text-align: center; padding: 16px 14px; }
-  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 48px; font-weight: 700; color: #C9A84C; line-height: 1; display: block; }
+  .right-col { display: flex; flex-direction: column; gap: 24px; }
+  .sync-index { text-align: center; padding: 20px 14px; }
+  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 56px; font-weight: 700; color: #C9A84C; line-height: 1; display: block; margin-top: 10px;}
   .sync-label { font-size: 9px; color: #555; letter-spacing: 2px; margin-top: 4px; }
-  .arc-wrap { display: flex; justify-content: center; margin: 8px 0; }
+  .arc-wrap { display: flex; justify-content: center; margin: 10px 0; }
 
-  .transit-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .transit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .transit-row:last-child { border-bottom: none; }
   .transit-planet { color: #999; letter-spacing: 1px; }
-  .tag { padding: 2px 8px; font-size: 9px; letter-spacing: 1px; }
+  .tag { padding: 3px 8px; font-size: 9px; letter-spacing: 1px; }
   .tag-fav { background: rgba(0,200,100,0.1); color: #00c864; border: 1px solid rgba(0,200,100,0.2); }
   .tag-tens { background: rgba(220,60,60,0.1); color: #e05555; border: 1px solid rgba(220,60,60,0.2); }
   .tag-neut { background: rgba(180,140,40,0.1); color: #C9A84C; border: 1px solid rgba(180,140,40,0.2); }
 
-  .bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; position: relative; z-index: 2; margin-bottom: 16px; }
-  .metric-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.12); padding: 12px 14px; }
-  .metric-label { font-size: 9px; color: #555; letter-spacing: 2px; margin-bottom: 6px; }
-  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; filter: blur(4px); user-select:none; }
+  .bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  .metric-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.12); padding: 16px 20px; }
+  .metric-label { font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase;}
+  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; filter: blur(4px); user-select:none; }
   .metric-value.pos { color: #00c864; } .metric-value.neg { color: #e05555; } .metric-value.neu { color: #C9A84C; }
   
-  .metric-bar { height: 2px; margin-top: 8px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
+  .metric-bar { height: 2px; margin-top: 12px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
   .metric-fill { height: 100%; border-radius: 1px; }
   .fill-green { background: #00c864; width: 0%; } .fill-red { background: #e05555; width: 0%;} .fill-gold { background: #C9A84C; width: 0%;}
 
-  .directiva-box { background: rgba(180,140,40,0.05); border: 1px solid rgba(180,140,40,0.2); border-left: 3px solid #C9A84C; padding: 14px 16px; position: relative; z-index: 2; margin-bottom: 16px; }
-  .directiva-label { font-size: 9px; color: #C9A84C; letter-spacing: 3px; margin-bottom: 8px; }
-  .directiva-text { font-size: 12px; color: #aaa; line-height: 1.6; }
+  .directiva-box { background: rgba(180,140,40,0.05); border: 1px solid rgba(180,140,40,0.2); border-left: 3px solid #C9A84C; padding: 20px; margin-bottom: 24px; }
+  .directiva-label { font-size: 10px; color: #C9A84C; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase;}
+  .directiva-text { font-size: 13px; color: #aaa; line-height: 1.6; }
 
-  .blocked-items { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-  .blocked-item { display: flex; align-items: center; gap: 10px; font-size: 11px; padding: 8px 12px; border: 1px dashed rgba(180,140,40,0.2); background: rgba(0,0,0,0.3); }
-  .blocked-icon { font-size: 12px; }
+  .blocked-items { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .blocked-item { display: flex; align-items: center; gap: 12px; font-size: 11px; padding: 10px 14px; border: 1px dashed rgba(180,140,40,0.2); background: rgba(0,0,0,0.3); }
+  .blocked-icon { font-size: 14px; }
   .blocked-text { color: #777; letter-spacing: 1px; }
-  .blocked-badge { margin-left: auto; font-size: 8px; padding: 2px 8px; background: rgba(180,140,40,0.1); color: #C9A84C; border: 1px solid rgba(180,140,40,0.2); letter-spacing: 2px; }
+  .blocked-badge { margin-left: auto; font-size: 9px; padding: 3px 10px; background: rgba(180,140,40,0.1); color: #C9A84C; border: 1px solid rgba(180,140,40,0.2); letter-spacing: 2px; }
 
-  .cta-btn { display: block; width: 100%; background: #C9A84C; color: #0a0a0a; border: none; padding: 16px; font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 4px; cursor: pointer; text-transform: uppercase; position: relative; z-index: 2; transition: background 0.3s; text-decoration: none; text-align: center;}
+  .cta-btn { display: block; width: 100%; background: #C9A84C; color: #0a0a0a; border: none; padding: 18px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; letter-spacing: 4px; cursor: pointer; text-transform: uppercase; text-decoration: none; text-align: center; transition: background 0.3s;}
   .cta-btn:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212,175,55,0.3);}
-  .cta-sub { text-align: center; font-size: 9px; color: #444; margin-top: 8px; letter-spacing: 2px; position: relative; z-index: 2; }
+  .cta-sub { text-align: center; font-size: 10px; color: #555; margin-top: 10px; letter-spacing: 2px; }
   
   #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; color: #C9A84C; letter-spacing: 4px; }
 </style>
@@ -132,111 +141,115 @@
 <div class="vl-panel" style="display: none;" id="panel-content">
   <div class="grid-bg"></div>
 
-  <div class="header">
-    <div class="header-left">
-      <div class="label">Sujeto de análisis</div>
-      <div class="name" id="nombre-display">---</div>
-      <div class="birthdata" id="datos-display">---</div>
-    </div>
-    <div class="header-right">
-      <div class="sync-badge">
-        <span class="sync-dot"></span> NASA JPL DE441 // SINCRO ACTIVA
-      </div>
-      <div class="status-grid">
-        <span class="sk">CONEXIÓN</span><span class="sv stable">ESTABLE</span>
-        <span class="sk">AUTH</span><span class="sv free" id="auth-display">FREE</span>
-        <span class="sk">GEO</span><span class="sv" id="geo-display">LAT: --</span>
-        <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="main-grid">
-    <div class="panel-box">
-      <div class="box-title">Vectores Natales</div>
-      <div id="vectores-lista">
+  <div class="panel-container">
+      
+      <div class="header">
+        <div class="header-left">
+          <div class="label">Sujeto de análisis</div>
+          <div class="name" id="nombre-display">---</div>
+          <div class="birthdata" id="datos-display">---</div>
         </div>
-    </div>
-
-    <div class="chart-container">
-      <div class="chart-canvas-wrap">
-        <div class="orbit-label">CARTA NATAL // POSICIÓN ORBITAL</div>
-        <canvas id="orbitCanvas" width="360" height="340"></canvas>
-      </div>
-    </div>
-
-    <div class="right-col">
-      <div class="panel-box sync-index">
-        <div class="box-title">Índice de Sincronía</div>
-        <div class="arc-wrap">
-          <canvas id="arcCanvas" width="120" height="70"></canvas>
+        <div class="header-right">
+          <div class="sync-badge">
+            <span class="sync-dot"></span> NASA JPL DE441 // SINCRO ACTIVA
+          </div>
+          <div class="status-grid">
+            <span class="sk">CONEXIÓN</span><span class="sv stable">ESTABLE</span>
+            <span class="sk">AUTH</span><span class="sv free" id="auth-display">FREE</span>
+            <span class="sk">GEO</span><span class="sv" id="geo-display">LAT: --</span>
+            <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
+          </div>
         </div>
-        <span class="sync-number" id="sync-score">--</span>
-        <div class="sync-label">/ 100 — MODERADO</div>
       </div>
 
-      <div class="panel-box">
-        <div class="box-title">Tránsitos Activos Hoy</div>
-        <div class="transit-row"><span class="transit-planet">JUPITER</span><span class="tag tag-fav">FAVORABLE</span></div>
-        <div class="transit-row"><span class="transit-planet">SATURNO</span><span class="tag tag-tens">TENSO</span></div>
-        <div class="transit-row"><span class="transit-planet">MERCURIO</span><span class="tag tag-neut">NEUTRO</span></div>
-        <div class="transit-row"><span class="transit-planet">MARTE</span><span class="tag tag-fav">FAVORABLE</span></div>
-      </div>
-    </div>
-  </div>
+      <div class="main-grid">
+        <div class="panel-box">
+          <div class="box-title">Vectores Natales</div>
+          <div id="vectores-lista" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            </div>
+        </div>
 
-  <div class="bottom-grid">
-    <div class="metric-card">
-      <div class="metric-label">Capital GXP</div>
-      <div class="metric-value pos">+22.4%</div>
-      <div class="metric-bar"><div class="metric-fill fill-green"></div></div>
-      <div style="font-size:9px;color:#444;margin-top:6px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Negociación</div>
-      <div class="metric-value neu">+12.1%</div>
-      <div class="metric-bar"><div class="metric-fill fill-gold"></div></div>
-      <div style="font-size:9px;color:#444;margin-top:6px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Ventana de Riesgo</div>
-      <div class="metric-value neg">-17.8%</div>
-      <div class="metric-bar"><div class="metric-fill fill-red"></div></div>
-      <div style="font-size:9px;color:#444;margin-top:6px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
-    </div>
-  </div>
+        <div class="chart-container">
+          <div class="chart-canvas-wrap">
+            <div class="orbit-label">CARTA NATAL // POSICIÓN ORBITAL</div>
+            <canvas id="orbitCanvas" width="460" height="460"></canvas>
+          </div>
+        </div>
 
-  <div class="directiva-box">
-    <div class="directiva-label">Directiva IA // Proyección 90 días</div>
-    <div class="directiva-text">Los vectores de sincronización iniciales indican un potencial no explotado. Júpiter en tránsito activa su sector de expansión en los próximos 18 días. Para análisis completo de volatilidades y oportunidades corporativas, proceda al upgrade.</div>
-    <div class="blocked-items">
-      <div class="blocked-item">
-        <span class="blocked-icon" style="color:#e05555;">⚠</span><span class="blocked-text">Ventana de vulnerabilidad en sector financiero</span>
-        <span class="blocked-badge">BLOQUEADO</span>
-      </div>
-      <div class="blocked-item">
-        <span class="blocked-icon" style="color:#00c864;">◆</span><span class="blocked-text">Ciclo de alta sincronía para cierre de negociaciones</span>
-        <span class="blocked-badge">BLOQUEADO</span>
-      </div>
-    </div>
-  </div>
+        <div class="right-col">
+          <div class="panel-box sync-index">
+            <div class="box-title">Índice de Sincronía</div>
+            <div class="arc-wrap">
+              <canvas id="arcCanvas" width="140" height="80"></canvas>
+            </div>
+            <span class="sync-number" id="sync-score">--</span>
+            <div class="sync-label">/ 100 — MODERADO</div>
+          </div>
 
-  <a href="suscripcion.html" class="cta-btn">⬡ Desbloquear Terminal Génesis</a>
-  <div class="cta-sub">Acceso inmediato // AES-256 Encriptado // Inteligencia VIP</div>
-</div>
+          <div class="panel-box" style="flex-grow: 1;">
+            <div class="box-title">Tránsitos Activos Hoy</div>
+            <div class="transit-row"><span class="transit-planet">JUPITER</span><span class="tag tag-fav">FAVORABLE</span></div>
+            <div class="transit-row"><span class="transit-planet">SATURNO</span><span class="tag tag-tens">TENSO</span></div>
+            <div class="transit-row"><span class="transit-planet">MERCURIO</span><span class="tag tag-neut">NEUTRO</span></div>
+            <div class="transit-row"><span class="transit-planet">MARTE</span><span class="tag tag-fav">FAVORABLE</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+        <div class="metric-card">
+          <div class="metric-label">Capital GXP</div>
+          <div class="metric-value pos">+22.4%</div>
+          <div class="metric-bar"><div class="metric-fill fill-green"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Negociación</div>
+          <div class="metric-value neu">+12.1%</div>
+          <div class="metric-bar"><div class="metric-fill fill-gold"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Ventana de Riesgo</div>
+          <div class="metric-value neg">-17.8%</div>
+          <div class="metric-bar"><div class="metric-fill fill-red"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+      </div>
+
+      <div class="directiva-box">
+        <div class="directiva-label">Directiva IA // Proyección 90 días</div>
+        <div class="directiva-text">Los vectores de sincronización iniciales indican un potencial no explotado. Júpiter en tránsito activa su sector de expansión en los próximos 18 días. Para análisis completo de volatilidades y oportunidades corporativas, proceda al upgrade.</div>
+        <div class="blocked-items">
+          <div class="blocked-item">
+            <span class="blocked-icon" style="color:#e05555;">⚠</span><span class="blocked-text">Ventana de vulnerabilidad en sector financiero</span>
+            <span class="blocked-badge">BLOQUEADO</span>
+          </div>
+          <div class="blocked-item">
+            <span class="blocked-icon" style="color:#00c864;">◆</span><span class="blocked-text">Ciclo de alta sincronía para cierre de negociaciones</span>
+            <span class="blocked-badge">BLOQUEADO</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="/suscripcion.html" id="btn-upgrade" class="cta-btn">⬡ Desbloquear Terminal Génesis</a>
+      <div class="cta-sub">Acceso inmediato // AES-256 Encriptado // Inteligencia VIP</div>
+
+  </div> </div>
 
 <script>
 // --- FUNCIONES DE DIBUJO ---
 function drawOrbit(vectoresReales) {
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
+    
+    // Agrandamos las variables para el Canvas más grande
+    const W = 460, H = 460;
     const cx = W/2, cy = H/2 + 10;
-    const R = 130;
+    const R = 170; // Círculo principal más grande
 
     const colores = { "SOL": "#FFD700", "LUNA": "#C0C0C0", "MARTE": "#E05555", "VENUS": "#C9A84C", "JUPITER": "#E8C87A", "SATURNO": "#A89060", "MERCURIO": "#88AACC" };
     
-    // Convertimos el objeto de la BD al array que usa el diseño
     const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({
         name: nom, deg: grad, color: colores[nom] || "#fff"
     }));
@@ -287,15 +300,15 @@ function drawOrbit(vectoresReales) {
     }
 
     pts.forEach(pt => {
-        ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI*2);
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI*2);
         ctx.fillStyle = pt.p.color; ctx.fill();
-        ctx.beginPath(); ctx.arc(pt.x, pt.y, 8, 0, Math.PI*2);
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 10, 0, Math.PI*2);
         ctx.strokeStyle = pt.p.color + '44'; ctx.lineWidth = 1; ctx.stroke();
 
         const a = degToRad(pt.p.deg);
-        const lx = cx + (R+24)*Math.cos(a);
-        const ly = cy + (R+24)*Math.sin(a);
-        ctx.fillStyle = '#C9A84C'; ctx.font = '9px Share Tech Mono, monospace';
+        const lx = cx + (R+28)*Math.cos(a);
+        const ly = cy + (R+28)*Math.sin(a);
+        ctx.fillStyle = '#C9A84C'; ctx.font = '10px Share Tech Mono, monospace';
         ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
         ctx.fillText(pt.p.name, lx, ly);
     });
@@ -311,11 +324,12 @@ function drawArc(score) {
 
     arcCtx.clearRect(0,0, arcC.width, arcC.height);
     
-    arcCtx.beginPath(); arcCtx.arc(60, 60, 48, Math.PI, Math.PI*2);
-    arcCtx.strokeStyle = 'rgba(180,140,40,0.12)'; arcCtx.lineWidth = 6; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    // Centramos el arco en el nuevo canvas de 140x80
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, Math.PI, Math.PI*2);
+    arcCtx.strokeStyle = 'rgba(180,140,40,0.12)'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
 
-    arcCtx.beginPath(); arcCtx.arc(60, 60, 48, startA, endA);
-    arcCtx.strokeStyle = '#C9A84C'; arcCtx.lineWidth = 6; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, startA, endA);
+    arcCtx.strokeStyle = '#C9A84C'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
     
     document.getElementById('sync-score').innerText = score;
 }
@@ -331,7 +345,10 @@ async function conectar() {
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email') || localStorage.getItem('vault_user_email');
     
-    if (!email) { window.location.href = 'portal.html'; return; }
+    if (!email) { window.location.href = '/portal.html'; return; } // Ruta absoluta
+
+    // Le agregamos el email al botón por seguridad
+    document.getElementById('btn-upgrade').href = `/suscripcion.html?email=${encodeURIComponent(email)}`;
 
     const hoy = new Date();
     document.getElementById('fecha-hoy').innerText = hoy.toLocaleDateString('es-ES');
@@ -348,16 +365,12 @@ async function conectar() {
             const d = res.datos;
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-            // ==========================================
-            // RUTEO VIP (Funciona si cambias la BD)
-            // ==========================================
-            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html?email=${encodeURIComponent(email)}`; return; }
+            // RUTEO VIP con RUTAS ABSOLUTAS (/)
+            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `/genesis-live.html?email=${encodeURIComponent(email)}`; return; } 
+            else if (nivelSuscripcion === "SENTINEL") { window.location.href = `/panel-sentinel.html?email=${encodeURIComponent(email)}`; return; } 
+            else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `/panel-executive.html?email=${encodeURIComponent(email)}`; return; }
 
-            // ==========================================
             // LLENADO DEL PANEL FREE
-            // ==========================================
             document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]);
             
             let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta", lat = 43.45;
@@ -388,7 +401,7 @@ async function conectar() {
 
             // Dibujar Gráficos
             drawOrbit(vectores);
-            let scoreSincronia = (seed % 40) + 40; // Da un número entre 40 y 80
+            let scoreSincronia = (seed % 40) + 40; 
             drawArc(scoreSincronia);
 
             // Quitar pantalla de carga
@@ -396,10 +409,10 @@ async function conectar() {
             document.getElementById('panel-content').style.display = 'block';
 
         } else {
-            document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d;'>DATOS NO ENCONTRADOS</div><br><a href='portal.html' style='color:#fff; text-decoration:underline;'>VOLVER AL INICIO</a>";
+            document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d;'>DATOS NO ENCONTRADOS</div><br><a href='/portal.html' style='color:#fff; text-decoration:underline;'>VOLVER AL INICIO</a>";
         }
     } catch (e) { 
-        document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d;'>ERROR DE CONEXIÓN</div><br><a href='portal.html' style='color:#fff; text-decoration:underline;'>VOLVER</a>";
+        document.getElementById('loading-screen').innerHTML = "<div style='color:#ff4d4d;'>ERROR DE CONEXIÓN</div><br><a href='/portal.html' style='color:#fff; text-decoration:underline;'>VOLVER</a>";
     }
 }
 
