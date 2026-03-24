@@ -1,35 +1,39 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-import datetime
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
+from supabase import create_client, Client
 
-app = Flask(__name__)
-CORS(app) # Esto es vital para que el Frontend pueda hablar con el Backend
+app = FastAPI()
 
-@app.route('/api/health')
-def health():
-    return jsonify({
-        "status": "online",
-        "system": "VAULT LOGIC GENESIS",
-        "timestamp": datetime.datetime.now().isoformat(),
-        "nasa_sync": "ACTIVE",
-        "latency": "12ms"
-    })
+# --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # El asterisco permite que Vercel se conecte
+    allow_credentials=True,
+    allow_methods=["*"],  # El asterisco permite enviar datos (POST)
+    allow_headers=["*"],
+)
 
-@app.route('/api/orbital-data')
-def orbital_data():
-    return jsonify({
-        "epoch": "J2000.0",
-        "reference": "DE441",
-        "vectors": {
-            "sun": [0.0, 0.0, 0.0],
-            "earth": [0.983, 0.123, 0.001],
-            "jupiter": [5.203, -0.456, 0.023]
-        },
-        "market_sync_score": 0.9847
-    })
+# === LAS CLAVES SIGUEN INVISIBLES Y SEGURAS AQUÍ ===
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-if __name__ == "__main__":
-    # Esto permite que corra localmente y en Render usando el puerto que ellos asignen
-    port = int(os.environ.get("PORT", 3000))
-    app.run(host='0.0.0.0', port=port)
+class LoginData(BaseModel):
+    email: str
+    password: str
+    login_only: bool = False
+    nombre: str = None
+    lugar: str = None
+    fecha: str = None
+    hora: str = None
+    lat: str = None
+    lon: str = None
+
+class PerfilRequest(BaseModel):
+    email: str
+
+# ... (AQUÍ DEBAJO DEBE CONTINUAR EL RESTO DE TU CÓDIGO CON LAS RUTAS /consultar) ...
