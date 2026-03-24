@@ -156,14 +156,8 @@
             const link = document.getElementById('toggle-link');
             const resContainer = document.getElementById('resultado');
 
-            // 1. SOLUCIÓN UX: Ocultar cualquier error viejo al cambiar de pestaña
             resContainer.classList.add('hidden');
-
-            // 2. SOLUCIÓN UX: Limpiar la contraseña (y el correo si vamos a registro) para no heredar datos
             document.getElementById('password').value = '';
-            if (!modoVIP) {
-                document.getElementById('email').value = '';
-            }
 
             if (modoVIP) {
                 campos.classList.add('hidden');
@@ -190,7 +184,6 @@
             const resCuerpo = document.getElementById('res-cuerpo');
             const btn = document.getElementById('btn-submit');
             
-            // SOLUCIÓN UX: Ocultar error previo al volver a intentar
             resContainer.classList.add('hidden');
             
             const emailInput = document.getElementById('email').value.trim().toLowerCase();
@@ -220,8 +213,8 @@
                 fecha: document.getElementById('fecha').value,
                 hora: document.getElementById('hora').value,
                 lugar: document.getElementById('lugar').value.trim().toUpperCase(),
-                lat: document.getElementById('lat').value || "0", // Salvavidas silencioso
-                lon: document.getElementById('lon').value || "0"
+                lat: document.getElementById('lat').value,
+                lon: document.getElementById('lon').value
             };
 
             if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
@@ -238,12 +231,17 @@
             resCuerpo.innerHTML = "Conectando con servidor seguro...";
 
             try {
-                // LA CONEXIÓN ORIGINAL A RENDER EXACTA
                 const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
+
+                // DIAGNÓSTICO: Si Render o la BD fallan, capturamos el error exacto
+                if (!respuesta.ok) {
+                    const errorText = await respuesta.text();
+                    throw new Error(`HTTP ${respuesta.status}: ${errorText.substring(0, 150)}`);
+                }
 
                 const data = await respuesta.json();
                 
@@ -266,12 +264,11 @@
             } catch (error) {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR CRÍTICO";
-                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+                resTitulo.innerHTML = "DIAGNÓSTICO DE SERVIDOR";
+                resCuerpo.innerHTML = `La API en Render o la base de datos fallaron.<br><br><b>Motivo real:</b> ${error.message}`;
             }
         }
 
-        // Lógica de Autocompletado Photon Original
         const lugarInput = document.getElementById('lugar');
         const lugarList = document.getElementById('lugar-list');
 
