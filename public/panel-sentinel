@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL | Basic Monitoring Terminal</title>
+    <style>
+        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
+        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 800px; margin: auto; }
+        .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.1); padding: 30px; position: relative; text-align: center; }
+        
+        .status-badge { font-size: 0.8rem; letter-spacing: 3px; padding: 5px 15px; border: 1px solid var(--gold); color: var(--gold); display: inline-block; margin-bottom: 20px; }
+        
+        /* Bloqueo de funciones */
+        .locked-feature { background: rgba(20,20,20,0.8); border: 1px dashed #333; padding: 20px; margin-top: 20px; color: #666; font-size: 0.7rem; }
+        .btn-upgrade { background: var(--gold); color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 15px; width: 100%; letter-spacing: 2px; }
+
+        #radar-svg { width: 300px; height: 300px; margin: 20px auto; display: block; }
+        .directiva-box { border-left: 3px solid var(--gold); padding: 20px; background: rgba(212,175,55,0.02); text-align: left; margin-top: 20px; font-size: 0.9rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <div style="font-size: 0.6rem; color: var(--gold); letter-spacing: 3px;">TERMINAL DE MONITOREO</div>
+        <div style="font-size: 1.2rem; font-weight: bold; letter-spacing: 5px;">SENTINEL <span style="color: #444;">v1.0</span></div>
+    </div>
+    <div style="text-align: right;">
+        <div id="user-display" style="font-size: 0.8rem; color: var(--gold);">CARGANDO...</div>
+        <div style="font-size: 0.5rem; color: #555;">ID: NIVEL_SENTINEL_01</div>
+    </div>
+</header>
+
+<div class="dashboard-grid">
+    <div class="panel">
+        <div class="status-badge">ESTADO ACTUAL: TIEMPO REAL</div>
+        
+        <div id="radar-container">
+            <svg id="radar-svg" viewBox="0 0 380 380">
+                <circle cx="190" cy="190" r="140" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1" />
+                <circle cx="190" cy="190" r="100" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />
+                <line x1="190" y1="50" x2="190" y2="330" stroke="rgba(212,175,55,0.1)" />
+                <line x1="50" y1="190" x2="330" y2="190" stroke="rgba(212,175,55,0.1)" />
+                <g id="planetas-g"></g>
+            </svg>
+        </div>
+
+        <div class="directiva-box">
+            <span style="font-size: 0.6rem; color: var(--gold);">DIRECTIVA DIARIA:</span><br>
+            <div id="msg-ia">Sincronizando con base de datos NASA...</div>
+        </div>
+
+        <div class="locked-feature">
+            <div style="margin-bottom: 10px;">🔒 PROYECCIONES DE ROI Y DOSSIER GX-2026 BLOQUEADOS</div>
+            <p>Su nivel actual solo permite monitoreo diario. Para acceder al calendario estratégico y proyecciones de capital, realice un upgrade.</p>
+            <button class="btn-upgrade" onclick="location.href='suscripcion.html'">DESBLOQUEAR NIVEL EXECUTIVE</button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function cargarSentinel() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email') || "usuario@test.com";
+    document.getElementById('user-display').innerText = email.toUpperCase();
+
+    try {
+        const response = await fetch(`https://vault-strategy-api.onrender.com/obtener_reporte/${encodeURIComponent(email)}`);
+        const res = await response.json();
+
+        if (res.status === "success") {
+            // Dibujar Planetas
+            const g = document.getElementById('planetas-g');
+            const vectores = res.data.mapatotal.vectores_eclipticos;
+            
+            Object.entries(vectores).forEach(([nom, grad]) => {
+                const rad = (grad - 90) * Math.PI / 180;
+                const x = 190 + 140 * Math.cos(rad);
+                const y = 190 + 140 * Math.sin(rad);
+                
+                g.innerHTML += `
+                    <circle cx="${x}" cy="${y}" r="4" fill="#fff" />
+                    <text x="${x+10}" y="${y+5}" fill="var(--gold)" font-size="8">${nom}</text>
+                `;
+            });
+
+            document.getElementById('msg-ia').innerHTML = `<b>CONFIGURACIÓN DE HOY:</b> ${res.data.directiva.substring(0, 150)}... <i>(Análisis completo disponible en Executive)</i>`;
+        }
+    } catch (e) {
+        console.error("Error de conexión");
+    }
+}
+
+window.onload = cargarSentinel;
+</script>
+<footer style="margin-top: 50px; border-top: 1px solid #222; padding: 20px; width: 100%; text-align: center;">
+    <div style="font-size: 0.6rem; letter-spacing: 2px;">
+        <a href="privacidad.html" style="color: #444; text-decoration: none; margin: 0 15px;">PRIVACIDAD</a>
+        <a href="terminos.html" style="color: #444; text-decoration: none; margin: 0 15px;">TÉRMINOS DE USO</a>
+        <span style="color: #222;">|</span>
+        <span style="color: #444; margin-left: 15px;">© 2026 VAULT LOGIC SYSTEMS</span>
+    </div>
+</footer>
+</body>
+</html>
