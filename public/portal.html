@@ -5,43 +5,21 @@
     <title>Terminal | Vault Logic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* ESTILOS DE DISEÑO (NO AFECTAN LA LÓGICA) */
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        .noise-overlay { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+        .glow-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; height: 800px; background: rgba(212, 175, 55, 0.03); filter: blur(150px); border-radius: 50%; z-index: 0; pointer-events: none; }
         
-        .noise-overlay {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-        
-        .glow-bg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 800px; height: 800px; background: rgba(212, 175, 55, 0.03);
-            filter: blur(150px); border-radius: 50%; z-index: 0; pointer-events: none;
-        }
-
-        /* HEADER MARCADO */
-        nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 25px 50px; position: relative; z-index: 10; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-        }
-        
-        /* LOGO */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 25px 50px; position: relative; z-index: 10; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); }
         .logo-group { display: flex; align-items: center; gap: 16px; text-decoration: none; cursor: pointer; }
-        .logo-box { 
-            width: 48px; height: 48px; background: rgba(212, 175, 55, 0.1); 
-            border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; 
-            display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; 
-        }
+        .logo-box { width: 48px; height: 48px; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
         .logo-text-col { display: flex; flex-direction: column; }
         .logo-title { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 20px; color: #fff; letter-spacing: -0.05em; transition: all 0.3s ease; }
         .logo-subtitle { display: flex; align-items: center; gap: 6px; opacity: 0.4; transition: opacity 0.3s ease; margin-top: 2px; }
         .logo-subtitle span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.2em; }
         .pulse-icon { animation: pulse-anim 2s infinite; }
-        
         @keyframes pulse-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
+        
         .logo-group:hover .logo-box { background: rgba(212, 175, 55, 0.2); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
         .logo-group:hover .logo-title { color: #D4AF37; text-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
         .logo-group:hover .logo-subtitle { opacity: 1; }
@@ -52,9 +30,7 @@
         .nav-links a.vip { color: #000; background-color: #D4AF37; padding: 10px 24px; border-radius: 4px; font-weight: bold; }
         .nav-links a.vip:hover { background-color: #FFF5D1; }
 
-        /* CONTENIDO PRINCIPAL */
         main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; padding: 60px 20px; }
-        
         h1 { font-size: 46px; font-weight: 300; text-align: center; margin-bottom: 15px; letter-spacing: -0.02em; line-height: 1.2; }
         h1 span { font-weight: 900; font-style: italic; color: #D4AF37; }
         .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 50px; max-width: 600px; line-height: 1.6; opacity: 0.9; }
@@ -62,16 +38,14 @@
         .form-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.15); padding: 40px; border-radius: 8px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .form-header { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #aaa; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         
-        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; transition: all 0.3s; color-scheme: dark; }
+        .space-y-4 > * + * { margin-top: 15px; }
+        input { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; border-radius: 4px; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; transition: all 0.3s; color-scheme: dark; }
         input:focus { outline: none; border-color: #D4AF37; background: #000; }
         input::placeholder { color: #555; text-transform: uppercase; }
-        
         input[type="email"] { text-transform: lowercase; }
         input[type="text"] { text-transform: uppercase; }
+        .grid-cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
-        .row { display: flex; gap: 15px; }
-        .row input { flex: 1; }
-
         button { width: 100%; background: #D4AF37; color: #000; padding: 16px; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: all 0.3s; }
         button:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
         button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
@@ -80,35 +54,20 @@
         .login-link a { color: #D4AF37; text-decoration: none; font-weight: bold; margin-left: 5px; transition: color 0.3s; cursor: pointer; }
         .login-link a:hover { color: #FFF5D1; }
 
-        /* ESTILOS DEL AUTOCOMPLETADO (Tu lógica original adaptada al diseño oscuro) */
-        .autocomplete-items {
-            position: absolute; border: 1px solid rgba(212,175,55,0.2); background-color: #0a0a0a;
-            z-index: 99; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8); border-radius: 0 0 4px 4px;
-        }
-        .autocomplete-item {
-            padding: 12px; cursor: pointer; font-size: 10px; color: #aaa;
-            border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
-        }
+        .autocomplete-items { position: absolute; border: 1px solid rgba(212,175,55,0.2); background-color: #0a0a0a; z-index: 99; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.8); border-radius: 0 0 4px 4px; }
+        .autocomplete-item { padding: 12px; cursor: pointer; font-size: 10px; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
         .autocomplete-item:hover { background-color: rgba(212,175,55,0.1); color: #D4AF37; }
         
-        /* ESTILOS DEL RESULTADO */
-        #resultado { margin-top: 20px; padding: 15px; border-left: 2px solid #D4AF37; background: rgba(15,15,15,0.8); font-family: 'JetBrains Mono', monospace; display: none; }
+        #resultado { margin-top: 20px; padding: 15px; border-left: 2px solid #D4AF37; background: rgba(15,15,15,0.8); font-family: 'JetBrains Mono', monospace; }
         #res-titulo { color: #D4AF37; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
         #res-cuerpo { color: #aaa; font-size: 10px; line-height: 1.4; text-transform: uppercase;}
-
-        /* FOOTER MARCADO */
-        footer { 
-            text-align: center; padding: 40px; position: relative; z-index: 10; 
-            font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; 
-            letter-spacing: 0.2em; text-transform: uppercase; 
-            border-top: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0, 0, 0, 0.6);
-        }
+        
+        footer { text-align: center; padding: 40px; position: relative; z-index: 10; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.2em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.6); }
         .footer-links { margin-top: 15px; }
         .footer-links a { color: #666; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
         .footer-links a:hover { color: #D4AF37; }
         
+        /* Esta clase es clave para que tu código original oculte las cosas */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -131,7 +90,7 @@
         </a>
         <div class="nav-links">
             <a href="/">Volver a la Portada</a>
-            <a onclick="toggleModo(true)" class="vip" id="nav-vip-btn">Acceso VIP</a>
+            <a onclick="toggleModo(true)" class="vip">Acceso VIP</a>
         </div>
     </nav>
 
@@ -146,9 +105,9 @@
                 <input type="email" id="email" placeholder="Email Corporativo / VIP">
                 <input type="password" id="password" placeholder="Contraseña Estratégica">
                 
-                <div id="campos-registro">
+                <div id="campos-registro" class="space-y-4">
                     <input type="text" id="nombre" placeholder="Nombre Completo">
-                    <div class="row">
+                    <div class="grid-cols-2">
                         <input type="date" id="fecha" style="color: #aaa;">
                         <input type="time" id="hora" style="color: #aaa;">
                     </div>
@@ -156,19 +115,20 @@
                         <input type="text" id="lugar" placeholder="Ciudad de Nacimiento" autocomplete="off">
                         <div id="lugar-list" class="autocomplete-items hidden"></div>
                     </div>
-                    <input type="hidden" id="lat">
-                    <input type="hidden" id="lon">
                 </div>
 
+                <input type="hidden" id="lat">
+                <input type="hidden" id="lon">
+                
                 <button onclick="consultar()" id="btn-submit">Iniciar Secuencia de Cálculo</button>
 
-                <div id="resultado">
+                <div id="resultado" class="hidden">
                     <div id="res-titulo"></div>
                     <div id="res-cuerpo"></div>
                 </div>
                 
                 <div class="login-link">
-                    <span id="toggle-desc">¿Ya tiene una terminal?</span> 
+                    <span id="toggle-text">¿YA TIENE UNA TERMINAL?</span> 
                     <a onclick="toggleModo()" id="toggle-link">Acceso VIP</a>
                 </div>
             </div>
@@ -178,161 +138,155 @@
     <footer>
         © 2026 Vault Logic - Executive Intelligence Suite
         <div class="footer-links">
-            <a href="privacidad.html">Privacidad</a> <span style="color:#333;">|</span> <a href="terminos.html">Términos</a>
+            <a href="privacidad.html">Privacidad</a> <span>|</span> <a href="terminos.html">Términos</a>
         </div>
     </footer>
 
-<script>
-        let modoVIP = false;
+    <script>
+    let modoVIP = false;
 
-        function toggleModo(forzarVIP = false) {
-            if (forzarVIP) modoVIP = true;
-            else modoVIP = !modoVIP;
+    function toggleModo(forzarVIP = false) {
+        if (forzarVIP) modoVIP = true;
+        else modoVIP = !modoVIP;
 
-            const campos = document.getElementById('campos-registro');
-            const titulo = document.getElementById('form-title');
-            const btn = document.getElementById('btn-submit');
-            const text = document.getElementById('toggle-desc');
-            const link = document.getElementById('toggle-link');
-            const navVipBtn = document.getElementById('nav-vip-btn');
+        const campos = document.getElementById('campos-registro');
+        const titulo = document.getElementById('form-title');
+        const btn = document.getElementById('btn-submit');
+        const text = document.getElementById('toggle-text');
+        const link = document.getElementById('toggle-link');
 
-            if (modoVIP) {
-                campos.classList.add('hidden');
-                titulo.innerText = "Acceso VIP Autorizado";
-                btn.innerText = "Vincular con el Núcleo";
-                text.innerText = "¿NUEVA TERMINAL?";
-                link.innerText = "Registrarse";
-                if(navVipBtn) navVipBtn.innerText = "Registrarse";
-            } else {
-                campos.classList.remove('hidden');
-                titulo.innerText = "Registro de Nueva Terminal";
-                btn.innerText = "Iniciar Secuencia de Cálculo";
-                text.innerText = "¿YA TIENE UNA TERMINAL?";
-                link.innerText = "Acceso VIP";
-                if(navVipBtn) navVipBtn.innerText = "Acceso VIP";
-            }
+        if (modoVIP) {
+            campos.classList.add('hidden');
+            titulo.innerText = "Acceso VIP Autorizado";
+            btn.innerText = "Vincular con el Núcleo";
+            text.innerText = "¿NUEVA TERMINAL?";
+            link.innerText = "Registrarse";
+        } else {
+            campos.classList.remove('hidden');
+            titulo.innerText = "Registro de Nueva Terminal";
+            btn.innerText = "Iniciar Secuencia de Cálculo";
+            text.innerText = "¿YA TIENE UNA TERMINAL?";
+            link.innerText = "Acceso VIP";
+        }
+    }
+
+    function validarEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function consultar() {
+        const resContainer = document.getElementById('resultado');
+        const resTitulo = document.getElementById('res-titulo');
+        const resCuerpo = document.getElementById('res-cuerpo');
+        const btn = document.getElementById('btn-submit');
+        
+        const emailInput = document.getElementById('email').value.trim().toLowerCase();
+        const passInput = document.getElementById('password').value.trim();
+
+        if (!validarEmail(emailInput)) {
+            resContainer.classList.remove('hidden');
+            resTitulo.innerText = "ERROR DE IDENTIDAD:";
+            resCuerpo.innerText = "Ingrese un formato de email válido.";
+            return;
+        }
+        if (passInput.length < 4) {
+            resContainer.classList.remove('hidden');
+            resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
+            resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
+            return;
         }
 
-        function validarEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const payload = modoVIP ? { 
+            email: emailInput, 
+            password: passInput, 
+            login_only: true 
+        } : {
+            nombre: document.getElementById('nombre').value.trim().toUpperCase(),
+            email: emailInput,
+            password: passInput,
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value,
+            lugar: document.getElementById('lugar').value.trim().toUpperCase(),
+            lat: document.getElementById('lat').value,
+            lon: document.getElementById('lon').value
+        };
+
+        if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
+            resContainer.classList.remove('hidden');
+            resTitulo.innerText = "DATOS INCOMPLETOS:";
+            resCuerpo.innerText = "Complete los parámetros de nacimiento.";
+            return;
         }
 
-        async function consultar() {
-            const resContainer = document.getElementById('resultado');
-            const resTitulo = document.getElementById('res-titulo');
-            const resCuerpo = document.getElementById('res-cuerpo');
-            const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerText = "AUTENTICANDO...";
+        resContainer.classList.remove('hidden');
+        resTitulo.innerHTML = "SISTEMA";
+        resCuerpo.innerHTML = "Conectando con servidor seguro...";
+
+        try {
+            const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            const data = await respuesta.json();
             
-            const emailInput = document.getElementById('email').value.trim().toLowerCase();
-            const passInput = document.getElementById('password').value.trim();
-
-            if (!validarEmail(emailInput)) {
-                resContainer.style.display = 'block';
-                resTitulo.innerText = "ERROR DE IDENTIDAD:";
-                resCuerpo.innerText = "Ingrese un formato de email válido.";
-                return;
-            }
-            if (passInput.length < 4) {
-                resContainer.style.display = 'block';
-                resTitulo.innerText = "SEGURIDAD INSUFICIENTE:";
-                resCuerpo.innerText = "La contraseña requiere al menos 4 caracteres.";
-                return;
-            }
-
-            // EL PAYLOAD EXACTO DE TU CÓDIGO ORIGINAL
-            const payload = modoVIP ? { 
-                email: emailInput, 
-                password: passInput, 
-                login_only: true 
-            } : {
-                nombre: document.getElementById('nombre').value.trim().toUpperCase(),
-                email: emailInput,
-                password: passInput,
-                fecha: document.getElementById('fecha').value,
-                hora: document.getElementById('hora').value,
-                lugar: document.getElementById('lugar').value.trim().toUpperCase(),
-                lat: document.getElementById('lat').value,
-                lon: document.getElementById('lon').value
-            };
-
-            if (!modoVIP && (!payload.fecha || !payload.lugar || !payload.nombre)) {
-                resContainer.style.display = 'block';
-                resTitulo.innerText = "DATOS INCOMPLETOS:";
-                resCuerpo.innerText = "Complete los parámetros de nacimiento.";
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "AUTENTICANDO...";
-            resContainer.style.display = 'block';
-            resTitulo.innerHTML = "SISTEMA";
-            resCuerpo.innerHTML = "Conectando con servidor seguro...";
-
-            try {
-                // LA CONEXIÓN ORIGINAL A RENDER SIN CÓDIGO EXTRA
-                const respuesta = await fetch("https://vault-strategy-api.onrender.com/consultar", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await respuesta.json();
+            if (data.status === "success" || data.status === "exists") {
+                resTitulo.innerHTML = "ACCESO AUTORIZADO";
+                resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
                 
-                if (data.status === "success" || data.status === "exists") {
-                    resTitulo.innerHTML = "ACCESO AUTORIZADO";
-                    resCuerpo.innerHTML = "Vínculo establecido. Abriendo Bóveda...";
-                    
-                    // Solo agregamos esto para que la bóveda sepa quién eres
-                    localStorage.setItem('vault_user_email', emailInput);
-                    if(!modoVIP) localStorage.setItem('vault_user_nombre', payload.nombre);
+                // Aseguramos que la Bóveda sepa tu correo usando localStorage
+                localStorage.setItem('vault_user_email', emailInput);
 
-                    setTimeout(() => {
-                        window.location.href = "boveda.html";
-                    }, 1200);
-                } else {
-                    btn.disabled = false;
-                    btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-                    resTitulo.innerHTML = "ACCESO DENEGADO";
-                    resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
-                }
-            } catch (error) {
+                setTimeout(() => {
+                    // Ahora redirige a boveda.html en lugar de genesis-live
+                    window.location.href = `boveda.html?email=${encodeURIComponent(emailInput)}`;
+                }, 1200);
+            } else {
                 btn.disabled = false;
                 btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
-                resTitulo.innerHTML = "ERROR CRÍTICO";
-                resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
+                resTitulo.innerHTML = "ACCESO DENEGADO";
+                resCuerpo.innerHTML = data.analisis_ejecutivo || "Credenciales incorrectas.";
             }
+        } catch (error) {
+            btn.disabled = false;
+            btn.innerText = modoVIP ? "Vincular con el Núcleo" : "Iniciar Secuencia de Cálculo";
+            resTitulo.innerHTML = "ERROR CRÍTICO";
+            resCuerpo.innerHTML = "Fallo de conexión con el servidor estratégico.";
         }
+    }
 
-        // AUTOCOMPLETADO EXACTO DE PHOTON
-        const lugarInput = document.getElementById('lugar');
-        const lugarList = document.getElementById('lugar-list');
+    const lugarInput = document.getElementById('lugar');
+    const lugarList = document.getElementById('lugar-list');
 
-        lugarInput.addEventListener('input', async (e) => {
-            const val = e.target.value;
-            if (val.length < 3) { lugarList.classList.add('hidden'); return; }
-            try {
-                const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
-                const data = await res.json();
-                lugarList.innerHTML = '';
-                lugarList.classList.remove('hidden');
-                data.features.forEach(feat => {
-                    const prop = feat.properties;
-                    const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.innerText = label.toUpperCase();
-                    item.onclick = () => {
-                        lugarInput.value = label.toUpperCase();
-                        document.getElementById('lat').value = feat.geometry.coordinates[1];
-                        document.getElementById('lon').value = feat.geometry.coordinates[0];
-                        lugarList.classList.add('hidden');
-                    };
-                    lugarList.appendChild(item);
-                });
-            } catch (err) { console.error(err); }
-        });
+    lugarInput.addEventListener('input', async (e) => {
+        const val = e.target.value;
+        if (val.length < 3) { lugarList.classList.add('hidden'); return; }
+        try {
+            const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+            const data = await res.json();
+            lugarList.innerHTML = '';
+            lugarList.classList.remove('hidden');
+            data.features.forEach(feat => {
+                const prop = feat.properties;
+                const label = [prop.name, prop.state, prop.country].filter(Boolean).join(", ");
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.innerText = label.toUpperCase();
+                item.onclick = () => {
+                    lugarInput.value = label.toUpperCase();
+                    document.getElementById('lat').value = feat.geometry.coordinates[1];
+                    document.getElementById('lon').value = feat.geometry.coordinates[0];
+                    lugarList.classList.add('hidden');
+                };
+                lugarList.appendChild(item);
+            });
+        } catch (err) { console.error(err); }
+    });
 
-        document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
+    document.addEventListener('click', (e) => { if (e.target !== lugarInput) lugarList.classList.add('hidden'); });
     </script>
 </body>
 </html>
