@@ -59,10 +59,12 @@
         .tier-info h3 { font-family: 'JetBrains Mono', monospace; margin: 0 0 5px 0; letter-spacing: 0.3em; font-size: 1.5rem; color: var(--white-text); }
         .tier-subtitle { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 0.7rem; margin-bottom: 25px; letter-spacing: 1px; display: block; text-transform: uppercase;}
         
+        /* SOLUCIÓN AL DISEÑO DESALINEADO */
         .features-list { list-style: none; padding: 0; margin: 0; }
-        .features-list li { color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: flex-start; line-height: 1.6; }
-        .features-list li::before { content: '✓'; color: var(--gold); margin-right: 12px; font-size: 1.1rem; font-weight: bold; line-height: 1.2;}
-        .features-list.limited li::before { color: #555; content: '■'; font-size: 0.6rem; margin-top: 6px;}
+        .features-list li { color: #d1d5db; font-size: 0.9rem; margin-bottom: 18px; line-height: 1.6; position: relative; padding-left: 24px; }
+        .features-list li::before { content: '✓'; color: var(--gold); position: absolute; left: 0; top: 0; font-size: 1.1rem; font-weight: bold; line-height: 1.4;}
+        .features-list.limited li::before { content: '■'; color: #555; font-size: 0.6rem; top: 5px;}
+        /* FIN DE LA SOLUCIÓN */
         
         .price-section { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); }
         .price { font-family: 'JetBrains Mono', monospace; font-size: 3.2rem; color: var(--white-text); font-weight: bold; margin-bottom: 5px; line-height: 1;}
@@ -226,7 +228,6 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    // CORRECCIÓN: Envía a Executive y pasa el email para no perder la sesión
                     window.location.href = `panel-executive.html?email=${encodeURIComponent(userEmail)}`;
                 }
             }).render('#paypal-button-executive');
@@ -241,7 +242,6 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    // CORRECCIÓN: Envía a Sentinel y pasa el email para no perder la sesión
                     window.location.href = `panel-sentinel.html?email=${encodeURIComponent(userEmail)}`;
                 }
             }).render('#paypal-button-sentinel');
