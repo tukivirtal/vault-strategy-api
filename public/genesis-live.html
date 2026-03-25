@@ -58,17 +58,19 @@
   .btn-dossier:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212,175,55,0.3);}
 
   #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #d4af37; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
-/* REGLAS DE ADAPTACIÓN PARA MÓVILES Y TABLETS */
+  
+  /* REGLAS DE ADAPTACIÓN PARA MÓVILES Y TABLETS */
   @media (max-width: 768px) {
-      .header-left .name { font-size: 28px; } /* Achica el nombre */
-      .horizon-picker { flex-direction: column; align-items: stretch; } /* Apila el buscador de fechas */
+      .header-left .name { font-size: 28px; }
+      .horizon-picker { flex-direction: column; align-items: stretch; }
       .btn-search { width: 100%; margin-top: 10px; }
-      .metrics-grid { grid-template-columns: 1fr; gap: 10px; } /* Apila las 3 tarjetas de métricas */
-      .main-grid { grid-template-columns: 1fr; } /* Pone la barra lateral arriba del contenido principal */
-      .status-grid { grid-template-columns: 1fr; text-align: left; gap: 8px;} /* Apila el status superior */
+      .metrics-grid { grid-template-columns: 1fr; gap: 10px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .status-grid { grid-template-columns: 1fr; text-align: left; gap: 8px;}
       .vl-panel { padding: 15px; }
   }
-/* DISEÑO DEL BOTÓN DE AYUDA (TOOLTIP) */
+
+  /* DISEÑO DEL BOTÓN DE AYUDA (TOOLTIP) */
   .info-tooltip { position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #888; font-size: 10px; font-weight: bold; font-family: 'Inter', sans-serif; margin-left: 10px; border: 1px solid #444; border-radius: 50%; width: 16px; height: 16px; transition: 0.3s;}
   .info-tooltip:hover { border-color: #d4af37; color: #d4af37; }
   .info-tooltip .tooltip-text { visibility: hidden; width: 280px; background-color: rgba(10,10,10,0.95); backdrop-filter: blur(10px); color: #ccc; text-align: left; border-radius: 4px; padding: 15px; position: absolute; z-index: 100; bottom: 150%; left: 50%; transform: translateX(-50%); border: 1px solid #d4af37; box-shadow: 0 10px 30px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; font-family: 'Inter', sans-serif; font-size: 11px; text-transform: none; letter-spacing: 0; line-height: 1.5; font-weight: normal;}
@@ -124,8 +126,8 @@
                 <div class="info-tooltip">?
                     <span class="tooltip-text">
                         <strong>CÓMO LEER ESTA GRÁFICA:</strong><br><br>
-                        <strong>Eje X (S1 - S7):</strong> Divide el rango de tiempo que seleccionaste en 7 segmentos iguales para mostrar la evolución temporal.<br><br>
-                        <strong>Eje Y (0 - 100):</strong> Mide la Intensidad del Ciclo. Un valor alto indica que la fuerza orbital (ya sea de expansión o de riesgo) estará en su punto máximo en ese momento.
+                        <strong>Eje X (S1 - S7):</strong> Divide el rango de tiempo seleccionado en 7 segmentos iguales para mostrar la evolución temporal.<br><br>
+                        <strong>Eje Y (0 - 100):</strong> Mide la Intensidad del Ciclo. Un valor alto indica que la fuerza orbital (de expansión o de riesgo) estará en su punto máximo en ese momento.
                     </span>
                 </div>
             </div>
@@ -215,12 +217,13 @@ function initCharts() {
     donutChart.render();
 }
 
-function sincronizarPanel() {
+async function sincronizarPanel() {
     const status = document.getElementById('user-status');
     const startInput = document.getElementById('date-start').value;
     const endInput = document.getElementById('date-end').value;
+    const email = localStorage.getItem('vault_user_email');
 
-    if (!startInput || !endInput) return;
+    if (!startInput || !endInput || !email) return;
 
     const startDate = new Date(startInput);
     const endDate = new Date(endInput);
@@ -232,67 +235,64 @@ function sincronizarPanel() {
         return;
     }
 
-    status.innerText = "SINTETIZANDO...";
+    status.innerText = "SINTETIZANDO NÚCLEO...";
     status.style.color = "#d4af37";
     document.getElementById('executive-translation').style.display = 'none';
 
-    setTimeout(() => {
-        const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
-        let currentData = {};
-        let translation = "";
-        
-        if (isRiskMonth) {
-            status.innerText = "MODO: DEFENSA";
-            status.style.color = "#ff4d4d";
-            currentData = {
-                cap: (-(Math.random() * 5 + 10).toFixed(1)) + "%",
-                neg: "+" + (Math.random() * 3 + 5).toFixed(1) + "%",
-                risk: (-(Math.random() * 10 + 35).toFixed(1)) + "%",
-                estado: "RIESGO ESTRUCTURAL // POSICIÓN DEFENSIVA",
-                rango: `${startInput} A ${endInput}`,
-                estrategia: "Posición Defensiva" 
-            };
+    try {
+        // Enviar petición matemática REAL a Python
+        const response = await fetch("https://vault-strategy-api.onrender.com/simular_periodo", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: email,
+                fecha_inicio: startInput,
+                fecha_fin: endInput
+            })
+        });
+        const res = await response.json();
+
+        if (res.status === "success") {
+            const data = res.datos;
+
+            // Actualizar interfaz con datos reales devueltos por Python
+            document.getElementById('roi-cap').innerText = data.cap;
+            document.getElementById('roi-neg').innerText = data.neg;
+            document.getElementById('roi-risk').innerText = data.risk;
+            document.getElementById('translation-text').innerHTML = data.directiva;
             
-            document.getElementById('card-cap').className = "metric-card warn";
-            document.getElementById('card-neg').className = "metric-card neutral";
-            document.getElementById('card-risk').className = "metric-card warn";
-            
-            mainChart.updateSeries([{ name: 'Índice de Riesgo', data: [40, 30, 22, 18, 12, 8, 15] }]);
-            mainChart.updateOptions({ colors: ['#ff4d4d'] });
-            
-            translation = "Los ciclos indican alta volatilidad en este periodo. <b>Acción sugerida:</b> Congele contrataciones agresivas, evite lanzamientos de nuevos productos y céntrese en fidelizar a sus clientes actuales. Las negociaciones serán tensas; no ceda margen de ganancia.";
+            if (data.modo === "DEFENSA") {
+                status.innerText = "MODO: DEFENSA";
+                status.style.color = "#ff4d4d";
+                document.getElementById('card-cap').className = "metric-card warn";
+                document.getElementById('card-neg').className = "metric-card neutral";
+                document.getElementById('card-risk').className = "metric-card warn";
+                
+                // AQUÍ USAMOS LA CURVA EXACTA DE 7 PUNTOS
+                mainChart.updateSeries([{ name: 'Intensidad de Riesgo', data: data.curva_exacta }]);
+                mainChart.updateOptions({ colors: ['#ff4d4d'] });
+            } else {
+                status.innerText = "MODO: EXPANSIÓN";
+                status.style.color = "#00c864";
+                document.getElementById('card-cap').className = "metric-card safe";
+                document.getElementById('card-neg').className = "metric-card safe";
+                document.getElementById('card-risk').className = "metric-card safe";
+                
+                // AQUÍ USAMOS LA CURVA EXACTA DE 7 PUNTOS
+                mainChart.updateSeries([{ name: 'Fuerza de Sincronía', data: data.curva_exacta }]);
+                mainChart.updateOptions({ colors: ['#00c864'] });
+            }
+
+            document.getElementById('executive-translation').style.display = 'block';
+            localStorage.setItem('ultimo_reporte', JSON.stringify(data));
         } else {
-            status.innerText = "MODO: EXPANSIÓN";
-            status.style.color = "#00c864";
-            currentData = {
-                cap: "+" + (Math.random() * 5 + 22).toFixed(1) + "%",
-                neg: "+" + (Math.random() * 2 + 11).toFixed(1) + "%",
-                risk: "-" + (Math.random() * 2 + 17).toFixed(1) + "%",
-                estado: "SINCRONÍA ÓPTIMA // ESCALABILIDAD",
-                rango: `${startInput} A ${endInput}`,
-                estrategia: "Inversión Agresiva" 
-            };
-            
-            document.getElementById('card-cap').className = "metric-card safe";
-            document.getElementById('card-neg').className = "metric-card safe";
-            document.getElementById('card-risk').className = "metric-card safe";
-
-            mainChart.updateSeries([{ name: 'Fuerza de Sincronía', data: [35, 48, 62, 98, 75, 82, 125] }]);
-            mainChart.updateOptions({ colors: ['#00c864'] });
-            
-            translation = "Ventana de sincronicidad excepcional. <b>Acción sugerida:</b> Acelere cierres de ventas, asigne presupuesto adicional a campañas de marketing y firme alianzas estratégicas. El clima de negociación favorece acuerdos de alto valor a largo plazo.";
+            status.innerText = "ERROR DE CÁLCULO";
+            status.style.color = "var(--alert)";
         }
-
-        document.getElementById('roi-cap').innerText = currentData.cap;
-        document.getElementById('roi-neg').innerText = currentData.neg;
-        document.getElementById('roi-risk').innerText = currentData.risk;
-        
-        document.getElementById('translation-text').innerHTML = translation;
-        document.getElementById('executive-translation').style.display = 'block';
-
-        localStorage.setItem('ultimo_reporte', JSON.stringify(currentData));
-
-    }, 800);
+    } catch (e) {
+        status.innerText = "FALLO EN CONEXIÓN API";
+        status.style.color = "var(--alert)";
+    }
 }
 
 function descargarDossier() {
