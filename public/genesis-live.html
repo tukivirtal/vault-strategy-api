@@ -288,6 +288,7 @@ function descargarDossier() {
 async function conectar() {
     const email = localStorage.getItem('vault_user_email');
     if (!email) { window.location.href = 'portal.html'; return; }
+    document.getElementById('fecha-hoy').innerText = new Date().toLocaleDateString('es-ES');
 
     try {
         const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
@@ -299,15 +300,13 @@ async function conectar() {
             const d = res.datos;
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-            // RUTEO DE SEGURIDAD ESTRICTO
+            // RUTEO DE SEGURIDAD
             if (nivelSuscripcion === "FREE") { window.location.href = `boveda.html`; return; }
             if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; }
-            if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
+            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html`; return; }
 
-            // CORRECCIÓN FANTASMA DE JUANA: Guardamos el nombre real en el navegador
-            const nombreReal = (d.nombre || email.split('@')[0]).toUpperCase();
-            document.getElementById('nombre-display').innerText = nombreReal;
-            localStorage.setItem('vault_user_nombre', nombreReal);
+            // DATOS DEL USUARIO
+            document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]).toUpperCase();
             
             let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta";
             let datosNatalesObj = d.datos_natales;
@@ -320,24 +319,31 @@ async function conectar() {
             }
             document.getElementById('datos-display').innerText = `${fecha} // ${hora} // ${lugar}`;
             
-            // CONFIGURACIÓN DE FECHAS
-            const now = new Date();
-            const nextMonth = new Date();
-            nextMonth.setMonth(now.getMonth() + 1);
-            document.getElementById('date-start').value = now.toISOString().split('T')[0];
-            document.getElementById('date-end').value = nextMonth.toISOString().split('T')[0];
-
-            initCharts();
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-ES'); }, 1000);
+            // 🧠 CONEXIÓN A DATOS REALES (SUPABASE)
+            let vectores = {};
             
-            setTimeout(sincronizarPanel, 500);
+            // Verificamos si la base de datos nos entregó un mapatotal real
+            if (d.mapatotal) {
+                let mapaObj = typeof d.mapatotal === 'string' ? JSON.parse(d.mapatotal) : d.mapatotal;
+                if (mapaObj && mapaObj.vectores_eclipticos) {
+                    vectores = mapaObj.vectores_eclipticos; // ¡Usamos los astros reales!
+                }
+            }
+            
+            // Si el usuario es nuevo (FREE) y su mapatotal dice NULL, usamos algoritmo temporal
+            if (Object.keys(vectores).length === 0) {
+                const seed = generarHashUsuario(email);
+                vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
+            }
+            
+            drawOrbit(vectores);
+            initChart();
 
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('panel-content').style.display = 'block';
         } else { window.location.href = 'portal.html'; }
     } catch (e) { window.location.href = 'portal.html'; }
 }
-
 window.onload = conectar;
 </script>
 
