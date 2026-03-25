@@ -144,7 +144,6 @@
 
   </div>
 </div>
-
 <script>
 let mainChart, miniChart, donutChart;
 
@@ -162,12 +161,16 @@ function initCharts() {
     });
     mainChart.render();
 
+    // CORRECCIÓN: Gráfica Decenal con años en el eje X
     miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
-        series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
+        series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130] }],
         chart: { type: 'area', height: 180, toolbar: { show: false } },
         colors: ['#d4af37'],
-        xaxis: { labels: { show: false } },
-        yaxis: { labels: { show: false } },
+        xaxis: { 
+            categories: ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035'],
+            labels: { style: { colors: '#666', fontFamily: 'Share Tech Mono', fontSize: '9px' } }
+        },
+        yaxis: { show: false },
         grid: { show: false },
         fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
         tooltip: { theme: 'dark' }
@@ -208,6 +211,8 @@ function sincronizarPanel() {
     document.getElementById('executive-translation').style.display = 'none';
 
     setTimeout(() => {
+        // NOTA PARA FÁTIMA: Esta es la simulación visual temporal. 
+        // Más adelante conectaremos esto con Python.
         const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
         let currentData = {};
         let translation = "";
@@ -289,8 +294,10 @@ async function conectar() {
             if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; }
             if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
 
-            // DATOS EXACTOS DEL USUARIO
-            document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]).toUpperCase();
+            // CORRECCIÓN FANTASMA DE JUANA: Guardamos el nombre real en el navegador
+            const nombreReal = (d.nombre || email.split('@')[0]).toUpperCase();
+            document.getElementById('nombre-display').innerText = nombreReal;
+            localStorage.setItem('vault_user_nombre', nombreReal);
             
             let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta";
             let datosNatalesObj = d.datos_natales;
@@ -323,5 +330,7 @@ async function conectar() {
 
 window.onload = conectar;
 </script>
+
+
 </body>
 </html>
