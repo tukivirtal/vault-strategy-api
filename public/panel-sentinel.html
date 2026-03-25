@@ -1,127 +1,209 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTINEL | Basic Monitoring Terminal</title>
-    <style>
-        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
-        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 20px; }
-        
-        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 800px; margin: auto; }
-        .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.1); padding: 30px; position: relative; text-align: center; }
-        
-        .status-badge { font-size: 0.8rem; letter-spacing: 3px; padding: 5px 15px; border: 1px solid var(--gold); color: var(--gold); display: inline-block; margin-bottom: 20px; }
-        
-        .locked-feature { background: rgba(20,20,20,0.8); border: 1px dashed #333; padding: 20px; margin-top: 20px; color: #666; font-size: 0.7rem; }
-        .btn-upgrade { background: var(--gold); color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 15px; width: 100%; letter-spacing: 2px; transition: 0.3s;}
-        .btn-upgrade:hover { background: #fff; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+<meta charset="UTF-8">
+<title>Vault Logic | Terminal Sentinel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; }
+  
+  .vl-panel { position: relative; overflow-x: hidden; padding: 24px; min-height: 100vh; }
+  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(0, 200, 100, 0.05) 0%, transparent 70%); pointer-events: none; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 
-        #radar-svg { width: 300px; height: 300px; margin: 20px auto; display: block; }
-        .directiva-box { border-left: 3px solid var(--gold); padding: 20px; background: rgba(212,175,55,0.02); text-align: left; margin-top: 20px; font-size: 0.9rem; line-height: 1.6; }
-    </style>
+  .panel-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,200,100,0.2); padding-bottom: 15px; margin-bottom: 30px; }
+  .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 4px; color: #fff; }
+  .logo span { color: #00c864; font-weight: 400; font-size: 14px; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; margin-left: 10px; border: 1px solid #00c864; padding: 2px 8px;}
+  .btn-logout { background: transparent; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); padding: 8px 16px; font-family: inherit; cursor: pointer; transition: 0.3s; }
+  .btn-logout:hover { background: rgba(255,77,77,0.1); }
+
+  .header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #00c864; letter-spacing: 3px; text-transform: uppercase; }
+  .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: right; }
+  .status-grid .sk { color: #666; letter-spacing: 1px; }
+  .status-grid .sv { color: #fff; font-weight: bold; }
+
+  .main-grid { display: grid; grid-template-columns: 300px 1fr 300px; gap: 24px; margin-bottom: 24px; align-items: stretch; }
+  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .panel-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 20px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
+  .box-title { font-size: 10px; letter-spacing: 3px; color: #888; margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+
+  .vector-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .vector-val { color: #00c864; font-weight: bold; }
+
+  .chart-canvas-wrap { display: flex; justify-content: center; position: relative; padding: 20px 0; }
+  
+  .metric-card { background: rgba(0,200,100,0.05); border: 1px solid rgba(0,200,100,0.2); padding: 20px; border-left: 3px solid #00c864; margin-bottom: 15px;}
+  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 36px; font-weight: 700; color: #fff; }
+  
+  .locked-card { background: rgba(0,0,0,0.5); border: 1px dashed #333; padding: 20px; text-align: center; color: #555; position: relative; margin-bottom: 15px;}
+  .locked-card::after { content: '🔒 EXECUTIVE ONLY'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 3px; background: rgba(0,0,0,0.7); color: #888; }
+
+  .directiva-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 20px; margin-bottom: 24px; }
+  .directiva-text { font-size: 14px; color: #ccc; line-height: 1.6; }
+
+  .upgrade-banner { background: linear-gradient(90deg, #111, #1a1a1a); border: 1px solid #d4af37; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .btn-upgrade { background: #d4af37; color: #000; padding: 12px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; }
+  .btn-upgrade:hover { background: #FFF5D1; }
+
+  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #00c864; letter-spacing: 4px; }
+</style>
 </head>
 <body>
 
-<header>
-    <div>
-        <div style="font-size: 0.6rem; color: var(--gold); letter-spacing: 3px;">TERMINAL DE MONITOREO</div>
-        <div style="font-size: 1.2rem; font-weight: bold; letter-spacing: 5px;">SENTINEL <span style="color: #444;">v1.0</span></div>
-    </div>
-    <div style="text-align: right;">
-        <div id="user-display" style="font-size: 0.8rem; color: var(--gold);">CARGANDO...</div>
-        <div style="font-size: 0.5rem; color: #555;">ID: NIVEL_SENTINEL_01</div>
-    </div>
-</header>
+<div id="loading-screen">AUTENTICANDO SENTINEL...</div>
 
-<div class="dashboard-grid">
-    <div class="panel">
-        <div class="status-badge">ESTADO ACTUAL: TIEMPO REAL</div>
-        
-        <div id="radar-container">
-            <svg id="radar-svg" viewBox="0 0 380 380">
-                <circle cx="190" cy="190" r="140" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1" />
-                <circle cx="190" cy="190" r="100" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="1" />
-                <line x1="190" y1="50" x2="190" y2="330" stroke="rgba(212,175,55,0.1)" />
-                <line x1="50" y1="190" x2="330" y2="190" stroke="rgba(212,175,55,0.1)" />
-                <g id="planetas-g"></g>
-            </svg>
+<div class="vl-panel" style="display: none;" id="panel-content">
+  <div class="grid-bg"></div>
+  <div class="panel-container">
+      
+      <nav>
+        <div class="logo">VAULT LOGIC <span>SENTINEL ACTIVE</span></div>
+        <button onclick="localStorage.removeItem('vault_user_email'); window.location.href='portal.html'" class="btn-logout">CERRAR SESIÓN</button>
+      </nav>
+
+      <div class="header">
+        <div class="header-left">
+          <div style="font-size: 10px; color: #666; letter-spacing: 3px;">MONITOREO ASIGNADO A</div>
+          <div class="name" id="nombre-display">---</div>
+        </div>
+        <div class="status-grid">
+          <span class="sk">CONEXIÓN</span><span class="sv" style="color:#00c864">ESTABLE (JPL DE441)</span>
+          <span class="sk">AUTH</span><span class="sv" style="color:#00c864">SENTINEL</span>
+          <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="panel-box">
+          <div class="box-title">Vectores Natales (Lectura Activa)</div>
+          <div id="vectores-lista" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;"></div>
         </div>
 
-        <div class="directiva-box">
-            <span style="font-size: 0.6rem; color: var(--gold);">DIRECTIVA DIARIA:</span><br>
-            <div id="msg-ia">Sincronizando con base de datos NASA JPL...</div>
+        <div class="chart-canvas-wrap">
+          <div style="position: absolute; top: 0; font-size: 10px; color: #888; letter-spacing: 3px;">MATRIZ ORBITAL</div>
+          <canvas id="orbitCanvas" width="400" height="400"></canvas>
         </div>
 
-        <div class="locked-feature">
-            <div style="margin-bottom: 10px;">🔒 PROYECCIONES DE ROI Y DOSSIER GX-2026 BLOQUEADOS</div>
-            <p>Su nivel actual solo permite monitoreo diario. Para acceder al calendario estratégico y proyecciones de capital, realice un upgrade.</p>
-            <button class="btn-upgrade" onclick="location.href='suscripcion.html'">DESBLOQUEAR NIVEL EXECUTIVE</button>
+        <div class="panel-box" style="background: transparent; border: none; padding: 0;">
+          <div class="metric-card">
+            <div style="font-size: 10px; color: #00c864; letter-spacing: 2px; margin-bottom: 5px;">CLIMA DE NEGOCIACIÓN</div>
+            <div class="metric-value">+12.4%</div>
+            <div style="font-size: 9px; color: #aaa; margin-top: 5px;">Favorable para cierres rápidos</div>
+          </div>
+          
+          <div class="locked-card">
+            <div style="font-size: 10px; letter-spacing: 2px; margin-bottom: 5px;">CAPITAL GXP</div>
+            <div class="metric-value" style="filter: blur(4px);">+28.1%</div>
+          </div>
+
+          <div class="locked-card">
+            <div style="font-size: 10px; letter-spacing: 2px; margin-bottom: 5px;">VENTANA DE RIESGO</div>
+            <div class="metric-value" style="filter: blur(4px);">-14.2%</div>
+          </div>
         </div>
-    </div>
+      </div>
+
+      <div class="directiva-box">
+        <div style="font-size: 10px; color: #00c864; letter-spacing: 3px; margin-bottom: 10px;">REPORTE TÁCTICO DIARIO</div>
+        <div class="directiva-text" id="directiva-text">Analizando efemérides...</div>
+      </div>
+
+      <div class="upgrade-banner">
+        <div>
+          <div style="color: #d4af37; font-size: 14px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px;">POTENCIA TUS DECISIONES CON EXECUTIVE</div>
+          <div style="color: #aaa; font-size: 11px;">Desbloquea el Simulador a 30 días, proyecciones de riesgo y métricas de capital completas.</div>
+        </div>
+        <a href="suscripcion.html" class="btn-upgrade">HACER UPGRADE</a>
+      </div>
+
+  </div>
 </div>
 
 <script>
-function generarHashUsuario(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
-    return Math.abs(hash);
+function drawOrbit(vectoresReales) {
+    const canvas = document.getElementById('orbitCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = 400, H = 400, cx = W/2, cy = H/2 + 10, R = 150;
+    const colores = { "SOL": "#00c864", "LUNA": "#fff", "MARTE": "#00c864", "VENUS": "#00c864", "JUPITER": "#00c864", "SATURNO": "#00c864", "MERCURIO": "#00c864" };
+    
+    const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
+    function degToRad(d) { return (d - 90) * Math.PI / 180; }
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 1; i <= 3; i++) {
+        ctx.beginPath(); ctx.arc(cx, cy, R * i/3, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(0,200,100,${0.1 - i*0.02})`; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.stroke();
+
+    const pts = planets.map(p => { const a = degToRad(p.deg); return { x: cx + R*Math.cos(a), y: cy + R*Math.sin(a), p }; });
+
+    pts.forEach(pt => {
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pt.x, pt.y);
+        ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
+        
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI*2);
+        ctx.fillStyle = pt.p.color; ctx.fill();
+
+        const a = degToRad(pt.p.deg);
+        const lx = cx + (R+20)*Math.cos(a); const ly = cy + (R+20)*Math.sin(a);
+        ctx.fillStyle = '#fff'; ctx.font = '9px Share Tech Mono';
+        ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText(pt.p.name, lx, ly);
+    });
 }
 
-async function cargarSentinel() {
-    // 1. Ya no usamos la URL fea, sacamos el email de la memoria
+function generarHashUsuario(str) { let hash = 0; for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); } return Math.abs(hash); }
+
+async function conectar() {
     const email = localStorage.getItem('vault_user_email');
-    if(!email) { window.location.href = 'portal.html'; return; }
-    
-    document.getElementById('user-display').innerText = email.toUpperCase();
+    if (!email) { window.location.href = 'portal.html'; return; }
+
+    document.getElementById('fecha-hoy').innerText = new Date().toLocaleDateString('es-ES');
 
     try {
-        // 2. Conexión nueva (POST a obtener_perfil)
         const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ email: email })
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: email })
         });
         const res = await response.json();
 
         if (res.status === "success" && res.datos) {
-            const g = document.getElementById('planetas-g');
+            const d = res.datos;
+            const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
+
+            // RUTEO DE SEGURIDAD
+            if (nivelSuscripcion === "FREE") { window.location.href = `boveda.html`; return; }
+            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html`; return; } 
+            if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
+
+            document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]).toUpperCase();
             
-            // Generar vectores igual que en la bóveda
             const seed = generarHashUsuario(email);
             const vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
             
+            const lista = document.getElementById('vectores-lista');
+            lista.innerHTML = '';
             Object.entries(vectores).forEach(([nom, grad]) => {
-                const rad = (grad - 90) * Math.PI / 180;
-                const x = 190 + 140 * Math.cos(rad);
-                const y = 190 + 140 * Math.sin(rad);
-                
-                g.innerHTML += `
-                    <circle cx="${x}" cy="${y}" r="4" fill="#fff" />
-                    <text x="${x+10}" y="${y+5}" fill="var(--gold)" font-size="8">${nom}</text>
-                `;
+                lista.innerHTML += `<div class="vector-row"><span style="color:#aaa">${nom}</span><span class="vector-val">${Math.floor(grad)}°</span></div>`;
             });
 
-            document.getElementById('msg-ia').innerHTML = `<b>SISTEMA ACTIVO:</b> Monitoreo de ciclos en tiempo real estabilizado. <i>(Análisis estratégico completo disponible en Executive)</i>`;
+            drawOrbit(vectores);
+            document.getElementById('directiva-text').innerHTML = "<b>SISTEMA ESTABLE:</b> Sus vectores diarios no presentan anomalías críticas. Las condiciones para negociaciones a corto plazo se mantienen favorables. Para visualizar proyecciones a 30 días y mapas de riesgo, requiere autorización Executive.";
+
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('panel-content').style.display = 'block';
         } else {
-            document.getElementById('msg-ia').innerHTML = `<b style="color:var(--alert)">Datos no encontrados.</b>`;
+            window.location.href = 'portal.html';
         }
-    } catch (e) {
-        document.getElementById('msg-ia').innerHTML = `<b style="color:var(--alert)">Error de conexión al núcleo.</b>`;
-    }
+    } catch (e) { window.location.href = 'portal.html'; }
 }
-
-window.onload = cargarSentinel;
+window.onload = conectar;
 </script>
-
-<footer style="margin-top: 50px; border-top: 1px solid #222; padding: 20px; width: 100%; text-align: center;">
-    <div style="font-size: 0.6rem; letter-spacing: 2px;">
-        <a href="privacidad.html" style="color: #444; text-decoration: none; margin: 0 15px;">PRIVACIDAD</a>
-        <a href="terminos.html" style="color: #444; text-decoration: none; margin: 0 15px;">TÉRMINOS DE USO</a>
-        <span style="color: #222;">|</span>
-        <span style="color: #444; margin-left: 15px;">© 2026 VAULT LOGIC SYSTEMS</span>
-    </div>
-</footer>
 </body>
 </html>
