@@ -366,9 +366,10 @@ async function conectar() {
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
             // RUTEO VIP con RUTAS RELATIVAS (../ para salir de 'public')
-            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `../genesis-live.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "SENTINEL") { window.location.href = `../panel-sentinel.html?email=${encodeURIComponent(email)}`; return; } 
-            else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `../panel-executive.html?email=${encodeURIComponent(email)}`; return; }
+            // RUTEO VIP ULTRA-LIMPIO (Sin correos en la URL)
+          if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html`; return; } 
+          else if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; } 
+          else if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
 
             // LLENADO DEL PANEL FREE
             document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]);
