@@ -103,6 +103,9 @@ async def obtener_perfil(req: PerfilRequest):
 # ==========================================
 # NUEVO MOTOR MATEMÁTICO: SIMULADOR DE CICLOS
 # ==========================================
+# ==========================================
+# NUEVO MOTOR MATEMÁTICO: SIMULADOR DE CICLOS DE 7 PUNTOS
+# ==========================================
 @app.post("/simular_periodo")
 async def simular_periodo(req: SimulacionRequest):
     if not supabase:
@@ -122,41 +125,55 @@ async def simular_periodo(req: SimulacionRequest):
             if "vectores_eclipticos" in mapa_obj:
                 vectores = mapa_obj["vectores_eclipticos"]
 
-        # Si no tiene vectores (FREE o error), creamos un hash determinista
         if not vectores:
             seed = sum(ord(c) for c in req.email)
             vectores = { "SOL": (seed % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360) }
 
-        # Lógica Matemática: Resonancia de Ciclos
+        # Cálculos de Tiempo
         f_inicio = datetime.strptime(req.fecha_inicio, "%Y-%m-%d")
+        f_fin = datetime.strptime(req.fecha_fin, "%Y-%m-%d")
         dias_desde_2000 = (f_inicio - datetime(2000, 1, 1)).days
+        dias_totales = max(1, (f_fin - f_inicio).days)
 
         jupiter_natal = vectores.get("JUPITER", 0)
         saturno_natal = vectores.get("SATURNO", 0)
         sol_natal = vectores.get("SOL", 0)
 
-        # Calculamos la onda orbital (Júpiter = Expansión, Saturno = Fricción)
+        # Cálculo Global del Mes
         ciclo_jupiter = math.sin(math.radians(((dias_desde_2000 % 4332) / 4332 * 360) - jupiter_natal))
         ciclo_saturno = math.cos(math.radians(((dias_desde_2000 % 10759) / 10759 * 360) - saturno_natal))
         ciclo_sol = math.sin(math.radians(((dias_desde_2000 % 365) / 365 * 360) - sol_natal))
 
-        # Conversión a Porcentajes Financieros (-30% a +30%)
         val_cap = round((ciclo_jupiter * 18) + (ciclo_sol * 10), 1)
         val_neg = round((ciclo_sol * 12) - (ciclo_saturno * 8), 1)
         val_risk = round((ciclo_saturno * -20) + (ciclo_jupiter * -5), 1)
 
         is_risk = val_risk < -5 or val_cap < 0
 
+        # NUEVO: CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS
+        curva_exacta = []
+        for i in range(7):
+            # Calculamos el día exacto de este segmento
+            dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
+            
+            # Recalculamos la órbita para ESE día específico
+            c_jup = math.sin(math.radians(((dia_segmento % 4332) / 4332 * 360) - jupiter_natal))
+            c_sat = math.cos(math.radians(((dia_segmento % 10759) / 10759 * 360) - saturno_natal))
+            
+            if is_risk:
+                punto = int(50 + (c_sat * 30) - (c_jup * 10)) # Sube si Saturno es fuerte
+            else:
+                punto = int(50 + (c_jup * 30) - (c_sat * 10)) # Sube si Júpiter es fuerte
+                
+            punto = max(5, min(100, punto)) # Mantenemos el score entre 5 y 100
+            curva_exacta.append(punto)
+
         if is_risk:
-            estado = "RIESGO ESTRUCTURAL // POSICIÓN DEFENSIVA"
-            estrategia = "Posición Defensiva"
-            directiva = "Los vectores matemáticos indican alta fricción en este ciclo orbital. <b>Acción sugerida:</b> Congele contrataciones agresivas, eleve su liquidez y evite lanzar nuevos productos. Negociaciones requerirán un enfoque altamente conservador."
-            modo = "DEFENSA"
+            estado, estrategia, modo = "RIESGO ESTRUCTURAL", "Posición Defensiva", "DEFENSA"
+            directiva = "Los vectores matemáticos indican alta fricción en este ciclo. <b>Acción:</b> Congele contrataciones y eleve liquidez."
         else:
-            estado = "SINCRONÍA ÓPTIMA // ESCALABILIDAD"
-            estrategia = "Inversión Agresiva"
-            directiva = "Ventana de resonancia armónica expansiva confirmada. <b>Acción sugerida:</b> Acelere cierres de ventas, expanda presupuestos de marketing y asuma riesgos calculados en nuevos mercados. Clima ideal para acuerdos corporativos."
-            modo = "EXPANSIÓN"
+            estado, estrategia, modo = "SINCRONÍA ÓPTIMA", "Inversión Agresiva", "EXPANSIÓN"
+            directiva = "Ventana de resonancia expansiva confirmada. <b>Acción:</b> Acelere cierres de ventas y expanda presupuestos de marketing."
 
         return {
             "status": "success",
@@ -168,10 +185,10 @@ async def simular_periodo(req: SimulacionRequest):
                 "estrategia": estrategia,
                 "directiva": directiva,
                 "modo": modo,
+                "curva_exacta": curva_exacta, # <--- ENVIAMOS LOS 7 PUNTOS AL HTML
                 "rango": f"{req.fecha_inicio} A {req.fecha_fin}"
             }
         }
-
     except Exception as e:
         return {"status": "error", "mensaje": str(e)}
 
