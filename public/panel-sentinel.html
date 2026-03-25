@@ -178,7 +178,6 @@ function drawOrbit(vectoresReales) {
     const ctx = canvas.getContext('2d');
     const W = 460, H = 460, cx = W/2, cy = H/2 + 10, R = 170;
     
-    // Tonos Sentinel (Verdes tácticos y dorados suaves)
     const colores = { "SOL": "#00c864", "LUNA": "#fff", "MARTE": "#00ff88", "VENUS": "#00c864", "JUPITER": "#00c864", "SATURNO": "#aaa", "MERCURIO": "#00c864" };
     
     const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
@@ -203,14 +202,13 @@ function drawOrbit(vectoresReales) {
         ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
     });
 
-    // Restauración de las líneas de conexión (Red Neuronal)
     for (let i = 0; i < pts.length; i++) {
         for (let j = i+1; j < pts.length; j++) {
             const diff = Math.abs(planets[i].deg - planets[j].deg);
             const angle = Math.min(diff, 360-diff);
             if (angle < 10 || Math.abs(angle - 60) < 8 || Math.abs(angle - 120) < 8 || Math.abs(angle - 180) < 8) {
                 ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
-                ctx.strokeStyle = 'rgba(212,175,55,0.2)'; // Conexiones en tono dorado sutil
+                ctx.strokeStyle = 'rgba(212,175,55,0.2)'; 
                 ctx.lineWidth = 0.6; ctx.setLineDash([3,4]); ctx.stroke(); ctx.setLineDash([]);
             }
         }
@@ -262,15 +260,25 @@ async function conectar() {
             const d = res.datos;
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-            // RUTEO DE SEGURIDAD
             if (nivelSuscripcion === "FREE") { window.location.href = `boveda.html`; return; }
             if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html`; return; } 
             if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
 
-            document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]).toUpperCase();
+            const nombreReal = (d.nombre || email.split('@')[0]).toUpperCase();
+            document.getElementById('nombre-display').innerText = nombreReal;
+            localStorage.setItem('vault_user_nombre', nombreReal);
             
-            const seed = generarHashUsuario(email);
-            const vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
+            // 🧠 CONEXIÓN A DATOS REALES (SUPABASE)
+            let vectores = {};
+            if (d.mapatotal) {
+                let mapaObj = typeof d.mapatotal === 'string' ? JSON.parse(d.mapatotal) : d.mapatotal;
+                if (mapaObj && mapaObj.vectores_eclipticos) { vectores = mapaObj.vectores_eclipticos; }
+            }
+            
+            if (Object.keys(vectores).length === 0) {
+                const seed = generarHashUsuario(email);
+                vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
+            }
             
             const lista = document.getElementById('vectores-lista');
             lista.innerHTML = '';
@@ -279,7 +287,10 @@ async function conectar() {
             });
 
             drawOrbit(vectores);
-            let scoreSincronia = (seed % 40) + 40; 
+            
+            // Score basado en la alineación orbital
+            let sum = Object.values(vectores).reduce((a,b)=>a+b, 0);
+            let scoreSincronia = (Math.floor(sum) % 40) + 40; 
             drawArc(scoreSincronia);
 
             document.getElementById('directiva-text').innerHTML = "<b>SISTEMA ACTIVO:</b> Sus vectores diarios no presentan anomalías críticas estructurales. Las condiciones macroeconómicas para el cierre de negociaciones a corto plazo se mantienen favorables. Para visualizar proyecciones dinámicas a 30 días y mapas de riesgo financiero, se requiere autorización de nivel Executive.";
