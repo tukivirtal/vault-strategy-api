@@ -1,156 +1,190 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>GÉNESIS | Strategic Command Terminal</title>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --gold: #d4af37; --alert: #ff4d4d; --safe: #00ff88; --bg: #050505; }
-        body { background-color: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
-        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-        .panel { background: rgba(15,15,15,0.98); border: 1px solid rgba(212,175,55,0.2); padding: 30px; position: relative; }
-        
-        .horizon-picker { background: rgba(212,175,55,0.03); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid #222; }
-        input[type="date"] { background: #000; color: #fff; border: 1px solid #444; padding: 8px; font-family: inherit; outline: none; }
-        input[type="date"]:focus { border-color: var(--gold); }
-        
-        .btn-search { background: var(--gold); color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 38px; transition: 0.3s; }
-        .btn-search:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
-        
-        .decision-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .decision-card { border: 1px solid #222; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); transition: 0.5s; }
-        
-        .roi { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
-        .label-mini { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 10px; }
-        .telemetry { font-size: 0.8rem; color: var(--gold); text-align: right; }
-        #user-welcome { color: var(--gold); font-weight: bold; font-size: 1.2rem; text-transform: uppercase; }
-        #clock { color: #444; }
+<meta charset="UTF-8">
+<title>Vault Logic | Terminal Génesis</title>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
+  
+  .vl-panel { position: relative; padding: 24px; min-height: 100vh; }
+  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(212, 175, 55, 0.1) 0%, transparent 70%); pointer-events: none; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 
-        /* NUEVO: Traductor Ejecutivo */
-        .executive-summary { margin-top: 20px; padding: 20px; border-left: 4px solid var(--gold); background: rgba(212,175,55,0.05); }
-        .executive-summary h4 { margin: 0 0 10px 0; font-size: 0.8rem; color: var(--gold); letter-spacing: 1px; }
-        .executive-summary p { margin: 0; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
-    </style>
+  .panel-container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; margin-bottom: 30px; }
+  .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 4px; color: #fff; }
+  .logo span { color: #d4af37; font-weight: 400; font-size: 14px; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; margin-left: 10px; border: 1px solid #d4af37; padding: 2px 8px; background: rgba(212,175,55,0.1);}
+  .btn-logout { background: transparent; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); padding: 8px 16px; font-family: inherit; cursor: pointer; transition: 0.3s; }
+  .btn-logout:hover { background: rgba(255,77,77,0.1); }
+  
+  .header { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: flex-end;}
+  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 42px; font-weight: 700; color: #d4af37; letter-spacing: 3px; text-transform: uppercase; line-height: 1;}
+  .header-left .birthdata { font-size: 11px; color: #aaa; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; }
+  
+  .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: right; }
+  .status-grid .sk { color: #666; letter-spacing: 1px; }
+  .status-grid .sv { color: #d4af37; font-weight: bold; }
+
+  .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; margin-bottom: 24px; align-items: stretch; }
+  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .header{flex-direction:column; gap:15px; align-items:flex-start;} .status-grid{text-align:left;} }
+
+  .panel-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.2); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
+  .box-title { font-size: 11px; letter-spacing: 3px; color: #d4af37; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px; }
+
+  .horizon-picker { background: rgba(0,0,0,0.5); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 24px;}
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-label { font-size: 9px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+  input[type="date"] { background: #111; color: #d4af37; border: 1px solid #333; padding: 10px; font-family: inherit; font-size: 12px; outline: none; border-radius: 2px;}
+  input[type="date"]:focus { border-color: #d4af37; }
+  .btn-search { background: #d4af37; color: #000; border: none; padding: 0 25px; font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 37px; transition: 0.3s; letter-spacing: 2px;}
+  .btn-search:hover { background: #fff; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+  .metric-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; text-align: center; transition: 0.3s;}
+  .metric-card.safe { border-top: 3px solid #00c864; background: rgba(0,200,100,0.05);}
+  .metric-card.warn { border-top: 3px solid #ff4d4d; background: rgba(255,77,77,0.05);}
+  .metric-card.neutral { border-top: 3px solid #d4af37; background: rgba(212,175,55,0.05);}
+  .m-label { font-size: 9px; color: #888; letter-spacing: 2px; display: block; margin-bottom: 8px;}
+  .m-val { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #fff;}
+
+  .directiva-box { background: rgba(212,175,55,0.05); border-left: 4px solid #d4af37; padding: 20px; margin-top: 20px; }
+  .directiva-text { font-size: 14px; color: #ddd; line-height: 1.6; }
+
+  .btn-dossier { display: block; width: 100%; background: #d4af37; color: #000; border: none; padding: 18px; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 4px; text-transform: uppercase; text-decoration: none; text-align: center; transition: 0.3s; margin-top: 24px;}
+  .btn-dossier:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212,175,55,0.3);}
+
+  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #d4af37; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
+</style>
 </head>
 <body>
 
-<header>
-    <div>
-        <span class="label-mini">SISTEMA GÉNESIS v2.0</span>
-        <div id="user-welcome">CARGANDO OPERADOR...</div>
-    </div>
-    <div class="telemetry">
-        <div id="clock">00:00:00</div>
-        <div>NASA JPL DE441 SYNC ACTIVE</div>
-    </div>
-</header>
+<div id="loading-screen">INICIALIZANDO GÉNESIS COMMAND...</div>
 
-<div class="dashboard-grid">
-    <aside>
-        <div class="panel">
-            <span class="label-mini">TENDENCIA DECENAL (REFERENCIA)</span>
-            <div id="chart-mini-trend"></div>
+<div class="vl-panel" style="display: none;" id="panel-content">
+  <div class="grid-bg"></div>
+  <div class="panel-container">
+      
+      <nav>
+        <div class="logo">VAULT LOGIC <span>GÉNESIS TERMINAL</span></div>
+        <button onclick="localStorage.removeItem('vault_user_email'); window.location.href='portal.html'" class="btn-logout">CERRAR SESIÓN</button>
+      </nav>
+
+      <div class="header">
+        <div class="header-left">
+          <div style="font-size: 10px; color: #666; letter-spacing: 3px;">COMANDANTE ESTRATÉGICO</div>
+          <div class="name" id="nombre-display">---</div>
+          <div class="birthdata" id="datos-display">---</div>
+        </div>
+        <div class="status-grid">
+          <span class="sk">NÚCLEO</span><span class="sv">DE441 ONLINE</span>
+          <span class="sk">STATUS</span><span class="sv" id="user-status">SINCRONIZANDO</span>
+          <span class="sk">HORA</span><span class="sv" id="clock" style="color:#fff">00:00:00</span>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div class="panel-box">
+                <div class="box-title">Tendencia Decenal (Macro)</div>
+                <div id="chart-mini-trend" style="min-height: 180px;"></div>
+            </div>
             
-            <div style="margin-top: 40px;">
-                <span class="label-mini">DISTRIBUCIÓN GXP</span>
-                <div id="chart-donut"></div>
+            <div class="panel-box" style="flex-grow: 1;">
+                <div class="box-title">Distribución de Recursos GXP</div>
+                <div id="chart-donut" style="display: flex; justify-content: center; align-items: center; flex-grow: 1;"></div>
             </div>
         </div>
-    </aside>
 
-    <main class="panel">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="user-status">MODO: ANÁLISIS</div>
-            
-            <div class="horizon-picker">
-                <div>
-                    <span class="label-mini">INICIO HORIZONTE</span>
-                    <input type="date" id="date-start">
+        <div class="panel-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; margin-bottom: 20px;">
+                <div class="box-title" style="border: none; padding: 0; margin: 0;">SIMULADOR DE HORIZONTE CORPORATIVO</div>
+                
+                <div class="horizon-picker" style="margin: 0; padding: 10px;">
+                    <div class="input-group">
+                        <span class="input-label">INICIO HORIZONTE</span>
+                        <input type="date" id="date-start">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-label">CIERRE ESTIMADO</span>
+                        <input type="date" id="date-end">
+                    </div>
+                    <button class="btn-search" onclick="sincronizarPanel()">SYNC</button>
                 </div>
-                <div>
-                    <span class="label-mini">CIERRE ESTIMADO</span>
-                    <input type="date" id="date-end">
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card" id="card-cap">
+                <span class="m-label">POTENCIAL CAPITAL</span>
+                <span class="m-val" id="roi-cap">--%</span>
                 </div>
-                <button class="btn-search" onclick="sincronizarPanel()">Sync</button>
+                <div class="metric-card" id="card-neg">
+                <span class="m-label">CLIMA DE NEGOCIACIÓN</span>
+                <span class="m-val" id="roi-neg">--%</span>
+                </div>
+                <div class="metric-card" id="card-risk">
+                <span class="m-label">EXPOSICIÓN AL RIESGO</span>
+                <span class="m-val" id="roi-risk">--%</span>
+                </div>
             </div>
+
+            <div id="main-focus-chart" style="min-height: 280px; width: 100%; margin-top: 10px;"></div>
+
+            <div class="directiva-box" id="executive-translation" style="display: none;">
+                <div style="font-size: 10px; color: #d4af37; letter-spacing: 3px; margin-bottom: 8px;">TRADUCTOR OPERATIVO IA</div>
+                <div class="directiva-text" id="translation-text">Esperando sincronización...</div>
+            </div>
+
+            <button onclick="descargarDossier()" class="btn-dossier">EXTRAER DOSSIER ESTRATÉGICO GX-2026</button>
         </div>
+      </div>
 
-        <div id="main-focus-chart" style="margin-top: 30px;"></div>
-
-        <div class="decision-matrix">
-            <div id="card-cap" class="decision-card" style="border-top: 3px solid var(--safe);">
-                <span class="label-mini">POTENCIAL CAPITAL</span>
-                <div class="roi" id="roi-cap">--%</div>
-            </div>
-            <div class="decision-card" style="border-top: 3px solid var(--gold);">
-                <span class="label-mini">CLIMA DE NEGOCIACIÓN</span>
-                <div class="roi" id="roi-neg">--%</div>
-            </div>
-            <div id="card-risk" class="decision-card" style="border-top: 3px solid var(--alert);">
-                <span class="label-mini">EXPOSICIÓN AL RIESGO</span>
-                <div class="roi" id="roi-risk">--%</div>
-            </div>
-        </div>
-
-        <div class="executive-summary" id="executive-translation" style="display: none;">
-            <h4>DIRECTIVA OPERATIVA</h4>
-            <p id="translation-text">Esperando sincronización de parámetros temporales...</p>
-        </div>
-
-        <button onclick="descargarDossier()" style="margin-top: 40px; background: var(--gold); color: #000; border: none; padding: 20px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase;">
-            Extraer Dossier Estratégico GX-2026
-        </button>
-    </main>
+  </div>
 </div>
 
 <script>
-    const userEmail = localStorage.getItem('vault_user_email');
-    if (!userEmail) window.location.href = 'index.html';
-    
-    // Obtenemos el nombre real guardado, si no, usamos un genérico
-    const storedName = localStorage.getItem('vault_user_nombre');
-    const userName = storedName ? storedName : "OPERADOR GXP";
+let mainChart, miniChart, donutChart;
 
-    let mainChart, miniChart, donutChart;
+function initCharts() {
+    mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
+        series: [{ name: 'Sincronía GXP', data: [0, 0, 0, 0, 0, 0, 0] }],
+        chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent', animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+        colors: ['#d4af37'],
+        stroke: { width: 3, curve: 'smooth' },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.05 } },
+        theme: { mode: 'dark' },
+        xaxis: { categories: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'], labels: { style: { colors: '#666', fontFamily: 'Share Tech Mono' } } },
+        yaxis: { labels: {style: {colors: '#666', fontFamily: 'Share Tech Mono'}} },
+        grid: { borderColor: '#222', strokeDashArray: 4 }
+    });
+    mainChart.render();
 
-    function init() {
-        document.getElementById('user-welcome').innerText = `BIENVENIDO, ${userName}`;
-        
-        mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
-            series: [{ name: 'Sincronía GXP', data: [0, 0, 0, 0, 0, 0, 0] }], // Inicia vacío
-            chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
-            colors: ['#d4af37'],
-            stroke: { width: 3, curve: 'smooth' },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.05 } },
-            xaxis: { categories: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'], labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } },
-            tooltip: { theme: 'dark' }
-        });
-        mainChart.render();
+    miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
+        series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
+        chart: { type: 'area', height: 180, toolbar: { show: false } },
+        colors: ['#d4af37'],
+        xaxis: { labels: { show: false } },
+        yaxis: { labels: { show: false } },
+        grid: { show: false },
+        fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
+        tooltip: { theme: 'dark' }
+    });
+    miniChart.render();
 
-        miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
-            series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130, 190] }],
-            chart: { type: 'area', height: 180, toolbar: { show: false } },
-            colors: ['#d4af37'],
-            xaxis: { labels: { show: false } },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
-            tooltip: { theme: 'dark' }
-        });
-        miniChart.render();
-
-        donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
-            series: [60, 25, 15],
-            chart: { type: 'donut', height: 200 },
-            labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
-            colors: ['#d4af37', '#222', '#111'],
-            legend: { position: 'bottom', labels: { colors: '#666' } }
-        });
-        donutChart.render();
-        
-        // Ejecuta la primera sincronización automáticamente
-        setTimeout(sincronizarPanel, 500); 
-    }
+    donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
+        series: [60, 25, 15],
+        chart: { type: 'donut', height: 220 },
+        labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
+        colors: ['#d4af37', '#333', '#111'],
+        stroke: { colors: ['#0a0a0a'] },
+        legend: { position: 'bottom', labels: { colors: '#888' }, fontFamily: 'Share Tech Mono' },
+        dataLabels: { style: { fontFamily: 'Share Tech Mono', fontWeight: 'bold' } }
+    });
+    donutChart.render();
+}
 
 function sincronizarPanel() {
     const status = document.getElementById('user-status');
@@ -165,23 +199,22 @@ function sincronizarPanel() {
     if (startDate >= endDate) {
         status.innerText = "ERROR DE SINCRONÍA";
         status.style.color = "var(--alert)";
-        alert("ANOMALÍA TEMPORAL DETECTADA: La fecha de inicio no puede ser mayor o igual a la fecha de cierre. Reajuste el horizonte.");
+        alert("ANOMALÍA TEMPORAL DETECTADA: La fecha de inicio no puede ser mayor o igual a la fecha de cierre.");
         return;
     }
 
     status.innerText = "SINTETIZANDO...";
-    status.style.color = "var(--gold)";
+    status.style.color = "#d4af37";
     document.getElementById('executive-translation').style.display = 'none';
 
     setTimeout(() => {
-        // Lógica de simulación
         const isRiskMonth = endInput.includes("-04") || endInput.includes("-05") || endInput.includes("-06");
         let currentData = {};
         let translation = "";
         
         if (isRiskMonth) {
             status.innerText = "MODO: DEFENSA";
-            status.style.color = "var(--alert)";
+            status.style.color = "#ff4d4d";
             currentData = {
                 cap: (-(Math.random() * 5 + 10).toFixed(1)) + "%",
                 neg: "+" + (Math.random() * 3 + 5).toFixed(1) + "%",
@@ -191,15 +224,17 @@ function sincronizarPanel() {
                 estrategia: "Posición Defensiva" 
             };
             
-            // ¡AQUÍ ESTÁ LA CORRECCIÓN! Le agregamos el 'name'
+            document.getElementById('card-cap').className = "metric-card warn";
+            document.getElementById('card-neg').className = "metric-card neutral";
+            document.getElementById('card-risk').className = "metric-card warn";
+            
             mainChart.updateSeries([{ name: 'Índice de Riesgo', data: [40, 30, 22, 18, 12, 8, 15] }]);
+            mainChart.updateOptions({ colors: ['#ff4d4d'] });
             
-            // Traducción Operativa para el Ejecutivo
             translation = "Los ciclos indican alta volatilidad en este periodo. <b>Acción sugerida:</b> Congele contrataciones agresivas, evite lanzamientos de nuevos productos y céntrese en fidelizar a sus clientes actuales. Las negociaciones serán tensas; no ceda margen de ganancia.";
-            
         } else {
             status.innerText = "MODO: EXPANSIÓN";
-            status.style.color = "var(--safe)";
+            status.style.color = "#00c864";
             currentData = {
                 cap: "+" + (Math.random() * 5 + 22).toFixed(1) + "%",
                 neg: "+" + (Math.random() * 2 + 11).toFixed(1) + "%",
@@ -209,10 +244,13 @@ function sincronizarPanel() {
                 estrategia: "Inversión Agresiva" 
             };
             
-            // ¡AQUÍ ESTÁ LA OTRA CORRECCIÓN! Le agregamos el 'name'
+            document.getElementById('card-cap').className = "metric-card safe";
+            document.getElementById('card-neg').className = "metric-card safe";
+            document.getElementById('card-risk').className = "metric-card safe";
+
             mainChart.updateSeries([{ name: 'Fuerza de Sincronía', data: [35, 48, 62, 98, 75, 82, 125] }]);
+            mainChart.updateOptions({ colors: ['#00c864'] });
             
-            // Traducción Operativa para el Ejecutivo
             translation = "Ventana de sincronicidad excepcional. <b>Acción sugerida:</b> Acelere cierres de ventas, asigne presupuesto adicional a campañas de marketing y firme alianzas estratégicas. El clima de negociación favorece acuerdos de alto valor a largo plazo.";
         }
 
@@ -220,35 +258,70 @@ function sincronizarPanel() {
         document.getElementById('roi-neg').innerText = currentData.neg;
         document.getElementById('roi-risk').innerText = currentData.risk;
         
-        // Mostrar la traducción
         document.getElementById('translation-text').innerHTML = translation;
         document.getElementById('executive-translation').style.display = 'block';
 
-        // GUARDAMOS EN MEMORIA PARA QUE EL DOSSIER LO LEA CORRECTAMENTE
         localStorage.setItem('ultimo_reporte', JSON.stringify(currentData));
 
     }, 800);
 }
-    function descargarDossier() {
-        // El Dossier ahora leerá el nombre desde localStorage y los datos desde 'ultimo_reporte'
-        window.location.href = `dossier-final.html`; 
-    }
 
-    window.onload = function() {
-        const now = new Date();
-        const nextMonth = new Date();
-        nextMonth.setMonth(now.getMonth() + 1);
-        
-        document.getElementById('date-start').value = now.toISOString().split('T')[0];
-        document.getElementById('date-end').value = nextMonth.toISOString().split('T')[0];
-        
-        init();
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-    };
+function descargarDossier() {
+    window.location.href = `dossier-final.html`; 
+}
+
+async function conectar() {
+    const email = localStorage.getItem('vault_user_email');
+    if (!email) { window.location.href = 'portal.html'; return; }
+
+    try {
+        const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: email })
+        });
+        const res = await response.json();
+
+        if (res.status === "success" && res.datos) {
+            const d = res.datos;
+            const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
+
+            // RUTEO DE SEGURIDAD ESTRICTO
+            if (nivelSuscripcion === "FREE") { window.location.href = `boveda.html`; return; }
+            if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; }
+            if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
+
+            // DATOS EXACTOS DEL USUARIO
+            document.getElementById('nombre-display').innerText = (d.nombre || email.split('@')[0]).toUpperCase();
+            
+            let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta";
+            let datosNatalesObj = d.datos_natales;
+            if (typeof datosNatalesObj === 'string') { try { datosNatalesObj = JSON.parse(datosNatalesObj); } catch(e) {} }
+
+            if (datosNatalesObj) {
+                if (datosNatalesObj.fecha) fecha = datosNatalesObj.fecha;
+                if (datosNatalesObj.hora || datosNatalesObj.hora_nacimiento) hora = datosNatalesObj.hora || datosNatalesObj.hora_nacimiento;
+                if (datosNatalesObj.lugar_original) lugar = datosNatalesObj.lugar_original.toUpperCase();
+            }
+            document.getElementById('datos-display').innerText = `${fecha} // ${hora} // ${lugar}`;
+            
+            // CONFIGURACIÓN DE FECHAS
+            const now = new Date();
+            const nextMonth = new Date();
+            nextMonth.setMonth(now.getMonth() + 1);
+            document.getElementById('date-start').value = now.toISOString().split('T')[0];
+            document.getElementById('date-end').value = nextMonth.toISOString().split('T')[0];
+
+            initCharts();
+            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-ES'); }, 1000);
+            
+            setTimeout(sincronizarPanel, 500);
+
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('panel-content').style.display = 'block';
+        } else { window.location.href = 'portal.html'; }
+    } catch (e) { window.location.href = 'portal.html'; }
+}
+
+window.onload = conectar;
 </script>
-
-<div style="text-align: center; margin-top: 50px; padding: 20px; border-top: 1px solid #222; font-size: 0.55rem; color: #555; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
-    <strong>Aviso Legal y de Riesgo:</strong> Vault Logic Terminal proporciona análisis basados en ciclos matemáticos y efemérides astronómicas (NASA JPL DE441). Las métricas presentadas (ROI, Riesgo, Sincronía) constituyen modelos probabilísticos prospectivos, no asesoramiento financiero, legal o de inversión garantizado. El uso de esta inteligencia estratégica para la toma de decisiones corporativas es bajo la exclusiva responsabilidad del operador.
-</div>
 </body>
 </html>
