@@ -7,9 +7,9 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; }
+  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
   
-  .vl-panel { position: relative; overflow-x: hidden; padding: 24px; min-height: 100vh; }
+  .vl-panel { position: relative; padding: 24px; min-height: 100vh; }
   .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); pointer-events: none; }
   .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 
@@ -47,9 +47,16 @@
   .directiva-box { background: rgba(212,175,55,0.05); border-left: 4px solid #d4af37; padding: 20px; margin-top: 20px; }
   .directiva-text { font-size: 14px; color: #ddd; line-height: 1.6; }
 
-  .upgrade-banner { background: #fff; color: #000; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; margin-top: 24px;}
-  .btn-upgrade { background: #000; color: #fff; padding: 12px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: 0.3s;}
-  .btn-upgrade:hover { background: #d4af37; color: #000; }
+  /* REMASTERIZACIÓN DEL UPGRADE BANNER (Dorado y Negro Premium) */
+  .upgrade-banner { 
+    background: rgba(15,15,15,0.8); backdrop-filter: blur(10px); color: #fff; 
+    border: 1px solid rgba(212,175,55,0.3); border-top: 2px solid #d4af37;
+    padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; margin-top: 24px;}
+  .btn-upgrade { 
+    background: #d4af37; color: #000; padding: 12px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: 0.3s;}
+  .btn-upgrade:hover { 
+    background: #FFF5D1; color: #000;
+    box-shadow: 0 0 15px rgba(212,175,55,0.3);}
   
   #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #d4af37; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
 </style>
@@ -90,7 +97,7 @@
         <div class="panel-box">
           <div class="box-title">Cartografía Orbital</div>
           <div style="display: flex; justify-content: center; padding: 20px 0;">
-            <canvas id="orbitCanvas" width="300" height="300"></canvas>
+            <canvas id="orbitCanvas" width="400" height="400"></canvas>
           </div>
           <div style="font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 15px; margin-top: auto;">
             Última actualización: <span id="fecha-hoy" style="color:#fff"></span>
@@ -129,7 +136,7 @@
       <div class="upgrade-banner">
         <div>
           <div style="font-size: 16px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px;">OBTÉN LA VENTAJA DEFINITIVA CON GÉNESIS</div>
-          <div style="font-size: 12px; color: #444;">Descarga el software Desktop Offline (.EXE) y extrae reportes PDF encriptados ilimitados.</div>
+          <div style="font-size: 12px; color: #aaa; letter-spacing: 1px;">Descarga el software Desktop Offline (.EXE) y extrae reportes PDF encriptados ilimitados.</div>
         </div>
         <a href="suscripcion.html" class="btn-upgrade">UPGRADE A GÉNESIS</a>
       </div>
@@ -192,7 +199,11 @@ function cambiarMes(btn, tipo) {
 function drawOrbit(vectoresReales) {
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
-    const W = 300, H = 300, cx = W/2, cy = H/2 + 10, R = 110;
+    
+    // AGRANDAMOS LAS VARIABLES OPERATIVAS DEL CANVA
+    const W = 400, H = 400, cx = W/2, cy = H/2 + 10;
+    const R = 150; // Radio principal más grande (era 110)
+
     const colores = { "SOL": "#d4af37", "LUNA": "#ccc", "MARTE": "#ff4d4d", "VENUS": "#d4af37", "JUPITER": "#d4af37", "SATURNO": "#888", "MERCURIO": "#aaa" };
     
     const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
@@ -207,7 +218,6 @@ function drawOrbit(vectoresReales) {
 
     const pts = planets.map(p => { const a = degToRad(p.deg); return { x: cx + R*Math.cos(a), y: cy + R*Math.sin(a), p }; });
 
-    // Conexiones de red
     for (let i = 0; i < pts.length; i++) {
         for (let j = i+1; j < pts.length; j++) {
             const diff = Math.abs(planets[i].deg - planets[j].deg);
@@ -226,7 +236,10 @@ function drawOrbit(vectoresReales) {
         
         const a = degToRad(pt.p.deg);
         const lx = cx + (R+18)*Math.cos(a); const ly = cy + (R+18)*Math.sin(a);
-        ctx.fillStyle = '#fff'; ctx.font = '8px Share Tech Mono';
+        
+        // CORRECCIÓN: CAMBIADO A DORADO PARA QUE NO ENCOJA EL CÍRCULO
+        ctx.fillStyle = '#d4af37'; 
+        ctx.font = '8px Share Tech Mono';
         ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
         ctx.fillText(pt.p.name, lx, ly);
     });
