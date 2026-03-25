@@ -151,19 +151,23 @@ async def simular_periodo(req: SimulacionRequest):
         is_risk = val_risk < -5 or val_cap < 0
 
         # NUEVO: CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS
+     # NUEVO: CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS (CON VOLATILIDAD SOLAR)
         curva_exacta = []
         for i in range(7):
             # Calculamos el día exacto de este segmento
             dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
             
-            # Recalculamos la órbita para ESE día específico
+            # Titanes (Macro tendencia) + Sol (Volatilidad Diaria)
             c_jup = math.sin(math.radians(((dia_segmento % 4332) / 4332 * 360) - jupiter_natal))
             c_sat = math.cos(math.radians(((dia_segmento % 10759) / 10759 * 360) - saturno_natal))
+            c_sol = math.sin(math.radians(((dia_segmento % 365) / 365 * 360) - sol_natal)) # Latido rápido
             
             if is_risk:
-                punto = int(50 + (c_sat * 30) - (c_jup * 10)) # Sube si Saturno es fuerte
+                # Saturno sube el riesgo, el Sol le da la forma de ola (+/- 15 puntos)
+                punto = int(50 + (c_sat * 25) - (c_jup * 10) + (c_sol * 15)) 
             else:
-                punto = int(50 + (c_jup * 30) - (c_sat * 10)) # Sube si Júpiter es fuerte
+                # Júpiter sube la sincronía, el Sol le da la forma de ola (+/- 15 puntos)
+                punto = int(50 + (c_jup * 25) - (c_sat * 10) + (c_sol * 15))
                 
             punto = max(5, min(100, punto)) # Mantenemos el score entre 5 y 100
             curva_exacta.append(punto)
