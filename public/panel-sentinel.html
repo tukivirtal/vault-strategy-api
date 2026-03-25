@@ -6,9 +6,9 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; }
+  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
   
-  .vl-panel { position: relative; overflow-x: hidden; padding: 24px; min-height: 100vh; }
+  .vl-panel { position: relative; padding: 24px; min-height: 100vh; }
   .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(0, 200, 100, 0.05) 0%, transparent 70%); pointer-events: none; }
   .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 
@@ -20,37 +20,60 @@
   .btn-logout { background: transparent; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); padding: 8px 16px; font-family: inherit; cursor: pointer; transition: 0.3s; }
   .btn-logout:hover { background: rgba(255,77,77,0.1); }
 
-  .header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+  .header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: flex-start;}
   .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #00c864; letter-spacing: 3px; text-transform: uppercase; }
   .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: right; }
   .status-grid .sk { color: #666; letter-spacing: 1px; }
   .status-grid .sv { color: #fff; font-weight: bold; }
 
-  .main-grid { display: grid; grid-template-columns: 300px 1fr 300px; gap: 24px; margin-bottom: 24px; align-items: stretch; }
-  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
+  .main-grid { display: grid; grid-template-columns: 260px 1fr 260px; gap: 24px; margin-bottom: 24px; align-items: stretch; }
+  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .header{flex-direction:column; gap:15px;}.status-grid{text-align:left;} }
 
   .panel-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 20px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
   .box-title { font-size: 10px; letter-spacing: 3px; color: #888; margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
 
-  .vector-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .vector-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .vector-row:last-child { border-bottom: none; }
+  .vector-name { color: #aaa; letter-spacing: 1px; display: flex; align-items: center; }
+  .planet-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c864; margin-right: 8px; }
   .vector-val { color: #00c864; font-weight: bold; }
 
-  .chart-canvas-wrap { display: flex; justify-content: center; position: relative; padding: 20px 0; }
+  .chart-container { display: flex; align-items: center; justify-content: center; position: relative; padding: 20px 0;}
+  .chart-canvas-wrap { position: relative; width: 100%; max-width: 460px; display: flex; justify-content: center;}
+  .orbit-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #00c864; letter-spacing: 3px; white-space: nowrap; }
+
+  .sync-index { text-align: center; padding: 20px 14px; }
+  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 56px; font-weight: 700; color: #00c864; line-height: 1; display: block; margin-top: 10px;}
+  .sync-label { font-size: 9px; color: #555; letter-spacing: 2px; margin-top: 4px; }
+  .arc-wrap { display: flex; justify-content: center; margin: 10px 0; }
+
+  .transit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .transit-row:last-child { border-bottom: none; }
+  .transit-planet { color: #999; letter-spacing: 1px; }
+  .tag { padding: 3px 8px; font-size: 9px; letter-spacing: 1px; }
+  .tag-act { background: rgba(0,200,100,0.1); color: #00c864; border: 1px solid rgba(0,200,100,0.2); }
+
+  .bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  .metric-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 16px 20px; position: relative;}
+  .metric-card.unlocked { border: 1px solid rgba(0,200,100,0.3); background: rgba(0,200,100,0.05); border-top: 3px solid #00c864;}
+  .metric-label { font-size: 10px; color: #888; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase;}
+  .metric-card.unlocked .metric-label { color: #00c864; }
+  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; user-select:none; color: #fff; }
+  .metric-value.blur { filter: blur(4px); color: #555;}
   
-  .metric-card { background: rgba(0,200,100,0.05); border: 1px solid rgba(0,200,100,0.2); padding: 20px; border-left: 3px solid #00c864; margin-bottom: 15px;}
-  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 36px; font-weight: 700; color: #fff; }
-  
-  .locked-card { background: rgba(0,0,0,0.5); border: 1px dashed #333; padding: 20px; text-align: center; color: #555; position: relative; margin-bottom: 15px;}
-  .locked-card::after { content: '🔒 EXECUTIVE ONLY'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 3px; background: rgba(0,0,0,0.7); color: #888; }
+  .metric-bar { height: 2px; margin-top: 12px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
+  .metric-fill { height: 100%; border-radius: 1px; background: #00c864; width: 65%;}
+  .lock-msg { font-size:10px; color:#555; margin-top:8px; letter-spacing:1px; }
 
-  .directiva-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 20px; margin-bottom: 24px; }
-  .directiva-text { font-size: 14px; color: #ccc; line-height: 1.6; }
+  .directiva-box { background: rgba(0,200,100,0.05); border: 1px solid rgba(0,200,100,0.2); border-left: 3px solid #00c864; padding: 20px; margin-bottom: 24px; }
+  .directiva-label { font-size: 10px; color: #00c864; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase;}
+  .directiva-text { font-size: 13px; color: #ccc; line-height: 1.6; }
 
-  .upgrade-banner { background: linear-gradient(90deg, #111, #1a1a1a); border: 1px solid #d4af37; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-  .btn-upgrade { background: #d4af37; color: #000; padding: 12px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; }
-  .btn-upgrade:hover { background: #FFF5D1; }
+  .upgrade-banner { background: linear-gradient(90deg, #111, #1a1a1a); border: 1px solid #d4af37; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;}
+  .btn-upgrade { background: #d4af37; color: #000; padding: 14px 28px; border: none; font-family: inherit; font-size: 12px; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; transition: 0.3s;}
+  .btn-upgrade:hover { background: #FFF5D1; box-shadow: 0 0 15px rgba(212,175,55,0.3);}
 
-  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #00c864; letter-spacing: 4px; }
+  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #00c864; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
 </style>
 </head>
 <body>
@@ -73,52 +96,77 @@
         </div>
         <div class="status-grid">
           <span class="sk">CONEXIÓN</span><span class="sv" style="color:#00c864">ESTABLE (JPL DE441)</span>
-          <span class="sk">AUTH</span><span class="sv" style="color:#00c864">SENTINEL</span>
+          <span class="sk">AUTH</span><span class="sv" style="color:#00c864">SENTINEL ONLINE</span>
           <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
         </div>
       </div>
 
       <div class="main-grid">
         <div class="panel-box">
-          <div class="box-title">Vectores Natales (Lectura Activa)</div>
+          <div class="box-title">Vectores Natales (En Vivo)</div>
           <div id="vectores-lista" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;"></div>
         </div>
 
-        <div class="chart-canvas-wrap">
-          <div style="position: absolute; top: 0; font-size: 10px; color: #888; letter-spacing: 3px;">MATRIZ ORBITAL</div>
-          <canvas id="orbitCanvas" width="400" height="400"></canvas>
+        <div class="chart-container">
+          <div class="chart-canvas-wrap">
+            <div class="orbit-label">MONITOREO ORBITAL // TIEMPO REAL</div>
+            <canvas id="orbitCanvas" width="460" height="460"></canvas>
+          </div>
         </div>
 
-        <div class="panel-box" style="background: transparent; border: none; padding: 0;">
-          <div class="metric-card">
-            <div style="font-size: 10px; color: #00c864; letter-spacing: 2px; margin-bottom: 5px;">CLIMA DE NEGOCIACIÓN</div>
-            <div class="metric-value">+12.4%</div>
-            <div style="font-size: 9px; color: #aaa; margin-top: 5px;">Favorable para cierres rápidos</div>
-          </div>
-          
-          <div class="locked-card">
-            <div style="font-size: 10px; letter-spacing: 2px; margin-bottom: 5px;">CAPITAL GXP</div>
-            <div class="metric-value" style="filter: blur(4px);">+28.1%</div>
+        <div class="right-col" style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="panel-box sync-index">
+            <div class="box-title">Índice de Sincronía Táctica</div>
+            <div class="arc-wrap">
+              <canvas id="arcCanvas" width="140" height="80"></canvas>
+            </div>
+            <span class="sync-number" id="sync-score">--</span>
+            <div class="sync-label">/ 100 — RANGO OPERATIVO</div>
           </div>
 
-          <div class="locked-card">
-            <div style="font-size: 10px; letter-spacing: 2px; margin-bottom: 5px;">VENTANA DE RIESGO</div>
-            <div class="metric-value" style="filter: blur(4px);">-14.2%</div>
+          <div class="panel-box" style="flex-grow: 1;">
+            <div class="box-title">Eventos Astrométricos</div>
+            <div class="transit-row"><span class="transit-planet">JUPITER</span><span class="tag tag-act">MONITOREANDO</span></div>
+            <div class="transit-row"><span class="transit-planet">SATURNO</span><span class="tag tag-act">MONITOREANDO</span></div>
+            <div class="transit-row"><span class="transit-planet">MERCURIO</span><span class="tag tag-act">MONITOREANDO</span></div>
           </div>
         </div>
       </div>
 
+      <div class="bottom-grid">
+        <div class="metric-card">
+          <div class="metric-label">Capital GXP</div>
+          <div class="metric-value blur">+22.4%</div>
+          <div class="metric-bar"><div class="metric-fill" style="background:#555; width:0%"></div></div>
+          <div class="lock-msg">🔒 REQUIERE EXECUTIVE</div>
+        </div>
+        
+        <div class="metric-card unlocked">
+          <div class="metric-label">Clima de Negociación</div>
+          <div class="metric-value">+14.2%</div>
+          <div class="metric-bar"><div class="metric-fill"></div></div>
+          <div class="lock-msg" style="color:#00c864">DESBLOQUEADO</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Ventana de Riesgo</div>
+          <div class="metric-value blur">-17.8%</div>
+          <div class="metric-bar"><div class="metric-fill" style="background:#555; width:0%"></div></div>
+          <div class="lock-msg">🔒 REQUIERE EXECUTIVE</div>
+        </div>
+      </div>
+
       <div class="directiva-box">
-        <div style="font-size: 10px; color: #00c864; letter-spacing: 3px; margin-bottom: 10px;">REPORTE TÁCTICO DIARIO</div>
+        <div class="directiva-label">REPORTE TÁCTICO DIARIO (DESBLOQUEADO)</div>
         <div class="directiva-text" id="directiva-text">Analizando efemérides...</div>
       </div>
 
       <div class="upgrade-banner">
         <div>
-          <div style="color: #d4af37; font-size: 14px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px;">POTENCIA TUS DECISIONES CON EXECUTIVE</div>
-          <div style="color: #aaa; font-size: 11px;">Desbloquea el Simulador a 30 días, proyecciones de riesgo y métricas de capital completas.</div>
+          <div style="color: #d4af37; font-size: 16px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px;">POTENCIA TUS DECISIONES CON EXECUTIVE</div>
+          <div style="color: #aaa; font-size: 11px; letter-spacing: 1px;">Desbloquea proyecciones de riesgo a 30 días, métricas de capital completas y el simulador de escenarios temporales.</div>
         </div>
-        <a href="suscripcion.html" class="btn-upgrade">HACER UPGRADE</a>
+        <a href="suscripcion.html" class="btn-upgrade">DESBLOQUEAR EXECUTIVE</a>
       </div>
 
   </div>
@@ -128,8 +176,10 @@
 function drawOrbit(vectoresReales) {
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
-    const W = 400, H = 400, cx = W/2, cy = H/2 + 10, R = 150;
-    const colores = { "SOL": "#00c864", "LUNA": "#fff", "MARTE": "#00c864", "VENUS": "#00c864", "JUPITER": "#00c864", "SATURNO": "#00c864", "MERCURIO": "#00c864" };
+    const W = 460, H = 460, cx = W/2, cy = H/2 + 10, R = 170;
+    
+    // Tonos Sentinel (Verdes tácticos y dorados suaves)
+    const colores = { "SOL": "#00c864", "LUNA": "#fff", "MARTE": "#00ff88", "VENUS": "#00c864", "JUPITER": "#00c864", "SATURNO": "#aaa", "MERCURIO": "#00c864" };
     
     const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
     function degToRad(d) { return (d - 90) * Math.PI / 180; }
@@ -137,26 +187,61 @@ function drawOrbit(vectoresReales) {
 
     for (let i = 1; i <= 3; i++) {
         ctx.beginPath(); ctx.arc(cx, cy, R * i/3, 0, Math.PI*2);
-        ctx.strokeStyle = `rgba(0,200,100,${0.1 - i*0.02})`; ctx.stroke();
+        ctx.strokeStyle = `rgba(0,200,100,${0.08 - i*0.01})`; ctx.stroke();
     }
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.stroke();
+    for (let i = 0; i < 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        ctx.beginPath(); ctx.moveTo(cx + (R+10)*Math.cos(a), cy + (R+10)*Math.sin(a)); ctx.lineTo(cx + (R+16)*Math.cos(a), cy + (R+16)*Math.sin(a));
+        ctx.strokeStyle = 'rgba(0,200,100,0.15)'; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.stroke();
 
     const pts = planets.map(p => { const a = degToRad(p.deg); return { x: cx + R*Math.cos(a), y: cy + R*Math.sin(a), p }; });
 
     pts.forEach(pt => {
         ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pt.x, pt.y);
         ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
-        
-        ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI*2);
-        ctx.fillStyle = pt.p.color; ctx.fill();
+    });
+
+    // Restauración de las líneas de conexión (Red Neuronal)
+    for (let i = 0; i < pts.length; i++) {
+        for (let j = i+1; j < pts.length; j++) {
+            const diff = Math.abs(planets[i].deg - planets[j].deg);
+            const angle = Math.min(diff, 360-diff);
+            if (angle < 10 || Math.abs(angle - 60) < 8 || Math.abs(angle - 120) < 8 || Math.abs(angle - 180) < 8) {
+                ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+                ctx.strokeStyle = 'rgba(212,175,55,0.2)'; // Conexiones en tono dorado sutil
+                ctx.lineWidth = 0.6; ctx.setLineDash([3,4]); ctx.stroke(); ctx.setLineDash([]);
+            }
+        }
+    }
+
+    pts.forEach(pt => {
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI*2); ctx.fillStyle = pt.p.color; ctx.fill();
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 10, 0, Math.PI*2); ctx.strokeStyle = pt.p.color + '44'; ctx.stroke();
 
         const a = degToRad(pt.p.deg);
-        const lx = cx + (R+20)*Math.cos(a); const ly = cy + (R+20)*Math.sin(a);
-        ctx.fillStyle = '#fff'; ctx.font = '9px Share Tech Mono';
+        const lx = cx + (R+28)*Math.cos(a); const ly = cy + (R+28)*Math.sin(a);
+        ctx.fillStyle = '#fff'; ctx.font = '10px Share Tech Mono';
         ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
         ctx.fillText(pt.p.name, lx, ly);
     });
+    ctx.fillStyle = '#00c864'; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
+}
+
+function drawArc(score) {
+    const arcC = document.getElementById('arcCanvas');
+    const arcCtx = arcC.getContext('2d');
+    const startA = Math.PI; const endA = Math.PI + (score/100) * Math.PI;
+
+    arcCtx.clearRect(0,0, arcC.width, arcC.height);
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, Math.PI, Math.PI*2);
+    arcCtx.strokeStyle = 'rgba(0,200,100,0.1)'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, startA, endA);
+    arcCtx.strokeStyle = '#00c864'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    
+    document.getElementById('sync-score').innerText = score;
 }
 
 function generarHashUsuario(str) { let hash = 0; for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); } return Math.abs(hash); }
@@ -190,17 +275,18 @@ async function conectar() {
             const lista = document.getElementById('vectores-lista');
             lista.innerHTML = '';
             Object.entries(vectores).forEach(([nom, grad]) => {
-                lista.innerHTML += `<div class="vector-row"><span style="color:#aaa">${nom}</span><span class="vector-val">${Math.floor(grad)}°</span></div>`;
+                lista.innerHTML += `<div class="vector-row"><span class="vector-name"><span class="planet-dot"></span>${nom}</span><span class="vector-val">${Math.floor(grad)}°</span></div>`;
             });
 
             drawOrbit(vectores);
-            document.getElementById('directiva-text').innerHTML = "<b>SISTEMA ESTABLE:</b> Sus vectores diarios no presentan anomalías críticas. Las condiciones para negociaciones a corto plazo se mantienen favorables. Para visualizar proyecciones a 30 días y mapas de riesgo, requiere autorización Executive.";
+            let scoreSincronia = (seed % 40) + 40; 
+            drawArc(scoreSincronia);
+
+            document.getElementById('directiva-text').innerHTML = "<b>SISTEMA ACTIVO:</b> Sus vectores diarios no presentan anomalías críticas estructurales. Las condiciones macroeconómicas para el cierre de negociaciones a corto plazo se mantienen favorables. Para visualizar proyecciones dinámicas a 30 días y mapas de riesgo financiero, se requiere autorización de nivel Executive.";
 
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('panel-content').style.display = 'block';
-        } else {
-            window.location.href = 'portal.html';
-        }
+        } else { window.location.href = 'portal.html'; }
     } catch (e) { window.location.href = 'portal.html'; }
 }
 window.onload = conectar;
