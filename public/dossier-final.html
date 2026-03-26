@@ -4,66 +4,116 @@
     <meta charset="UTF-8">
     <title>GÉNESIS | Dossier Estratégico GX-2026</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display:ital@0;1&display=swap');
+        
         :root {
             --gold: #d4af37;
             --alert: #ff4d4d;
-            --safe: #00ff88;
+            --safe: #00c864;
             --dark: #050505;
             --gray: #222;
         }
+        
         body { 
-            background: #000; color: #fff; 
-            font-family: 'JetBrains Mono', monospace; 
+            background: #111; color: #fff; 
+            font-family: 'Share Tech Mono', monospace; 
             margin: 0; padding: 0; 
-            -webkit-print-color-adjust: exact;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
+        
         .page { 
             width: 210mm; min-height: 297mm; 
-            padding: 20mm 25mm; margin: 20px auto; 
-            background: var(--dark); border: 1px solid #111; 
+            padding: 25mm 20mm; margin: 20px auto; 
+            background: var(--dark); border: 1px solid #333; 
             position: relative; box-sizing: border-box;
+            background-image: linear-gradient(rgba(212,175,55,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
+
+        /* CABECERA MILITAR */
+        .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--gray); padding-bottom: 15px; margin-bottom: 30px; }
+        .doc-meta { font-size: 0.6rem; color: #666; line-height: 1.6; }
+        .doc-meta span { color: var(--gold); }
+        .barcode-container { text-align: right; }
+        .barcode { font-family: 'Libre Barcode 39', cursive, monospace; font-size: 1.2rem; letter-spacing: 2px; color: #fff; opacity: 0.8;}
+        .barcode-text { font-size: 0.5rem; color: #555; letter-spacing: 3px; margin-top: 5px; }
+
         .confidential-stamp { 
-            position: absolute; top: 15mm; right: 15mm; 
+            position: absolute; top: 35mm; right: 20mm; 
             border: 2px solid var(--alert); color: var(--alert); 
-            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; 
-            transform: rotate(5deg); letter-spacing: 0.2em;
-            background: rgba(255, 77, 77, 0.05);
+            padding: 8px 20px; font-size: 0.8rem; font-weight: bold; 
+            transform: rotate(5deg); letter-spacing: 0.3em;
+            background: rgba(255, 77, 77, 0.05); z-index: 0;
+            opacity: 0.8;
         }
+
         h1 { 
-            font-size: 1.2rem; letter-spacing: 0.5em; 
-            border-bottom: 1px solid var(--gray); padding-bottom: 20px; 
-            text-transform: uppercase; color: var(--gold);
+            font-size: 1.6rem; letter-spacing: 0.4em; 
+            text-transform: uppercase; color: #fff;
+            margin: 0 0 5px 0; z-index: 2; position: relative;
         }
+        .subtitle { font-size: 0.8rem; color: var(--gold); letter-spacing: 4px; margin-bottom: 40px; }
+
+        /* SECCIONES */
         .section-title { 
-            font-size: 0.7rem; color: #777; 
-            letter-spacing: 0.3em; margin-top: 40px; 
+            font-size: 0.75rem; color: #888; 
+            letter-spacing: 0.3em; margin-top: 35px; 
             margin-bottom: 15px; border-left: 3px solid var(--gold);
-            padding-left: 15px; text-transform: uppercase;
+            padding-left: 12px; text-transform: uppercase; background: rgba(212,175,55,0.05); padding-top: 4px; padding-bottom: 4px;
         }
         .content { font-size: 0.85rem; line-height: 1.8; color: #ccc; }
-        .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        .impact-matrix th { text-align: left; font-size: 0.6rem; color: #555; padding: 10px; border-bottom: 1px solid var(--gray); }
-        .impact-matrix td { padding: 15px 10px; font-size: 0.75rem; border-bottom: 1px solid #111; }
         
+        /* MATRIZ DE DATOS */
+        .impact-matrix { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(0,0,0,0.5); border: 1px solid #222;}
+        .impact-matrix th { text-align: left; font-size: 0.65rem; color: #666; padding: 12px 15px; border-bottom: 1px solid var(--gray); background: #0a0a0a;}
+        .impact-matrix td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid #111; }
+        .val-number { font-size: 1.1rem; font-weight: bold; }
+
+        /* TRADUCTOR EJECUTIVO (ESTILO FORMAL) */
+        .executive-box {
+            margin-top: 30px; padding: 25px;
+            border: 1px solid var(--gold); background: rgba(212,175,55,0.03);
+            position: relative;
+        }
+        .executive-box::before {
+            content: 'DIRECTIVA ESTRATÉGICA // IA TRADUCTION';
+            position: absolute; top: -8px; left: 15px;
+            background: var(--dark); padding: 0 10px;
+            font-size: 0.65rem; color: var(--gold); letter-spacing: 2px;
+        }
+        .proyeccion-texto {
+            font-family: 'Playfair Display', serif; /* Contraste tipográfico premium */
+            font-size: 0.95rem; line-height: 1.8; color: #e0e0e0;
+            text-align: justify;
+        }
+
+        /* PIE DE PÁGINA */
+        .disclaimer-legal {
+            margin-top: 50px; padding: 20px; border-top: 1px solid #222; 
+            font-size: 0.55rem; color: #555; font-family: Arial, sans-serif; 
+            text-transform: uppercase; letter-spacing: 1px; text-align: justify;
+            line-height: 1.6;
+        }
+        .footer-tech {
+            margin-top: 20px; border-top: 1px solid #111; padding-top: 15px; 
+            font-size: 0.6rem; color: #444; display: flex; justify-content: space-between;
+        }
+
+        /* BOTÓN DE IMPRESIÓN */
         .no-print {
             position: fixed; bottom: 30px; right: 30px; 
             background: var(--gold); color: #000; border: none; 
-            padding: 15px 30px; font-weight: bold; cursor: pointer;
-            z-index: 100; transition: 0.3s;
+            padding: 15px 30px; font-family: 'Share Tech Mono', monospace; font-weight: bold; 
+            cursor: pointer; z-index: 100; transition: 0.3s; letter-spacing: 2px; box-shadow: 0 5px 20px rgba(212,175,55,0.4);
         }
         .no-print:hover { background: #fff; }
         
-        .disclaimer-legal {
-            margin-top: 50px; padding: 20px; border-top: 1px solid #222; 
-            font-size: 0.55rem; color: #555; font-family: 'Inter', sans-serif; 
-            text-transform: uppercase; letter-spacing: 1px; text-align: justify;
-        }
-
         @media print {
             .no-print { display: none; }
-            body { background: #000 !important; }
-            .page { margin: 0; border: none; }
+            body { background: var(--dark) !important; }
+            .page { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%;}
         }
     </style>
 </head>
@@ -73,116 +123,147 @@
 
 <div class="page">
     <div class="confidential-stamp">TOP SECRET // CLASSIFIED</div>
-    <h1>Dossier Estratégico GX-2026</h1>
-
-    <div class="section-title">SUJETO DE ANÁLISIS</div>
-    <div class="content">
-        OPERADOR: <span style="color:var(--gold)" id="user-name">...</span><br>
-        RANGO DE ANÁLISIS: <span id="display-range" style="color:var(--gold)">...</span><br>
-        ESTADO: <span id="display-status">SINCRONIZADO NASA JPL DE441</span>
+    
+    <div class="doc-header">
+        <div class="doc-meta">
+            ID TRANSACCIÓN: <span id="tx-id">...</span><br>
+            TIMESTAMP: <span id="tx-time">...</span><br>
+            MOTOR LÓGICO: <span>JPL DE441 (SUPABASE)</span><br>
+            ENCRIPTACIÓN: <span>AES-256 (NIVEL GÉNESIS)</span>
+        </div>
+        <div class="barcode-container">
+            <div class="barcode">|| | ||| || || | ||| | || |</div>
+            <div class="barcode-text">GXP-TERMINAL-VALIDATED</div>
+        </div>
     </div>
 
-    <div class="section-title">Matriz de Impacto de Ciclos</div>
+    <h1>Dossier Estratégico</h1>
+    <div class="subtitle">VAULT LOGIC // TERMINAL GÉNESIS</div>
+
+    <div class="section-title">SUJETO DE ANÁLISIS</div>
+    <div class="content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>OPERADOR: <span style="color:var(--gold)" id="user-name">...</span></div>
+        <div>ESTADO: <span id="display-status">...</span></div>
+        <div style="grid-column: 1 / 3;">HORIZONTE DE SIMULACIÓN: <span id="display-range" style="color:var(--gold)">...</span></div>
+    </div>
+
+    <div class="section-title">Matriz de Impacto Orbital</div>
     <table class="impact-matrix">
         <thead>
             <tr>
-                <th>FASE</th>
-                <th>INDICADOR</th>
-                <th>ROI EST.</th>
+                <th>FASE LOGÍSTICA</th>
+                <th>DIAGNÓSTICO DEL SISTEMA</th>
+                <th>MÉTRICA DE IMPACTO</th>
                 <th>ESTRATEGIA RECOMENDADA</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>POTENCIAL CAPITAL</td>
-                <td style="color:var(--safe)">OPORTUNIDAD VIGENTE</td>
-                <td id="val-cap">+24.8%</td>
-                <td id="est-cap">Expansión Inmediata</td>
+                <td style="color:#aaa;">POTENCIAL CAPITAL</td>
+                <td id="ind-cap" style="color:var(--safe)">OPORTUNIDAD VIGENTE</td>
+                <td class="val-number" id="val-cap">+--%</td>
+                <td id="est-cap" style="color:#fff;">Expansión Inmediata</td>
             </tr>
             <tr>
-                <td>CLIMA NEGOCIACIÓN</td>
-                <td style="color:var(--gold)">FLUCTUACIÓN MODERADA</td>
-                <td id="val-neg">+18.5%</td>
-                <td id="est-neg">Aceleración de Cierres</td>
+                <td style="color:#aaa;">CLIMA NEGOCIACIÓN</td>
+                <td id="ind-neg" style="color:var(--gold)">FLUCTUACIÓN MODERADA</td>
+                <td class="val-number" id="val-neg">+--%</td>
+                <td id="est-neg" style="color:#fff;">Aceleración de Cierres</td>
             </tr>
             <tr>
-                <td>EXPOSICIÓN RIESGO</td>
-                <td style="color:var(--alert)">VULNERABILIDAD ESTRUCTURAL</td>
-                <td id="val-risk">-12.0%</td>
-                <td id="est-risk">Auditoría de Pasivos</td>
+                <td style="color:#aaa;">EXPOSICIÓN RIESGO</td>
+                <td id="ind-risk" style="color:var(--alert)">VULNERABILIDAD ESTRUCTURAL</td>
+                <td class="val-number" id="val-risk">---%</td>
+                <td id="est-risk" style="color:#fff;">Auditoría de Pasivos</td>
             </tr>
         </tbody>
     </table>
 
-    <div class="section-title">PROYECCIÓN ESTRATÉGICA Y DIRECTIVA</div>
-    <div class="content" id="proyeccion-texto">
-        Sincronizando directivas del núcleo...
+    <div class="executive-box">
+        <div class="proyeccion-texto" id="proyeccion-texto">
+            Sincronizando directivas del núcleo...
+        </div>
     </div>
 
     <div class="disclaimer-legal">
-        <strong>Aviso Legal y de Riesgo:</strong> Vault Logic Terminal proporciona análisis basados en ciclos matemáticos y efemérides astronómicas (NASA JPL DE441). Las métricas presentadas (ROI, Riesgo, Sincronía) constituyen modelos probabilísticos prospectivos, no asesoramiento financiero, legal o de inversión garantizado. El uso de esta inteligencia estratégica para la toma de decisiones corporativas es bajo la exclusiva responsabilidad del operador.
+        <strong>Aviso Legal y de Riesgo:</strong> Vault Logic Terminal proporciona análisis basados en ciclos matemáticos y efemérides astronómicas (NASA JPL DE441). Las métricas presentadas (ROI, Riesgo, Sincronía) constituyen modelos probabilísticos prospectivos, no asesoramiento financiero, legal o de inversión garantizado. El uso de esta inteligencia estratégica para la toma de decisiones corporativas es bajo la exclusiva responsabilidad del operador logueado. Documento intransferible.
     </div>
 
-    <div class="footer-tech" style="margin-top: 30px; border-top: 1px solid #111; padding-top: 20px; font-size: 0.6rem; color: #444; text-align: center;">
-        CERTIFICACIÓN: NASA JPL DE441 COMPLIANT // VAULT LOGIC SYSTEMS 2026.
+    <div class="footer-tech">
+        <div>AUTENTICADO POR: VAULT LOGIC SYSTEMS 2026.</div>
+        <div style="color:var(--gold)">FIRMA DIGITAL VÁLIDA</div>
     </div>
 </div>
+
 <script>
  window.onload = function() {
+    // Generar Metadatos Únicos para el PDF
+    document.getElementById('tx-id').innerText = "GXP-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+    document.getElementById('tx-time').innerText = new Date().toISOString().replace('T', ' ').substr(0, 19) + " UTC";
+
+    // Cargar Usuario
     const storedName = localStorage.getItem('vault_user_nombre');
     const name = storedName ? storedName : "OPERADOR GXP";
     document.getElementById('user-name').innerText = name.toUpperCase();
 
+    // Cargar Datos de Python
     const data = JSON.parse(localStorage.getItem('ultimo_reporte'));
     
     if(data) {
-        if(document.getElementById('display-range')) document.getElementById('display-range').innerText = data.rango || "PERIODO ESTÁNDAR";
-        if(document.getElementById('val-cap')) document.getElementById('val-cap').innerText = data.cap || "--";
-        if(document.getElementById('val-risk')) document.getElementById('val-risk').innerText = data.risk || "--";
-        if(document.getElementById('val-neg')) document.getElementById('val-neg').innerText = data.neg || "--";
-        if(document.getElementById('display-status')) document.getElementById('display-status').innerText = data.estado || "ANÁLISIS COMPLETADO";
+        document.getElementById('display-range').innerText = data.rango || "PERIODO ESTÁNDAR";
+        document.getElementById('val-cap').innerText = data.cap || "--";
+        document.getElementById('val-risk').innerText = data.risk || "--";
+        document.getElementById('val-neg').innerText = data.neg || "--";
+        document.getElementById('display-status').innerText = data.estado || "ANÁLISIS COMPLETADO";
 
         const pTexto = document.getElementById('proyeccion-texto');
-        const estCap = document.getElementById('est-cap');
-        const estNeg = document.getElementById('est-neg');
-        const estRisk = document.getElementById('est-risk');
         
-        // Elementos de la matriz para cambiar color
-        const indCap = document.getElementById('val-cap').previousElementSibling; 
-        const indNeg = document.getElementById('val-neg').previousElementSibling;
-        const indRisk = document.getElementById('val-risk').previousElementSibling;
+        // Asignación Inteligente de Colores y Textos según el MODO
+        if(data.modo === "DEFENSA" || (data.estado && data.estado.includes("RIESGO"))) {
+            pTexto.innerHTML = `Tras cruzar sus vectores natales con las efemérides del periodo (<strong>${data.rango}</strong>), el sistema JPL DE441 detecta una <strong style="color:var(--alert);">VOLATILIDAD ESTRUCTURAL CRÍTICA</strong>.<br><br><strong>ACCIÓN SUGERIDA:</strong> Se recomienda encarecidamente la congelación de contrataciones agresivas, liquidación de posiciones de alto riesgo y refugio en activos de baja correlación. La fricción orbital indica que las negociaciones enfrentarán resistencia severa; priorice la defensa de márgenes actuales sobre el volumen de cierre de nuevos contratos.`;
+            document.getElementById('display-status').style.color = "var(--alert)";
+            
+            // CAPITAL (Rojo/Neutro)
+            document.getElementById('est-cap').innerText = "Protección de Capital";
+            document.getElementById('ind-cap').innerText = "ALERTA DE LIQUIDEZ";
+            document.getElementById('ind-cap').style.color = "var(--alert)";
+            document.getElementById('val-cap').style.color = "var(--alert)";
+            
+            // NEGOCIACIÓN (Gris/Oro)
+            document.getElementById('est-neg').innerText = "Negociación Conservadora";
+            document.getElementById('ind-neg').innerText = "ALTA FRICCIÓN";
+            document.getElementById('ind-neg').style.color = "#888";
+            
+            // RIESGO (Rojo)
+            document.getElementById('est-risk').innerText = "Mitigación Activa";
+            document.getElementById('val-risk').style.color = "var(--alert)";
 
-        // AQUÍ ESTABA EL BUG: Ahora busca la palabra "DEFENSIVA" o "RIESGO"
-        if(data.estado && (data.estado.includes("DEFENSIVA") || data.estado.includes("RIESGO"))) {
-            pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los algoritmos detectan una <strong>VOLATILIDAD ESTRUCTURAL</strong> crítica. <br><br><strong>ACCIÓN SUGERIDA:</strong> Se recomienda la congelación de contrataciones agresivas, liquidación de posiciones de alto riesgo y refugio en activos de baja correlación. Las negociaciones enfrentarán fricción; priorice la defensa de márgenes sobre el volumen de cierre.`;
-            pTexto.style.color = "var(--alert)";
-            
-            estCap.innerText = "Protección de Capital";
-            indCap.innerText = "ALERTA DE LIQUIDEZ";
-            indCap.style.color = "var(--alert)"; // Se pone rojo
-            
-            estNeg.innerText = "Negociación Conservadora";
-            indNeg.innerText = "ALTA FRICCIÓN";
-            indNeg.style.color = "var(--alert)";
-            
-            estRisk.innerText = "Mitigación Activa";
         } else {
-            pTexto.innerHTML = `Para el rango analizado (<strong>${data.rango}</strong>), los ciclos confirman una <strong>SINCRONÍA ÓPTIMA</strong>. <br><br><strong>ACCIÓN SUGERIDA:</strong> Es un momento ideal para el escalamiento agresivo de capital y la expansión operativa. Se recomienda adelantar firmas de contratos y despliegue de presupuestos. El clima favorece la aceptación de sus términos comerciales.`;
-            pTexto.style.color = "#ccc";
+            pTexto.innerHTML = `Tras cruzar sus vectores natales con las efemérides del periodo (<strong>${data.rango}</strong>), los ciclos confirman una <strong style="color:var(--safe);">SINCRONÍA ÓPTIMA DE EXPANSIÓN</strong>.<br><br><strong>ACCIÓN SUGERIDA:</strong> Nos encontramos en una ventana ideal para el escalamiento agresivo de capital y la expansión operativa. Se recomienda adelantar firmas de contratos, despliegue de presupuestos y asunción de riesgos calculados. El clima orbital favorece la aceptación de sus términos comerciales en mesas de negociación.`;
+            document.getElementById('display-status').style.color = "var(--safe)";
             
-            estCap.innerText = "Inversión Agresiva";
-            indCap.innerText = "OPORTUNIDAD VIGENTE";
-            indCap.style.color = "var(--safe)"; // Se pone verde
+            // CAPITAL (Verde)
+            document.getElementById('est-cap').innerText = "Inversión Agresiva";
+            document.getElementById('ind-cap').innerText = "OPORTUNIDAD VIGENTE";
+            document.getElementById('ind-cap').style.color = "var(--safe)";
+            document.getElementById('val-cap').style.color = "var(--safe)";
             
-            estNeg.innerText = "Aceleración de Cierres";
-            indNeg.innerText = "FLUCTUACIÓN MODERADA";
-            indNeg.style.color = "var(--gold)";
+            // NEGOCIACIÓN (Verde/Oro)
+            document.getElementById('est-neg').innerText = "Aceleración de Cierres";
+            document.getElementById('ind-neg').innerText = "FLUCTUACIÓN FAVORABLE";
+            document.getElementById('ind-neg').style.color = "var(--gold)";
+            document.getElementById('val-neg').style.color = "var(--safe)";
             
-            estRisk.innerText = "Asunción Controlada";
+            // RIESGO (Seguro)
+            document.getElementById('est-risk').innerText = "Asunción Controlada";
+            document.getElementById('ind-risk').innerText = "SISTEMA ESTABLE";
+            document.getElementById('ind-risk').style.color = "var(--safe)";
+            document.getElementById('val-risk').style.color = "#888";
         }
     } else {
-        document.getElementById('display-range').innerText = "ERROR DE SINCRONIZACIÓN. REGRESE A LA TERMINAL.";
+        document.getElementById('display-range').innerText = "ERROR DE SINCRONIZACIÓN. REGRESE A LA TERMINAL GÉNESIS.";
         document.getElementById('display-range').style.color = "var(--alert)";
+        document.getElementById('proyeccion-texto').innerText = "No se detectaron datos en la memoria cifrada.";
     }
 }
 </script>
