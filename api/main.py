@@ -47,7 +47,26 @@ class SimulacionRequest(BaseModel):
     fecha_inicio: str
     fecha_fin: str
 
+# --- NUEVA ESTRUCTURA PARA RECIBIR PAGOS ---
+class UpgradeRequest(BaseModel):
+    email: str
+    nivel_suscripcion: str
+
 # 4. RUTAS DEL SISTEMA
+
+# --- NUEVA RUTA: ACTUALIZACIÓN TRAS EL PAGO EN PAYPAL ---
+@app.post("/upgrade_nivel")
+async def upgrade_nivel(req: UpgradeRequest):
+    if not supabase:
+        return {"status": "error", "mensaje": "Base de datos desconectada"}
+    try:
+        # Busca al usuario por su email y le cambia el nivel (EJ: de FREE a EXECUTIVE)
+        response = supabase.table("clientes_vip").update({"nivel_suscripcion": req.nivel_suscripcion}).eq("email", req.email).execute()
+        return {"status": "success", "mensaje": f"Nivel actualizado a {req.nivel_suscripcion}"}
+    except Exception as e:
+        return {"status": "error", "mensaje": str(e)}
+
+
 @app.post("/consultar")
 async def consultar(data: LoginData):
     if not supabase:
@@ -100,11 +119,9 @@ async def obtener_perfil(req: PerfilRequest):
     except Exception as e:
         return {"status": "error"}
 
+
 # ==========================================
-# NUEVO MOTOR MATEMÁTICO: SIMULADOR DE CICLOS
-# ==========================================
-# ==========================================
-# NUEVO MOTOR MATEMÁTICO: SIMULADOR DE CICLOS DE 7 PUNTOS
+# MOTOR MATEMÁTICO: SIMULADOR DE CICLOS DE 7 PUNTOS
 # ==========================================
 @app.post("/simular_periodo")
 async def simular_periodo(req: SimulacionRequest):
@@ -127,7 +144,7 @@ async def simular_periodo(req: SimulacionRequest):
 
         if not vectores:
             seed = sum(ord(c) for c in req.email)
-            vectores = { "SOL": (seed % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360) }
+            vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360) }
 
         # Cálculos de Tiempo
         f_inicio = datetime.strptime(req.fecha_inicio, "%Y-%m-%d")
@@ -138,6 +155,7 @@ async def simular_periodo(req: SimulacionRequest):
         jupiter_natal = vectores.get("JUPITER", 0)
         saturno_natal = vectores.get("SATURNO", 0)
         sol_natal = vectores.get("SOL", 0)
+        luna_natal = vectores.get("LUNA", 0)
 
         # Cálculo Global del Mes
         ciclo_jupiter = math.sin(math.radians(((dias_desde_2000 % 4332) / 4332 * 360) - jupiter_natal))
@@ -150,26 +168,22 @@ async def simular_periodo(req: SimulacionRequest):
 
         is_risk = val_risk < -5 or val_cap < 0
 
-        # NUEVO: CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS
-     # NUEVO: CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS (CON VOLATILIDAD SOLAR)
+        # CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS (CON VOLATILIDAD LUNAR Y SOLAR)
         curva_exacta = []
         for i in range(7):
-            # Calculamos el día exacto de este segmento
             dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
             
-            # Titanes (Macro tendencia) + Sol (Volatilidad Diaria)
             c_jup = math.sin(math.radians(((dia_segmento % 4332) / 4332 * 360) - jupiter_natal))
             c_sat = math.cos(math.radians(((dia_segmento % 10759) / 10759 * 360) - saturno_natal))
-            c_sol = math.sin(math.radians(((dia_segmento % 365) / 365 * 360) - sol_natal)) # Latido rápido
+            c_sol = math.sin(math.radians(((dia_segmento % 365) / 365 * 360) - sol_natal))
+            c_luna = math.sin(math.radians(((dia_segmento % 28) / 28 * 360) - luna_natal)) # Volatilidad alta
             
             if is_risk:
-                # Saturno sube el riesgo, el Sol le da la forma de ola (+/- 15 puntos)
-                punto = int(50 + (c_sat * 25) - (c_jup * 10) + (c_sol * 15)) 
+                punto = int(50 + (c_sat * 25) - (c_jup * 10) + (c_sol * 10) + (c_luna * 15)) 
             else:
-                # Júpiter sube la sincronía, el Sol le da la forma de ola (+/- 15 puntos)
-                punto = int(50 + (c_jup * 25) - (c_sat * 10) + (c_sol * 15))
+                punto = int(50 + (c_jup * 25) - (c_sat * 10) + (c_sol * 10) + (c_luna * 15))
                 
-            punto = max(5, min(100, punto)) # Mantenemos el score entre 5 y 100
+            punto = max(5, min(100, punto))
             curva_exacta.append(punto)
 
         if is_risk:
@@ -189,7 +203,7 @@ async def simular_periodo(req: SimulacionRequest):
                 "estrategia": estrategia,
                 "directiva": directiva,
                 "modo": modo,
-                "curva_exacta": curva_exacta, # <--- ENVIAMOS LOS 7 PUNTOS AL HTML
+                "curva_exacta": curva_exacta,
                 "rango": f"{req.fecha_inicio} A {req.fecha_fin}"
             }
         }
