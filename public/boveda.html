@@ -2,306 +2,258 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Vault Logic | Terminal Génesis</title>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<title>Vault Logic | Terminal de Análisis</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
+  body { background: #0a0a0a; margin: 0; }
+  .vl-panel { background: #0a0a0a; color: #e8e8e0; font-family: 'Share Tech Mono', monospace; min-height: 100vh; padding: 24px; position: relative; overflow-x: hidden; }
+  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(180,140,40,0.07) 0%, transparent 70%); pointer-events: none; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(180,140,40,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(180,140,40,0.04) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+  .panel-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
   
-  .vl-panel { position: relative; padding: 24px; min-height: 100vh; }
-  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(212, 175, 55, 0.1) 0%, transparent 70%); pointer-events: none; }
-  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid rgba(180,140,40,0.2); padding-bottom: 16px; }
+  .header-left .label { font-size: 10px; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 36px; font-weight: 700; color: #fff; letter-spacing: 4px; line-height: 1; text-transform: uppercase; }
+  .header-left .birthdata { font-size: 11px; color: #C9A84C; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  .header-right { text-align: right; }
+  .sync-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,200,100,0.08); border: 1px solid rgba(0,200,100,0.25); padding: 4px 12px; font-size: 10px; letter-spacing: 2px; color: #00c864; margin-bottom: 8px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c864; animation: pulse-green 2s infinite; }
+  @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: left; }
+  .status-grid .sk { color: #555; letter-spacing: 1px; }
+  .status-grid .sv { color: #C9A84C; font-weight: bold; }
+  .status-grid .sv.free { color: #888; }
+  .status-grid .sv.stable { color: #00c864; }
 
-  .panel-container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+  .main-grid { display: grid; grid-template-columns: 260px 1fr 260px; gap: 24px; margin-bottom: 24px; align-items: stretch; }
+  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 20px; } .header-right { text-align: left; } }
 
-  nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; margin-bottom: 30px; }
-  .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 4px; color: #fff; }
-  .logo span { color: #d4af37; font-weight: 400; font-size: 14px; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; margin-left: 10px; border: 1px solid #d4af37; padding: 2px 8px; background: rgba(212,175,55,0.1);}
-  .btn-logout { background: transparent; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); padding: 8px 16px; font-family: inherit; cursor: pointer; transition: 0.3s; }
-  .btn-logout:hover { background: rgba(255,77,77,0.1); }
+  .panel-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.15); padding: 18px; display: flex; flex-direction: column;}
+  .box-title { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid rgba(180,140,40,0.1); padding-bottom: 6px; }
+
+  .vector-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .vector-row:last-child { border-bottom: none; }
+  .vector-name { color: #777; letter-spacing: 1px; display: flex; align-items: center; }
+  .planet-dot { width: 6px; height: 6px; border-radius: 50%; background: #C9A84C; margin-right: 8px; }
+  .vector-val { color: #C9A84C; font-weight: bold; }
+
+  .chart-container { display: flex; align-items: center; justify-content: center; position: relative; padding: 20px 0;}
+  .chart-canvas-wrap { position: relative; width: 100%; max-width: 500px; display: flex; justify-content: center;}
+  .orbit-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #555; letter-spacing: 3px; white-space: nowrap; }
+
+  .right-col { display: flex; flex-direction: column; gap: 24px; }
+  .sync-index { text-align: center; padding: 20px 14px; }
+  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 56px; font-weight: 700; color: #C9A84C; line-height: 1; display: block; margin-top: 10px;}
+  .sync-label { font-size: 9px; color: #555; letter-spacing: 2px; margin-top: 4px; }
+  .arc-wrap { display: flex; justify-content: center; margin: 10px 0; }
+
+  .transit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .transit-row:last-child { border-bottom: none; }
+  .transit-planet { color: #999; letter-spacing: 1px; }
+  .tag { padding: 3px 8px; font-size: 9px; letter-spacing: 1px; }
+  .tag-fav { background: rgba(0,200,100,0.1); color: #00c864; border: 1px solid rgba(0,200,100,0.2); }
+  .tag-tens { background: rgba(220,60,60,0.1); color: #e05555; border: 1px solid rgba(220,60,60,0.2); }
+  .tag-neut { background: rgba(180,140,40,0.1); color: #C9A84C; border: 1px solid rgba(180,140,40,0.2); }
+
+  .bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  .metric-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(180,140,40,0.12); padding: 16px 20px; }
+  .metric-label { font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase;}
+  .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; filter: blur(4px); user-select:none; }
+  .metric-value.pos { color: #00c864; } .metric-value.neg { color: #e05555; } .metric-value.neu { color: #C9A84C; }
+  .metric-bar { height: 2px; margin-top: 12px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
+  .metric-fill { height: 100%; border-radius: 1px; }
+  .fill-green { background: #00c864; width: 0%; } .fill-red { background: #e05555; width: 0%;} .fill-gold { background: #C9A84C; width: 0%;}
+
+  .directiva-box { background: rgba(180,140,40,0.05); border: 1px solid rgba(180,140,40,0.2); border-left: 3px solid #C9A84C; padding: 20px; margin-bottom: 24px; }
+  .directiva-label { font-size: 10px; color: #C9A84C; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase;}
+  .directiva-text { font-size: 13px; color: #aaa; line-height: 1.6; }
+  .blocked-items { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .blocked-item { display: flex; align-items: center; gap: 12px; font-size: 11px; padding: 10px 14px; border: 1px dashed rgba(180,140,40,0.2); background: rgba(0,0,0,0.3); }
+  .blocked-icon { font-size: 14px; }
+  .blocked-text { color: #777; letter-spacing: 1px; }
+  .blocked-badge { margin-left: auto; font-size: 9px; padding: 3px 10px; background: rgba(180,140,40,0.1); color: #C9A84C; border: 1px solid rgba(180,140,40,0.2); letter-spacing: 2px; }
+
+  .cta-btn { display: block; width: 100%; background: #C9A84C; color: #0a0a0a; border: none; padding: 18px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; letter-spacing: 4px; cursor: pointer; text-transform: uppercase; text-decoration: none; text-align: center; transition: background 0.3s;}
+  .cta-btn:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212,175,55,0.3);}
+  .cta-sub { text-align: center; font-size: 10px; color: #555; margin-top: 10px; letter-spacing: 2px; }
   
-  .header { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: flex-end;}
-  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 42px; font-weight: 700; color: #d4af37; letter-spacing: 3px; text-transform: uppercase; line-height: 1;}
-  .header-left .birthdata { font-size: 11px; color: #aaa; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; }
-  
-  .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: right; }
-  .status-grid .sk { color: #666; letter-spacing: 1px; }
-  .status-grid .sv { color: #d4af37; font-weight: bold; }
-
-  .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; margin-bottom: 24px; align-items: stretch; }
-  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .header{flex-direction:column; gap:15px; align-items:flex-start;} .status-grid{text-align:left;} }
-
-  .panel-box { background: rgba(15,15,15,0.8); border: 1px solid rgba(212,175,55,0.2); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
-  .box-title { font-size: 11px; letter-spacing: 3px; color: #d4af37; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px; }
-
-  .horizon-picker { background: rgba(0,0,0,0.5); padding: 15px; display: flex; gap: 15px; align-items: flex-end; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 24px;}
-  .input-group { display: flex; flex-direction: column; gap: 5px; }
-  .input-label { font-size: 9px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
-  input[type="date"] { background: #111; color: #d4af37; border: 1px solid #333; padding: 10px; font-family: inherit; font-size: 12px; outline: none; border-radius: 2px;}
-  input[type="date"]:focus { border-color: #d4af37; }
-  .btn-search { background: #d4af37; color: #000; border: none; padding: 0 25px; font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase; height: 37px; transition: 0.3s; letter-spacing: 2px;}
-  .btn-search:hover { background: #fff; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
-
-  .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-  .metric-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; text-align: center; transition: 0.3s;}
-  .metric-card.safe { border-top: 3px solid #00c864; background: rgba(0,200,100,0.05);}
-  .metric-card.warn { border-top: 3px solid #ff4d4d; background: rgba(255,77,77,0.05);}
-  .metric-card.neutral { border-top: 3px solid #d4af37; background: rgba(212,175,55,0.05);}
-  .m-label { font-size: 9px; color: #888; letter-spacing: 2px; display: block; margin-bottom: 8px;}
-  .m-val { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #fff;}
-
-  .directiva-box { background: rgba(212,175,55,0.05); border-left: 4px solid #d4af37; padding: 20px; margin-top: 20px; }
-  .directiva-text { font-size: 14px; color: #ddd; line-height: 1.6; }
-
-  .btn-dossier { display: block; width: 100%; background: #d4af37; color: #000; border: none; padding: 18px; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 4px; text-transform: uppercase; text-decoration: none; text-align: center; transition: 0.3s; margin-top: 24px;}
-  .btn-dossier:hover { background: #FFF5D1; box-shadow: 0 0 20px rgba(212,175,55,0.3);}
-
-  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #d4af37; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
-  
-  /* DISEÑO DEL BOTÓN DE AYUDA (TOOLTIP) */
-  .info-tooltip { position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #888; font-size: 10px; font-weight: bold; font-family: 'Inter', sans-serif; margin-left: 10px; border: 1px solid #444; border-radius: 50%; width: 16px; height: 16px; transition: 0.3s;}
-  .info-tooltip:hover { border-color: #d4af37; color: #d4af37; }
-  .info-tooltip .tooltip-text { visibility: hidden; width: 280px; background-color: rgba(10,10,10,0.95); backdrop-filter: blur(10px); color: #ccc; text-align: left; border-radius: 4px; padding: 15px; position: absolute; z-index: 100; bottom: 150%; left: 50%; transform: translateX(-50%); border: 1px solid #d4af37; box-shadow: 0 10px 30px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; font-family: 'Inter', sans-serif; font-size: 11px; text-transform: none; letter-spacing: 0; line-height: 1.5; font-weight: normal;}
-  .info-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
-  .info-tooltip .tooltip-text strong { color: #d4af37; }
-  .info-tooltip .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #d4af37 transparent transparent transparent; }
-
-  /* REGLAS DE ADAPTACIÓN PARA MÓVILES Y TABLETS */
-  @media (max-width: 768px) {
-      .header-left .name { font-size: 28px; }
-      .horizon-picker { flex-direction: column; align-items: stretch; }
-      .btn-search { width: 100%; margin-top: 10px; }
-      .metrics-grid { grid-template-columns: 1fr; gap: 10px; }
-      .main-grid { grid-template-columns: 1fr; }
-      .status-grid { grid-template-columns: 1fr; text-align: left; gap: 8px;}
-      .vl-panel { padding: 15px; }
-  }
+  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; color: #C9A84C; letter-spacing: 4px; }
 </style>
 </head>
 <body>
 
-<div id="loading-screen">INICIALIZANDO GÉNESIS COMMAND...</div>
+<div id="loading-screen">SINCRO NÚCLEO JPL...</div>
 
 <div class="vl-panel" style="display: none;" id="panel-content">
   <div class="grid-bg"></div>
+
   <div class="panel-container">
       
-      <nav>
-        <div class="logo">VAULT LOGIC <span>GÉNESIS TERMINAL</span></div>
-        <button onclick="localStorage.removeItem('vault_user_email'); window.location.href='portal.html'" class="btn-logout">CERRAR SESIÓN</button>
-      </nav>
-
       <div class="header">
         <div class="header-left">
-          <div style="font-size: 10px; color: #666; letter-spacing: 3px;">COMANDANTE ESTRATÉGICO</div>
+          <div class="label">Sujeto de análisis</div>
           <div class="name" id="nombre-display">---</div>
           <div class="birthdata" id="datos-display">---</div>
         </div>
-        <div class="status-grid">
-          <span class="sk">NÚCLEO</span><span class="sv">DE441 ONLINE</span>
-          <span class="sk">STATUS</span><span class="sv" id="user-status">SINCRONIZANDO</span>
-          <span class="sk">HORA</span><span class="sv" id="clock" style="color:#fff">00:00:00</span>
+        <div class="header-right">
+          <div class="sync-badge"><span class="sync-dot"></span> NASA JPL DE441 // SINCRO ACTIVA</div>
+          <div class="status-grid">
+            <span class="sk">CONEXIÓN</span><span class="sv stable">ESTABLE</span>
+            <span class="sk">AUTH</span><span class="sv free" id="auth-display">FREE</span>
+            <span class="sk">GEO</span><span class="sv" id="geo-display">LAT: --</span>
+            <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
+          </div>
         </div>
       </div>
 
       <div class="main-grid">
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-            <div class="panel-box">
-                <div class="box-title">Tendencia Decenal (Macro)</div>
-                <div id="chart-mini-trend" style="min-height: 180px;"></div>
-            </div>
-            
-            <div class="panel-box" style="flex-grow: 1;">
-                <div class="box-title">Distribución de Recursos GXP</div>
-                <div id="chart-donut" style="display: flex; justify-content: center; align-items: center; flex-grow: 1;"></div>
-            </div>
+        <div class="panel-box">
+          <div class="box-title">Vectores Natales</div>
+          <div id="vectores-lista" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;"></div>
         </div>
 
-        <div class="panel-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; margin-bottom: 20px;">
-               <div class="box-title" style="border: none; padding: 0; margin: 0; display:flex; align-items:center;">
-                SIMULADOR DE HORIZONTE CORPORATIVO
-                <div class="info-tooltip">?
-                    <span class="tooltip-text">
-                        <strong>CÓMO LEER ESTA GRÁFICA:</strong><br><br>
-                        <strong>Eje X (S1 - S7):</strong> Divide el rango de tiempo seleccionado en 7 segmentos iguales para mostrar la evolución temporal.<br><br>
-                        <strong>Eje Y (0 - 100):</strong> Mide la Intensidad del Ciclo. Un valor alto indica que la fuerza orbital (de expansión o de riesgo) estará en su punto máximo en ese momento.
-                    </span>
-                </div>
-            </div>
-                
-                <div class="horizon-picker" style="margin: 0; padding: 10px;">
-                    <div class="input-group">
-                        <span class="input-label">INICIO HORIZONTE</span>
-                        <input type="date" id="date-start">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-label">CIERRE ESTIMADO</span>
-                        <input type="date" id="date-end">
-                    </div>
-                    <button class="btn-search" onclick="sincronizarPanel()">SYNC</button>
-                </div>
-            </div>
+        <div class="chart-container">
+          <div class="chart-canvas-wrap">
+            <div class="orbit-label">CARTA NATAL // POSICIÓN ORBITAL</div>
+            <canvas id="orbitCanvas" width="460" height="460"></canvas>
+          </div>
+        </div>
 
-            <div class="metrics-grid">
-                <div class="metric-card" id="card-cap">
-                <span class="m-label">POTENCIAL CAPITAL</span>
-                <span class="m-val" id="roi-cap">--%</span>
-                </div>
-                <div class="metric-card" id="card-neg">
-                <span class="m-label">CLIMA DE NEGOCIACIÓN</span>
-                <span class="m-val" id="roi-neg">--%</span>
-                </div>
-                <div class="metric-card" id="card-risk">
-                <span class="m-label">EXPOSICIÓN AL RIESGO</span>
-                <span class="m-val" id="roi-risk">--%</span>
-                </div>
-            </div>
+        <div class="right-col">
+          <div class="panel-box sync-index">
+            <div class="box-title">Índice de Sincronía</div>
+            <div class="arc-wrap"><canvas id="arcCanvas" width="140" height="80"></canvas></div>
+            <span class="sync-number" id="sync-score">--</span>
+            <div class="sync-label">/ 100 — MODERADO</div>
+          </div>
 
-            <div id="main-focus-chart" style="min-height: 280px; width: 100%; margin-top: 10px;"></div>
-            
-            <div style="text-align: center; border-top: 1px solid #222; padding-top: 10px; margin-top: -15px; margin-bottom: 20px;">
-                <span style="font-size: 8px; color: #555; letter-spacing: 2px; text-transform: uppercase;">
-                    <b style="color:#d4af37">TENDENCIA MACRO:</b> TITANES ORBITALES (JUP/SAT) &nbsp;&nbsp;//&nbsp;&nbsp; <b style="color:#d4af37">VOLATILIDAD (OLA):</b> TRÁNSITO SOLAR
-                </span>
-            </div>
-
-            <div class="directiva-box" id="executive-translation" style="display: none;">
-                <div style="font-size: 10px; color: #d4af37; letter-spacing: 3px; margin-bottom: 8px;">TRADUCTOR OPERATIVO IA</div>
-                <div class="directiva-text" id="translation-text">Esperando sincronización...</div>
-            </div>
-
-            <button onclick="descargarDossier()" class="btn-dossier">EXTRAER DOSSIER ESTRATÉGICO GX-2026</button>
+          <div class="panel-box" style="flex-grow: 1;">
+            <div class="box-title">Tránsitos Activos Hoy</div>
+            <div class="transit-row"><span class="transit-planet">JUPITER</span><span class="tag tag-fav">FAVORABLE</span></div>
+            <div class="transit-row"><span class="transit-planet">SATURNO</span><span class="tag tag-tens">TENSO</span></div>
+            <div class="transit-row"><span class="transit-planet">MERCURIO</span><span class="tag tag-neut">NEUTRO</span></div>
+            <div class="transit-row"><span class="transit-planet">MARTE</span><span class="tag tag-fav">FAVORABLE</span></div>
+          </div>
         </div>
       </div>
 
-  </div>
+      <div class="bottom-grid">
+        <div class="metric-card">
+          <div class="metric-label">Capital GXP</div>
+          <div class="metric-value pos">+22.4%</div>
+          <div class="metric-bar"><div class="metric-fill fill-green"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Negociación</div>
+          <div class="metric-value neu">+12.1%</div>
+          <div class="metric-bar"><div class="metric-fill fill-gold"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Ventana de Riesgo</div>
+          <div class="metric-value neg">-17.8%</div>
+          <div class="metric-bar"><div class="metric-fill fill-red"></div></div>
+          <div style="font-size:10px;color:#555;margin-top:8px;letter-spacing:1px;">🔒 REQUIERE UPGRADE</div>
+        </div>
+      </div>
+
+      <div class="directiva-box">
+        <div class="directiva-label">Directiva IA // Proyección 90 días</div>
+        <div class="directiva-text">Los vectores de sincronización iniciales indican un potencial no explotado. Júpiter en tránsito activa su sector de expansión en los próximos 18 días. Para análisis completo de volatilidades y oportunidades corporativas, proceda al upgrade.</div>
+        <div class="blocked-items">
+          <div class="blocked-item">
+            <span class="blocked-icon" style="color:#e05555;">⚠</span><span class="blocked-text">Ventana de vulnerabilidad en sector financiero</span><span class="blocked-badge">BLOQUEADO</span>
+          </div>
+          <div class="blocked-item">
+            <span class="blocked-icon" style="color:#00c864;">◆</span><span class="blocked-text">Ciclo de alta sincronía para cierre de negociaciones</span><span class="blocked-badge">BLOQUEADO</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="suscripcion.html" id="btn-upgrade" class="cta-btn">⬡ Desbloquear Terminal Génesis</a>
+      <div class="cta-sub">Acceso inmediato // AES-256 Encriptado // Inteligencia VIP</div>
+
+  </div> 
 </div>
 
 <script>
-let mainChart, miniChart, donutChart;
+function drawOrbit(vectoresReales) {
+    const canvas = document.getElementById('orbitCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = 460, H = 460, cx = W/2, cy = H/2 + 10, R = 170; 
+    const colores = { "SOL": "#FFD700", "LUNA": "#C0C0C0", "MARTE": "#E05555", "VENUS": "#C9A84C", "JUPITER": "#E8C87A", "SATURNO": "#A89060", "MERCURIO": "#88AACC" };
+    
+    const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
+    function degToRad(d) { return (d - 90) * Math.PI / 180; }
 
-function initCharts() {
-    mainChart = new ApexCharts(document.querySelector("#main-focus-chart"), {
-        series: [{ name: 'Sincronía GXP', data: [0, 0, 0, 0, 0, 0, 0] }],
-        chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent', animations: { enabled: true, easing: 'easeinout', speed: 800 } },
-        colors: ['#d4af37'],
-        stroke: { width: 3, curve: 'smooth' },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.05 } },
-        theme: { mode: 'dark' },
-        xaxis: { categories: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'], labels: { style: { colors: '#666', fontFamily: 'Share Tech Mono' } } },
-        yaxis: { labels: {style: {colors: '#666', fontFamily: 'Share Tech Mono'}} },
-        grid: { borderColor: '#222', strokeDashArray: 4 }
-    });
-    mainChart.render();
+    ctx.clearRect(0, 0, W, H);
 
-    miniChart = new ApexCharts(document.querySelector("#chart-mini-trend"), {
-        series: [{ name: 'Tendencia Global', data: [35, 45, 30, 95, 60, 70, 85, 120, 150, 130] }],
-        chart: { type: 'area', height: 180, toolbar: { show: false } },
-        colors: ['#d4af37'],
-        xaxis: { 
-            categories: ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035'],
-            labels: { style: { colors: '#666', fontFamily: 'Share Tech Mono', fontSize: '9px' } }
-        },
-        yaxis: { show: false },
-        grid: { show: false },
-        fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
-        tooltip: { theme: 'dark' }
-    });
-    miniChart.render();
-
-    donutChart = new ApexCharts(document.querySelector("#chart-donut"), {
-        series: [60, 25, 15],
-        chart: { type: 'donut', height: 220 },
-        labels: ['ESTRATEGIA', 'OPERACIÓN', 'RECUPERACIÓN'],
-        colors: ['#d4af37', '#333', '#111'],
-        stroke: { colors: ['#0a0a0a'] },
-        legend: { position: 'bottom', labels: { colors: '#888' }, fontFamily: 'Share Tech Mono' },
-        dataLabels: { style: { fontFamily: 'Share Tech Mono', fontWeight: 'bold' } }
-    });
-    donutChart.render();
-}
-
-async function sincronizarPanel() {
-    const status = document.getElementById('user-status');
-    const startInput = document.getElementById('date-start').value;
-    const endInput = document.getElementById('date-end').value;
-    const email = localStorage.getItem('vault_user_email');
-
-    if (!startInput || !endInput || !email) return;
-
-    const startDate = new Date(startInput);
-    const endDate = new Date(endInput);
-
-    if (startDate >= endDate) {
-        status.innerText = "ERROR DE SINCRONÍA";
-        status.style.color = "var(--alert)";
-        alert("ANOMALÍA TEMPORAL DETECTADA: La fecha de inicio no puede ser mayor o igual a la fecha de cierre.");
-        return;
+    for (let i = 1; i <= 3; i++) {
+        ctx.beginPath(); ctx.arc(cx, cy, R * i/3, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(180,140,40,${0.06 - i*0.01})`; ctx.stroke();
     }
+    for (let i = 0; i < 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        ctx.beginPath(); ctx.moveTo(cx + (R+10)*Math.cos(a), cy + (R+10)*Math.sin(a)); ctx.lineTo(cx + (R+16)*Math.cos(a), cy + (R+16)*Math.sin(a));
+        ctx.strokeStyle = 'rgba(180,140,40,0.15)'; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.strokeStyle = 'rgba(180,140,40,0.25)'; ctx.stroke();
 
-    status.innerText = "SINTETIZANDO NÚCLEO...";
-    status.style.color = "#d4af37";
-    document.getElementById('executive-translation').style.display = 'none';
+    const pts = planets.map(p => { const a = degToRad(p.deg); return { x: cx + R*Math.cos(a), y: cy + R*Math.sin(a), p }; });
 
-    try {
-        const response = await fetch("https://vault-strategy-api.onrender.com/simular_periodo", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                email: email,
-                fecha_inicio: startInput,
-                fecha_fin: endInput
-            })
-        });
-        const res = await response.json();
+    pts.forEach(pt => {
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pt.x, pt.y);
+        ctx.strokeStyle = 'rgba(201,168,76,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
+    });
 
-        if (res.status === "success") {
-            const data = res.datos;
-
-            document.getElementById('roi-cap').innerText = data.cap;
-            document.getElementById('roi-neg').innerText = data.neg;
-            document.getElementById('roi-risk').innerText = data.risk;
-            document.getElementById('translation-text').innerHTML = data.directiva;
-            
-            if (data.modo === "DEFENSA") {
-                status.innerText = "MODO: DEFENSA";
-                status.style.color = "#ff4d4d";
-                document.getElementById('card-cap').className = "metric-card warn";
-                document.getElementById('card-neg').className = "metric-card neutral";
-                document.getElementById('card-risk').className = "metric-card warn";
-                
-                mainChart.updateSeries([{ name: 'Intensidad de Riesgo', data: data.curva_exacta }]);
-                mainChart.updateOptions({ colors: ['#ff4d4d'] });
-            } else {
-                status.innerText = "MODO: EXPANSIÓN";
-                status.style.color = "#00c864";
-                document.getElementById('card-cap').className = "metric-card safe";
-                document.getElementById('card-neg').className = "metric-card safe";
-                document.getElementById('card-risk').className = "metric-card safe";
-                
-                mainChart.updateSeries([{ name: 'Fuerza de Sincronía', data: data.curva_exacta }]);
-                mainChart.updateOptions({ colors: ['#00c864'] });
+    for (let i = 0; i < pts.length; i++) {
+        for (let j = i+1; j < pts.length; j++) {
+            const diff = Math.abs(planets[i].deg - planets[j].deg);
+            const angle = Math.min(diff, 360-diff);
+            if (angle < 10 || Math.abs(angle - 60) < 8 || Math.abs(angle - 120) < 8 || Math.abs(angle - 180) < 8) {
+                ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+                ctx.strokeStyle = 'rgba(201,168,76,0.18)'; ctx.lineWidth = 0.6; ctx.setLineDash([3,4]); ctx.stroke(); ctx.setLineDash([]);
             }
-
-            document.getElementById('executive-translation').style.display = 'block';
-            localStorage.setItem('ultimo_reporte', JSON.stringify(data));
-        } else {
-            status.innerText = "ERROR DE CÁLCULO";
-            status.style.color = "var(--alert)";
         }
-    } catch (e) {
-        status.innerText = "FALLO EN CONEXIÓN API";
-        status.style.color = "var(--alert)";
     }
+
+    pts.forEach(pt => {
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI*2); ctx.fillStyle = pt.p.color; ctx.fill();
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 10, 0, Math.PI*2); ctx.strokeStyle = pt.p.color + '44'; ctx.stroke();
+        const a = degToRad(pt.p.deg);
+        const lx = cx + (R+28)*Math.cos(a); const ly = cy + (R+28)*Math.sin(a);
+        ctx.fillStyle = '#C9A84C'; ctx.font = '10px Share Tech Mono, monospace';
+        ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText(pt.p.name, lx, ly);
+    });
+    ctx.fillStyle = '#C9A84C'; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
 }
 
-function descargarDossier() { window.location.href = `dossier-final.html`; }
+function drawArc(score) {
+    const arcC = document.getElementById('arcCanvas');
+    const arcCtx = arcC.getContext('2d');
+    const startA = Math.PI; const endA = Math.PI + (score/100) * Math.PI;
+
+    arcCtx.clearRect(0,0, arcC.width, arcC.height);
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, Math.PI, Math.PI*2);
+    arcCtx.strokeStyle = 'rgba(180,140,40,0.12)'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+
+    arcCtx.beginPath(); arcCtx.arc(70, 70, 60, startA, endA);
+    arcCtx.strokeStyle = '#C9A84C'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    
+    document.getElementById('sync-score').innerText = score;
+}
+
+function generarHashUsuario(str) { let hash = 0; for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); } return Math.abs(hash); }
 
 async function conectar() {
     const email = localStorage.getItem('vault_user_email');
     if (!email) { window.location.href = 'portal.html'; return; }
+
+    const hoy = new Date();
+    document.getElementById('fecha-hoy').innerText = hoy.toLocaleDateString('es-ES');
 
     try {
         const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
@@ -313,15 +265,15 @@ async function conectar() {
             const d = res.datos;
             const nivelSuscripcion = (d.nivel_suscripcion || "FREE").toUpperCase();
 
-            if (nivelSuscripcion === "FREE") { window.location.href = `boveda.html`; return; }
-            if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; }
+            // RUTEO VIP
+            if (nivelSuscripcion.includes("GENESIS")) { window.location.href = `genesis-live.html`; return; } 
+            if (nivelSuscripcion === "SENTINEL") { window.location.href = `panel-sentinel.html`; return; } 
             if (nivelSuscripcion === "EXECUTIVE") { window.location.href = `panel-executive.html`; return; }
 
             const nombreReal = (d.nombre || email.split('@')[0]).toUpperCase();
             document.getElementById('nombre-display').innerText = nombreReal;
-            localStorage.setItem('vault_user_nombre', nombreReal);
             
-            let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta";
+            let fecha = "PENDIENTE", hora = "--:--", lugar = "Sincronización Incompleta", lat = 43.45;
             let datosNatalesObj = d.datos_natales;
             if (typeof datosNatalesObj === 'string') { try { datosNatalesObj = JSON.parse(datosNatalesObj); } catch(e) {} }
 
@@ -329,26 +281,41 @@ async function conectar() {
                 if (datosNatalesObj.fecha) fecha = datosNatalesObj.fecha;
                 if (datosNatalesObj.hora || datosNatalesObj.hora_nacimiento) hora = datosNatalesObj.hora || datosNatalesObj.hora_nacimiento;
                 if (datosNatalesObj.lugar_original) lugar = datosNatalesObj.lugar_original.toUpperCase();
+                if (datosNatalesObj.lat) lat = parseFloat(datosNatalesObj.lat);
             }
-            document.getElementById('datos-display').innerText = `${fecha} // ${hora} // ${lugar}`;
-            
-            const now = new Date();
-            const nextMonth = new Date();
-            nextMonth.setMonth(now.getMonth() + 1);
-            document.getElementById('date-start').value = now.toISOString().split('T')[0];
-            document.getElementById('date-end').value = nextMonth.toISOString().split('T')[0];
 
-            initCharts();
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-ES'); }, 1000);
+            document.getElementById('datos-display').innerText = `${fecha} // ${hora} // ${lugar}`;
+            document.getElementById('auth-display').innerText = nivelSuscripcion;
+            document.getElementById('geo-display').innerText = `LAT: ${lat.toFixed(2)}`;
+
+            // 🧠 CONEXIÓN A DATOS REALES
+            let vectores = {};
+            if (d.mapatotal) {
+                let mapaObj = typeof d.mapatotal === 'string' ? JSON.parse(d.mapatotal) : d.mapatotal;
+                if (mapaObj && mapaObj.vectores_eclipticos) { vectores = mapaObj.vectores_eclipticos; }
+            }
+            if (Object.keys(vectores).length === 0) {
+                const seed = generarHashUsuario(email);
+                vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "MARTE": ((seed * 3) % 360), "VENUS": ((seed * 5) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360), "MERCURIO": ((seed * 13) % 360) };
+            }
             
-            setTimeout(sincronizarPanel, 500);
+            const lista = document.getElementById('vectores-lista');
+            lista.innerHTML = '';
+            Object.entries(vectores).forEach(([nom, grad]) => {
+                lista.innerHTML += `<div class="vector-row"><span class="vector-name"><span class="planet-dot"></span>${nom}</span><span class="vector-val">${Math.floor(grad)}°</span></div>`;
+            });
+
+            drawOrbit(vectores);
+            let sum = Object.values(vectores).reduce((a,b)=>a+b, 0);
+            let scoreSincronia = (Math.floor(sum) % 40) + 40; 
+            drawArc(scoreSincronia);
 
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('panel-content').style.display = 'block';
+
         } else { window.location.href = 'portal.html'; }
     } catch (e) { window.location.href = 'portal.html'; }
 }
-
 window.onload = conectar;
 </script>
 </body>
