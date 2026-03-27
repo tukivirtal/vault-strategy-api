@@ -62,9 +62,13 @@
         #res-titulo { color: #D4AF37; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
         #res-cuerpo { color: #aaa; font-size: 10px; line-height: 1.4; text-transform: uppercase;}
         
-        footer { text-align: center; padding: 40px; position: relative; z-index: 10; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.2em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.6); }
-        .footer-links { margin-top: 15px; }
-        .footer-links a { color: #666; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
+        footer { text-align: center; padding: 40px; position: relative; z-index: 10; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.6); }
+        .footer-info { margin-bottom: 10px; letter-spacing: 0.2em; }
+        .footer-contact { margin-bottom: 15px; color: #888; }
+        .footer-contact a { color: #D4AF37; text-decoration: none; font-weight: bold; text-transform: none; margin-left: 5px; transition: color 0.3s; }
+        .footer-contact a.twitter { text-transform: uppercase; }
+        .footer-contact a:hover { color: #FFF5D1; }
+        .footer-links a { color: #666; text-decoration: none; margin: 0 15px; letter-spacing: 0.2em; transition: color 0.3s; }
         .footer-links a:hover { color: #D4AF37; }
         
         /* Esta clase es clave para que tu código original oculte las cosas */
@@ -136,10 +140,17 @@
     </main>
 
    <footer>
-        © 2026 Vault Logic - Executive Intelligence Suite
+        <div class="footer-info">© 2026 Vault Logic - Executive Intelligence Suite</div>
+        
+        <div class="footer-contact">
+            SOPORTE: <a href="mailto:support@vaultlogicsys.com">support@vaultlogicsys.com</a> 
+            <span style="margin: 0 10px; color: #444;">|</span> 
+            RED TÁCTICA: <a href="https://x.com/VaultLogicSys" target="_blank" rel="noopener noreferrer" class="twitter">@VaultLogicSys</a>
+        </div>
+
         <div class="footer-links">
             <a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad</a> 
-            <span>|</span> 
+            <span style="color: #444;">|</span> 
             <a href="terminos.html" target="_blank" rel="noopener noreferrer">Términos</a>
         </div>
     </footer>
