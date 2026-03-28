@@ -276,13 +276,15 @@ export default function App() {
             </div>
 
             <div className="md:col-span-3">
+            <span style="margin: 0 10px; color: #444;">|</span> 
+            RED TÁCTICA: <a href="https://x.com/VaultLogicSys" target="_blank" rel="noopener noreferrer" class="twitter">@VaultLogicSys</a>
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Contacto</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li>
                   <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
                   {/* Ahora lleva a una página de formulario en lugar de abrir Outlook */}
                   <a href="contacto.html" className="hover:text-gold transition-colors whitespace-nowrap">
-                    contact@emotionalvaults.com
+                    support@vaultlogicsys.com
                   </a>
                 </li>
               </ul>
