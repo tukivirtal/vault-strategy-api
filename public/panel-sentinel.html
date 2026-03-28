@@ -62,7 +62,7 @@
   .metric-value.blur { filter: blur(4px); color: #555;}
   
   .metric-bar { height: 2px; margin-top: 12px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
-  .metric-fill { height: 100%; border-radius: 1px; background: #00c864; width: 65%;}
+  .metric-fill { height: 100%; border-radius: 1px; background: #00c864; width: 0%; transition: width 1.5s ease-out;} /* Añadida transición para la barra */
   .lock-msg { font-size:10px; color:#555; margin-top:8px; letter-spacing:1px; }
 
   .directiva-box { background: rgba(0,200,100,0.05); border: 1px solid rgba(0,200,100,0.2); border-left: 3px solid #00c864; padding: 20px; margin-bottom: 24px; }
@@ -144,7 +144,7 @@
         <div class="metric-card unlocked">
           <div class="metric-label">Clima de Negociación</div>
          <div class="metric-value" id="val-neg-sentinel">--%</div>
-          <div class="metric-bar"><div class="metric-fill"></div></div>
+          <div class="metric-bar"><div class="metric-fill" id="bar-neg-sentinel"></div></div>
           <div class="lock-msg" style="color:#00c864">DESBLOQUEADO</div>
         </div>
 
@@ -292,6 +292,18 @@ async function conectar() {
             let sum = Object.values(vectores).reduce((a,b)=>a+b, 0);
             let scoreSincronia = (Math.floor(sum) % 40) + 40; 
             drawArc(scoreSincronia);
+
+            // 🟢 NUEVO CÁLCULO: CLIMA DE NEGOCIACIÓN (Desbloqueado)
+            // Genera un número creíble y variable según el usuario, entre 60 y 94.
+            let climaNegociacion = (Math.floor(sum * 1.5) % 35) + 60; 
+            
+            // Actualiza el número visible
+            document.getElementById('val-neg-sentinel').innerText = climaNegociacion + '%';
+            
+            // Da un pequeño retraso a la barra para que se vea la animación al entrar
+            setTimeout(() => {
+                document.getElementById('bar-neg-sentinel').style.width = climaNegociacion + '%';
+            }, 100);
 
             document.getElementById('directiva-text').innerHTML = "<b>SISTEMA ACTIVO:</b> Sus vectores diarios no presentan anomalías críticas estructurales. Las condiciones macroeconómicas para el cierre de negociaciones a corto plazo se mantienen favorables. Para visualizar proyecciones dinámicas a 30 días y mapas de riesgo financiero, se requiere autorización de nivel Executive.";
 
