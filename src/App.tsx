@@ -250,8 +250,7 @@ export default function App() {
         </section>
       </main>
 
-    {/* Footer Ampliado y Mejorado */}
- {/* Footer Final: Grid ajustado y Enlace a Formulario */}
+   {/* Footer Final: Grid ajustado y Enlace a Formulario */}
       <footer className="relative py-32 px-8 md:px-16 border-t border-white/5 bg-black">
         <div className="max-w-7xl mx-auto">
           {/* Ajustamos a 12 columnas para distribuir el espacio perfectamente */}
@@ -266,7 +265,7 @@ export default function App() {
               </p>
             </div>
             
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Legal</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li><a href="privacidad.html" className="hover:text-white transition-colors">Privacidad</a></li>
@@ -275,31 +274,20 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="md:col-span-3">
-            <span style="margin: 0 10px; color: #444;">|</span> 
-            RED TÁCTICA: <a href="https://x.com/VaultLogicSys" target="_blank" rel="noopener noreferrer" class="twitter">@VaultLogicSys</a>
-              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Contacto</h5>
+            <div className="md:col-span-4">
+              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Contacto y Redes</h5>
               <ul className="space-y-6 text-white/50 font-mono text-sm">
                 <li>
                   <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
-                  {/* Ahora lleva a una página de formulario en lugar de abrir Outlook */}
-                  <a href="contacto.html" className="hover:text-gold transition-colors whitespace-nowrap">
+                  <a href="mailto:support@vaultlogicsys.com" className="hover:text-gold transition-colors whitespace-nowrap">
                     support@vaultlogicsys.com
                   </a>
                 </li>
-              </ul>
-            </div>
-            
-            <div className="md:col-span-2">
-              <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-8">Sistema</h5>
-              <ul className="space-y-6 text-white/50 font-mono text-sm">
-                <li className="flex items-center gap-3 whitespace-nowrap">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  NASA JPL: ONLINE
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  LATENCIA: 12ms
+                <li>
+                  <span className="block text-[10px] text-white/30 uppercase mb-2">Red Táctica (X)</span>
+                  <a href="https://x.com/VaultLogicSys" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors whitespace-nowrap">
+                    @VaultLogicSys
+                  </a>
                 </li>
               </ul>
             </div>
