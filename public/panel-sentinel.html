@@ -6,22 +6,29 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0a0a; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
+  
+  /* BOOST DE LUMINANCIA: Fondo con un sutil glow verde */
+  body { background: radial-gradient(circle at 50% -20%, #1a332a 0%, #0a0a0a 60%) !important; margin: 0; color: #fff; font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden;}
   
   .vl-panel { position: relative; padding: 24px; min-height: 100vh; }
-  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(0, 200, 100, 0.05) 0%, transparent 70%); pointer-events: none; }
+  .vl-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(0, 255, 140, 0.05) 0%, transparent 70%); pointer-events: none; }
   .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 
   .panel-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
 
-  nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,200,100,0.2); padding-bottom: 15px; margin-bottom: 30px; }
+  /* BOOST DE LUMINANCIA */
+  nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,255,140,0.3) !important; padding-bottom: 15px; margin-bottom: 30px; }
   .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 4px; color: #fff; }
-  .logo span { color: #00c864; font-weight: 400; font-size: 14px; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; margin-left: 10px; border: 1px solid #00c864; padding: 2px 8px;}
+  
+  /* BOOST DE LUMINANCIA: Textos primarios */
+  .logo span { color: #00ff8c !important; font-weight: 400; font-size: 14px; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; margin-left: 10px; border: 1px solid #00ff8c !important; padding: 2px 8px;}
   .btn-logout { background: transparent; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); padding: 8px 16px; font-family: inherit; cursor: pointer; transition: 0.3s; }
   .btn-logout:hover { background: rgba(255,77,77,0.1); }
 
   .header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: flex-start;}
-  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #00c864; letter-spacing: 3px; text-transform: uppercase; }
+  
+  /* BOOST DE LUMINANCIA: Glow en el nombre del operador */
+  .header-left .name { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: #00ff8c !important; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(0, 255, 140, 0.5); }
   .status-grid { display: grid; grid-template-columns: auto auto; gap: 4px 20px; font-size: 10px; text-align: right; }
   .status-grid .sk { color: #666; letter-spacing: 1px; }
   .status-grid .sv { color: #fff; font-weight: bold; }
@@ -35,45 +42,61 @@
   .vector-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .vector-row:last-child { border-bottom: none; }
   .vector-name { color: #aaa; letter-spacing: 1px; display: flex; align-items: center; }
-  .planet-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c864; margin-right: 8px; }
-  .vector-val { color: #00c864; font-weight: bold; }
+  
+  /* BOOST DE LUMINANCIA: Planetas */
+  .planet-dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff8c !important; box-shadow: 0 0 5px #00ff8c; margin-right: 8px; }
+  .vector-val { color: #00ff8c !important; font-weight: bold; }
 
   .chart-container { display: flex; align-items: center; justify-content: center; position: relative; padding: 20px 0;}
   .chart-canvas-wrap { position: relative; width: 100%; max-width: 460px; display: flex; justify-content: center;}
-  .orbit-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #00c864; letter-spacing: 3px; white-space: nowrap; }
+  
+  /* BOOST DE LUMINANCIA */
+  .orbit-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #00ff8c !important; letter-spacing: 3px; white-space: nowrap; }
 
   .sync-index { text-align: center; padding: 20px 14px; }
-  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 56px; font-weight: 700; color: #00c864; line-height: 1; display: block; margin-top: 10px;}
+  
+  /* BOOST DE LUMINANCIA: Glow en el score principal */
+  .sync-number { font-family: 'Rajdhani', sans-serif; font-size: 56px; font-weight: 700; color: #00ff8c !important; line-height: 1; display: block; margin-top: 10px; text-shadow: 0 0 20px rgba(0, 255, 140, 0.6);}
   .sync-label { font-size: 9px; color: #555; letter-spacing: 2px; margin-top: 4px; }
+  
+  /* BOOST DE LUMINANCIA: Glow de la gráfica semicircular */
   .arc-wrap { display: flex; justify-content: center; margin: 10px 0; }
+  #arcCanvas { filter: drop-shadow(0 0 4px #00ff8c); }
 
   .transit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .transit-row:last-child { border-bottom: none; }
   .transit-planet { color: #999; letter-spacing: 1px; }
+  
+  /* BOOST DE LUMINANCIA: Tags */
   .tag { padding: 3px 8px; font-size: 9px; letter-spacing: 1px; }
-  .tag-act { background: rgba(0,200,100,0.1); color: #00c864; border: 1px solid rgba(0,200,100,0.2); }
+  .tag-act { background: rgba(0, 255, 140, 0.1) !important; color: #00ff8c !important; border: 1px solid rgba(0, 255, 140, 0.4) !important; }
 
   .bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
   .metric-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 16px 20px; position: relative;}
-  .metric-card.unlocked { border: 1px solid rgba(0,200,100,0.3); background: rgba(0,200,100,0.05); border-top: 3px solid #00c864;}
+  
+  /* BOOST DE LUMINANCIA: Tarjeta de Clima Desbloqueada */
+  .metric-card.unlocked { border: 1px solid rgba(0, 255, 140, 0.5) !important; background: rgba(0, 255, 140, 0.08) !important; border-top: 3px solid #00ff8c !important; box-shadow: 0 0 20px rgba(0, 255, 140, 0.1);}
   .metric-label { font-size: 10px; color: #888; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase;}
-  .metric-card.unlocked .metric-label { color: #00c864; }
+  .metric-card.unlocked .metric-label { color: #00ff8c !important; }
   .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; user-select:none; color: #fff; }
   .metric-value.blur { filter: blur(4px); color: #555;}
   
   .metric-bar { height: 2px; margin-top: 12px; border-radius: 1px; background: rgba(255,255,255,0.05); overflow: hidden; }
-  .metric-fill { height: 100%; border-radius: 1px; background: #00c864; width: 0%; transition: width 1.5s ease-out;} /* Añadida transición para la barra */
+  
+  /* BOOST DE LUMINANCIA: Barra de progreso brillante */
+  .metric-fill { height: 100%; border-radius: 1px; background: #00ff8c !important; width: 0%; transition: width 1.5s ease-out; box-shadow: 0 0 10px #00ff8c;} 
   .lock-msg { font-size:10px; color:#555; margin-top:8px; letter-spacing:1px; }
 
-  .directiva-box { background: rgba(0,200,100,0.05); border: 1px solid rgba(0,200,100,0.2); border-left: 3px solid #00c864; padding: 20px; margin-bottom: 24px; }
-  .directiva-label { font-size: 10px; color: #00c864; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase;}
+  /* BOOST DE LUMINANCIA: Caja de Directivas */
+  .directiva-box { background: rgba(0, 255, 140, 0.06) !important; border: 1px solid rgba(0, 255, 140, 0.3) !important; border-left: 3px solid #00ff8c !important; padding: 20px; margin-bottom: 24px; }
+  .directiva-label { font-size: 10px; color: #00ff8c !important; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase;}
   .directiva-text { font-size: 13px; color: #ccc; line-height: 1.6; }
 
   .upgrade-banner { background: linear-gradient(90deg, #111, #1a1a1a); border: 1px solid #d4af37; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;}
   .btn-upgrade { background: #d4af37; color: #000; padding: 14px 28px; border: none; font-family: inherit; font-size: 12px; font-weight: bold; cursor: pointer; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; transition: 0.3s;}
   .btn-upgrade:hover { background: #FFF5D1; box-shadow: 0 0 15px rgba(212,175,55,0.3);}
 
-  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #00c864; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
+  #loading-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 999; display: flex; align-items: center; justify-content: center; color: #00ff8c; letter-spacing: 4px; font-family: 'Share Tech Mono', monospace;}
 </style>
 </head>
 <body>
@@ -95,8 +118,8 @@
           <div class="name" id="nombre-display">---</div>
         </div>
         <div class="status-grid">
-          <span class="sk">CONEXIÓN</span><span class="sv" style="color:#00c864">ESTABLE (JPL DE441)</span>
-          <span class="sk">AUTH</span><span class="sv" style="color:#00c864">SENTINEL ONLINE</span>
+          <span class="sk">CONEXIÓN</span><span class="sv" style="color:#00ff8c">ESTABLE (JPL DE441)</span>
+          <span class="sk">AUTH</span><span class="sv" style="color:#00ff8c">SENTINEL ONLINE</span>
           <span class="sk">FECHA</span><span class="sv" id="fecha-hoy">--/--/----</span>
         </div>
       </div>
@@ -145,7 +168,7 @@
           <div class="metric-label">Clima de Negociación</div>
          <div class="metric-value" id="val-neg-sentinel">--%</div>
           <div class="metric-bar"><div class="metric-fill" id="bar-neg-sentinel"></div></div>
-          <div class="lock-msg" style="color:#00c864">DESBLOQUEADO</div>
+          <div class="lock-msg" style="color:#00ff8c">DESBLOQUEADO</div>
         </div>
 
         <div class="metric-card">
@@ -178,7 +201,8 @@ function drawOrbit(vectoresReales) {
     const ctx = canvas.getContext('2d');
     const W = 460, H = 460, cx = W/2, cy = H/2 + 10, R = 170;
     
-    const colores = { "SOL": "#00c864", "LUNA": "#fff", "MARTE": "#00ff88", "VENUS": "#00c864", "JUPITER": "#00c864", "SATURNO": "#aaa", "MERCURIO": "#00c864" };
+    // BOOST DE LUMINANCIA: Planetas verdes ahora usan el tono esmeralda neón (#00ff8c)
+    const colores = { "SOL": "#00ff8c", "LUNA": "#fff", "MARTE": "#00ff8c", "VENUS": "#00ff8c", "JUPITER": "#00ff8c", "SATURNO": "#aaa", "MERCURIO": "#00ff8c" };
     
     const planets = Object.entries(vectoresReales).map(([nom, grad]) => ({ name: nom, deg: grad, color: colores[nom] || "#fff" }));
     function degToRad(d) { return (d - 90) * Math.PI / 180; }
@@ -186,20 +210,20 @@ function drawOrbit(vectoresReales) {
 
     for (let i = 1; i <= 3; i++) {
         ctx.beginPath(); ctx.arc(cx, cy, R * i/3, 0, Math.PI*2);
-        ctx.strokeStyle = `rgba(0,200,100,${0.08 - i*0.01})`; ctx.stroke();
+        ctx.strokeStyle = `rgba(0,255,140,${0.08 - i*0.01})`; ctx.stroke();
     }
     for (let i = 0; i < 12; i++) {
         const a = (i * 30 - 90) * Math.PI / 180;
         ctx.beginPath(); ctx.moveTo(cx + (R+10)*Math.cos(a), cy + (R+10)*Math.sin(a)); ctx.lineTo(cx + (R+16)*Math.cos(a), cy + (R+16)*Math.sin(a));
-        ctx.strokeStyle = 'rgba(0,200,100,0.15)'; ctx.stroke();
+        ctx.strokeStyle = 'rgba(0,255,140,0.15)'; ctx.stroke();
     }
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.strokeStyle = 'rgba(0,255,140,0.3)'; ctx.stroke();
 
     const pts = planets.map(p => { const a = degToRad(p.deg); return { x: cx + R*Math.cos(a), y: cy + R*Math.sin(a), p }; });
 
     pts.forEach(pt => {
         ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pt.x, pt.y);
-        ctx.strokeStyle = 'rgba(0,200,100,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
+        ctx.strokeStyle = 'rgba(0,255,140,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
     });
 
     for (let i = 0; i < pts.length; i++) {
@@ -224,7 +248,7 @@ function drawOrbit(vectoresReales) {
         ctx.textAlign = lx > cx ? 'left' : 'right'; ctx.textBaseline = 'middle';
         ctx.fillText(pt.p.name, lx, ly);
     });
-    ctx.fillStyle = '#00c864'; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#00ff8c'; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
 }
 
 function drawArc(score) {
@@ -234,10 +258,10 @@ function drawArc(score) {
 
     arcCtx.clearRect(0,0, arcC.width, arcC.height);
     arcCtx.beginPath(); arcCtx.arc(70, 70, 60, Math.PI, Math.PI*2);
-    arcCtx.strokeStyle = 'rgba(0,200,100,0.1)'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    arcCtx.strokeStyle = 'rgba(0,255,140,0.1)'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
 
     arcCtx.beginPath(); arcCtx.arc(70, 70, 60, startA, endA);
-    arcCtx.strokeStyle = '#00c864'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
+    arcCtx.strokeStyle = '#00ff8c'; arcCtx.lineWidth = 8; arcCtx.lineCap = 'round'; arcCtx.stroke();
     
     document.getElementById('sync-score').innerText = score;
 }
@@ -294,13 +318,10 @@ async function conectar() {
             drawArc(scoreSincronia);
 
             // 🟢 NUEVO CÁLCULO: CLIMA DE NEGOCIACIÓN (Desbloqueado)
-            // Genera un número creíble y variable según el usuario, entre 60 y 94.
             let climaNegociacion = (Math.floor(sum * 1.5) % 35) + 60; 
             
-            // Actualiza el número visible
             document.getElementById('val-neg-sentinel').innerText = climaNegociacion + '%';
             
-            // Da un pequeño retraso a la barra para que se vea la animación al entrar
             setTimeout(() => {
                 document.getElementById('bar-neg-sentinel').style.width = climaNegociacion + '%';
             }, 100);
