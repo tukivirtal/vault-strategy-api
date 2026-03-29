@@ -233,14 +233,13 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-       
-      # 3. CONEXIÓN DIRECTA CON MAILERLITE
+       # 3. CONEXIÓN DIRECTA CON MAILERLITE
         ml_api_key = os.getenv("MAILERLITE_API_KEY")
         raw_group_id = os.getenv("MAILERLITE_GROUP_ID")
         
         if ml_api_key and raw_group_id:
-            # Limpiamos espacios invisibles (El error 422 suele ser por esto)
-            ml_group_id = str(raw_group_id).strip()
+            # EL SECRETO: Convertimos el texto a NÚMERO ENTERO matemático
+            ml_group_id = int(str(raw_group_id).strip())
             email_limpio = str(req.email_usuario).strip()
             
             url = "https://connect.mailerlite.com/api/subscribers"
@@ -251,14 +250,13 @@ async def generar_ticket(req: SoporteRequest):
             }
             data = {
                 "email": email_limpio,
-                "groups": [ml_group_id]
+                "groups": [ml_group_id] # Ahora viaja como número puro, sin comillas
             }
             req_ml = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers, method='POST')
             try:
-                urllib.request.urlopen(req_ml)
+                respuesta_ml = urllib.request.urlopen(req_ml)
                 print(f"✉️ Señal EXITOSA a MailerLite para {email_limpio}")
             except urllib.error.HTTPError as ml_err:
-                # Si falla, leemos el mensaje secreto de MailerLite
                 error_info = ml_err.read().decode('utf-8')
                 print(f"❌ RECHAZO MAILERLITE (422): Detalles exactos -> {error_info}")
             except Exception as ml_err:
