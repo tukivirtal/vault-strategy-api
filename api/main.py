@@ -233,11 +233,16 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. CONEXIÓN DIRECTA CON MAILERLITE
+       
+      # 3. CONEXIÓN DIRECTA CON MAILERLITE
         ml_api_key = os.getenv("MAILERLITE_API_KEY")
-        ml_group_id = os.getenv("MAILERLITE_GROUP_ID")
+        raw_group_id = os.getenv("MAILERLITE_GROUP_ID")
         
-        if ml_api_key and ml_group_id:
+        if ml_api_key and raw_group_id:
+            # Limpiamos espacios invisibles (El error 422 suele ser por esto)
+            ml_group_id = str(raw_group_id).strip()
+            email_limpio = str(req.email_usuario).strip()
+            
             url = "https://connect.mailerlite.com/api/subscribers"
             headers = {
                 "Content-Type": "application/json",
@@ -245,15 +250,19 @@ async def generar_ticket(req: SoporteRequest):
                 "Authorization": f"Bearer {ml_api_key}"
             }
             data = {
-                "email": req.email_usuario,
+                "email": email_limpio,
                 "groups": [ml_group_id]
             }
             req_ml = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers, method='POST')
             try:
                 urllib.request.urlopen(req_ml)
-                print(f"✉️ Señal enviada a MailerLite para {req.email_usuario}")
+                print(f"✉️ Señal EXITOSA a MailerLite para {email_limpio}")
+            except urllib.error.HTTPError as ml_err:
+                # Si falla, leemos el mensaje secreto de MailerLite
+                error_info = ml_err.read().decode('utf-8')
+                print(f"❌ RECHAZO MAILERLITE (422): Detalles exactos -> {error_info}")
             except Exception as ml_err:
-                print("❌ Error contactando a MailerLite:", ml_err)
+                print("❌ Error general contactando a MailerLite:", ml_err)
 
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
