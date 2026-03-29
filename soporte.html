@@ -110,8 +110,8 @@
         feedback.innerText = "ENVIANDO DATOS AL NÚCLEO RENDER...";
 
         try {
-            // El frontend le habla a RENDER, no a Supabase directamente
-            const res = await fetch(`https://vault-strategy-api.onrender.com/generar_ticket`, {
+            // URL ACTUALIZADA AL NUEVO SERVIDOR
+            const res = await fetch(`https://vault-strategy-api-9lxc.onrender.com/generar_ticket`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
