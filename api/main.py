@@ -7,6 +7,8 @@ import math
 from datetime import datetime
 from supabase import create_client, Client
 import uvicorn
+import random
+import urllib.request
 
 app = FastAPI()
 
@@ -211,6 +213,64 @@ async def simular_periodo(req: SimulacionRequest):
 @app.get("/api/health")
 def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
+
+# ==========================================
+# MÓDULO DE SOPORTE TÁCTICO Y MAILERLITE
+# ==========================================
+class SoporteRequest(BaseModel):
+    email_usuario: str
+    plan_nivel: str
+    mensaje: str
+    estado: str = "ABIERTO"
+
+@app.post("/generar_ticket")
+async def generar_ticket(req: SoporteRequest):
+    if not supabase:
+        return {"status": "error", "mensaje": "Base de datos desconectada"}
+    
+    try:
+        # 1. Generamos el código exacto de su sistema (Ej: GX-82964)
+        codigo = str(random.randint(10000, 99999))
+        ticket_ref = f"GX-{codigo}"
+        
+        # 2. Guardamos en la tabla 'soporte_tickets' de Supabase
+        nuevo_ticket = {
+            "ticket_ref": ticket_ref,
+            "email_usuario": req.email_usuario,
+            "plan_nivel": req.plan_nivel,
+            "mensaje": req.mensaje
+        }
+        supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
+        print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
+        
+        # 3. CONEXIÓN DIRECTA CON MAILERLITE (Reemplaza a Make.com)
+        ml_api_key = os.getenv("MAILERLITE_API_KEY")
+        ml_group_id = os.getenv("MAILERLITE_GROUP_ID")
+        
+        if ml_api_key and ml_group_id:
+            url = "https://connect.mailerlite.com/api/subscribers"
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": f"Bearer {ml_api_key}"
+            }
+            # Agregamos al usuario al grupo específico que dispara la automatización
+            data = {
+                "email": req.email_usuario,
+                "groups": [ml_group_id]
+            }
+            req_ml = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers, method='POST')
+            try:
+                urllib.request.urlopen(req_ml)
+                print(f"✉️ Señal enviada a MailerLite para automatización de {req.email_usuario}")
+            except Exception as ml_err:
+                print("❌ Error contactando a MailerLite:", ml_err)
+
+        return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
+        
+    except Exception as e:
+        print("❌ Error en Ticket:", str(e))
+        return {"status": "error", "mensaje": "Fallo en el núcleo de soporte."}
 
 # ==========================================
 # NUEVA RUTA: TRADUCTOR OFICIAL DE PAYPAL
