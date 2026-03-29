@@ -5,14 +5,16 @@ import os
 import json
 import math
 import random
-import urllib.request
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from supabase import create_client, Client
 import uvicorn
 
 app = FastAPI()
 
-# 1. SEGURIDAD (CORS) - Puertas abiertas para Vercel
+# 1. SEGURIDAD (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -66,7 +68,7 @@ async def upgrade_nivel(req: UpgradeRequest):
     if not supabase:
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     try:
-        response = supabase.table("clientes_vip").update({"nivel_suscripcion": req.nivel_suscripcion}).eq("email", req.email).execute()
+        supabase.table("clientes_vip").update({"nivel_suscripcion": req.nivel_suscripcion}).eq("email", req.email).execute()
         return {"status": "success", "mensaje": f"Nivel actualizado a {req.nivel_suscripcion}"}
     except Exception as e:
         return {"status": "error", "mensaje": str(e)}
@@ -75,7 +77,6 @@ async def upgrade_nivel(req: UpgradeRequest):
 async def consultar(data: LoginData):
     if not supabase:
         return {"status": "error", "analisis_ejecutivo": "Error interno: Base de datos no conectada."}
-        
     try:
         response = supabase.table("clientes_vip").select("*").eq("email", data.email).execute()
         user = response.data[0] if response.data else None
@@ -89,7 +90,7 @@ async def consultar(data: LoginData):
         else:
             if user:
                 if str(user.get("password")) != str(data.password):
-                    return {"status": "error", "analisis_ejecutivo": "El correo ya está registrado con otra contraseña."}
+                    return {"status": "error", "analisis_ejecutivo": "El correo ya está registrado."}
                 return {"status": "exists"}
             
             nuevo_usuario = {
@@ -107,7 +108,6 @@ async def consultar(data: LoginData):
             }
             supabase.table("clientes_vip").insert(nuevo_usuario).execute()
             return {"status": "success"}
-            
     except Exception as e:
         return {"status": "error", "analisis_ejecutivo": f"Fallo en la base de datos: {str(e)}"}
 
@@ -126,8 +126,7 @@ async def obtener_perfil(req: PerfilRequest):
 @app.post("/simular_periodo")
 async def simular_periodo(req: SimulacionRequest):
     if not supabase:
-        return {"status": "error", "mensaje": "Núcleo de base de datos desconectado"}
-
+        return {"status": "error", "mensaje": "Base de datos desconectada"}
     try:
         response = supabase.table("clientes_vip").select("*").eq("email", req.email).execute()
         if not response.data:
@@ -184,10 +183,10 @@ async def simular_periodo(req: SimulacionRequest):
 
         if is_risk:
             estado, estrategia, modo = "RIESGO ESTRUCTURAL", "Posición Defensiva", "DEFENSA"
-            directiva = "Los vectores matemáticos indican alta fricción en este ciclo. <b>Acción:</b> Congele contrataciones y eleve liquidez."
+            directiva = "Vectores indican fricción en este ciclo. Acción: Congele contrataciones y eleve liquidez."
         else:
             estado, estrategia, modo = "SINCRONÍA ÓPTIMA", "Inversión Agresiva", "EXPANSIÓN"
-            directiva = "Ventana de resonancia expansiva confirmada. <b>Acción:</b> Acelere cierres de ventas y expanda presupuestos de marketing."
+            directiva = "Ventana de resonancia expansiva confirmada. Acción: Acelere ventas y marketing."
 
         return {
             "status": "success",
@@ -211,7 +210,7 @@ def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
 
 # ==========================================
-# MÓDULO DE SOPORTE TÁCTICO Y MAILERLITE
+# MÓDULO DE SOPORTE TÁCTICO Y ALERTA HOSTINGER
 # ==========================================
 @app.post("/generar_ticket")
 async def generar_ticket(req: SoporteRequest):
@@ -233,34 +232,42 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-       # 3. CONEXIÓN DIRECTA CON MAILERLITE
-        ml_api_key = os.getenv("MAILERLITE_API_KEY")
-        raw_group_id = os.getenv("MAILERLITE_GROUP_ID")
-        
-        if ml_api_key and raw_group_id:
-            # EL SECRETO: Convertimos el texto a NÚMERO ENTERO matemático
-            ml_group_id = int(str(raw_group_id).strip())
-            email_limpio = str(req.email_usuario).strip()
-            
-            url = "https://connect.mailerlite.com/api/subscribers"
-            headers = {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": f"Bearer {ml_api_key}"
-            }
-            data = {
-                "email": email_limpio,
-                "groups": [ml_group_id] # Ahora viaja como número puro, sin comillas
-            }
-            req_ml = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers, method='POST')
+        # 3. CONEXIÓN DIRECTA CON HOSTINGER (Envío de correo)
+        smtp_user = "support@vaultlogicsys.com"
+        smtp_pass = os.getenv("EMAIL_PASSWORD") # La llave que usted configuró en Render
+        destinatario = "support@vaultlogicsys.com"
+
+        if smtp_pass:
             try:
-                respuesta_ml = urllib.request.urlopen(req_ml)
-                print(f"✉️ Señal EXITOSA a MailerLite para {email_limpio}")
-            except urllib.error.HTTPError as ml_err:
-                error_info = ml_err.read().decode('utf-8')
-                print(f"❌ RECHAZO MAILERLITE (422): Detalles exactos -> {error_info}")
-            except Exception as ml_err:
-                print("❌ Error general contactando a MailerLite:", ml_err)
+                msg = MIMEMultipart()
+                msg['From'] = smtp_user
+                msg['To'] = destinatario
+                msg['Subject'] = f"🔴 NUEVO TICKET GXP: {ticket_ref}"
+
+                cuerpo = f"""
+Comandante, ha recibido una nueva transmisión de soporte táctico:
+
+ID DEL TICKET: {ticket_ref}
+EMAIL DEL USUARIO: {req.email_usuario}
+NIVEL DE ACCESO: {req.plan_nivel}
+
+REPORTE DEL INCIDENTE:
+{req.mensaje}
+"""
+                msg.attach(MIMEText(cuerpo, 'plain'))
+
+                # Coordenadas maestras de Hostinger
+                server = smtplib.SMTP('smtp.hostinger.com', 587)
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+                text = msg.as_string()
+                server.sendmail(smtp_user, destinatario, text)
+                server.quit()
+                print(f"✉️ Alerta oficial enviada con éxito a su bandeja para el ticket {ticket_ref}")
+            except Exception as e:
+                print("❌ Error enviando email de alerta corporativa:", str(e))
+        else:
+            print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD en Render. No se envió correo.")
 
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
@@ -294,9 +301,6 @@ async def paypal_webhook(request: Request):
         print("❌ Error procesando Webhook de PayPal:", str(e))
         return {"status": "error", "mensaje": "Señal con errores internos"}
 
-# ==========================================
-# EL MOTOR DE ARRANQUE PARA RENDER
-# ==========================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
