@@ -4,11 +4,11 @@ from pydantic import BaseModel
 import os
 import json
 import math
+import random
+import urllib.request
 from datetime import datetime
 from supabase import create_client, Client
 import uvicorn
-import random
-import urllib.request
 
 app = FastAPI()
 
@@ -53,6 +53,12 @@ class UpgradeRequest(BaseModel):
     email: str
     nivel_suscripcion: str
 
+class SoporteRequest(BaseModel):
+    email_usuario: str
+    plan_nivel: str
+    mensaje: str
+    estado: str = "ABIERTO"
+
 # 4. RUTAS DEL SISTEMA
 
 @app.post("/upgrade_nivel")
@@ -60,7 +66,6 @@ async def upgrade_nivel(req: UpgradeRequest):
     if not supabase:
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     try:
-        # Busca al usuario por su email y le cambia el nivel (EJ: de FREE a EXECUTIVE)
         response = supabase.table("clientes_vip").update({"nivel_suscripcion": req.nivel_suscripcion}).eq("email", req.email).execute()
         return {"status": "success", "mensaje": f"Nivel actualizado a {req.nivel_suscripcion}"}
     except Exception as e:
@@ -121,7 +126,7 @@ async def obtener_perfil(req: PerfilRequest):
 
 
 # ==========================================
-# MOTOR MATEMÁTICO: SIMULADOR DE CICLOS DE 7 PUNTOS
+# MOTOR MATEMÁTICO: SIMULADOR DE CICLOS
 # ==========================================
 @app.post("/simular_periodo")
 async def simular_periodo(req: SimulacionRequest):
@@ -146,7 +151,6 @@ async def simular_periodo(req: SimulacionRequest):
             seed = sum(ord(c) for c in req.email)
             vectores = { "SOL": (seed % 360), "LUNA": ((seed * 2) % 360), "JUPITER": ((seed * 7) % 360), "SATURNO": ((seed * 11) % 360) }
 
-        # Cálculos de Tiempo
         f_inicio = datetime.strptime(req.fecha_inicio, "%Y-%m-%d")
         f_fin = datetime.strptime(req.fecha_fin, "%Y-%m-%d")
         dias_desde_2000 = (f_inicio - datetime(2000, 1, 1)).days
@@ -157,7 +161,6 @@ async def simular_periodo(req: SimulacionRequest):
         sol_natal = vectores.get("SOL", 0)
         luna_natal = vectores.get("LUNA", 0)
 
-        # Cálculo Global del Mes
         ciclo_jupiter = math.sin(math.radians(((dias_desde_2000 % 4332) / 4332 * 360) - jupiter_natal))
         ciclo_saturno = math.cos(math.radians(((dias_desde_2000 % 10759) / 10759 * 360) - saturno_natal))
         ciclo_sol = math.sin(math.radians(((dias_desde_2000 % 365) / 365 * 360) - sol_natal))
@@ -168,11 +171,9 @@ async def simular_periodo(req: SimulacionRequest):
 
         is_risk = val_risk < -5 or val_cap < 0
 
-        # CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS
         curva_exacta = []
         for i in range(7):
             dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
-            
             c_jup = math.sin(math.radians(((dia_segmento % 4332) / 4332 * 360) - jupiter_natal))
             c_sat = math.cos(math.radians(((dia_segmento % 10759) / 10759 * 360) - saturno_natal))
             c_sol = math.sin(math.radians(((dia_segmento % 365) / 365 * 360) - sol_natal))
@@ -214,15 +215,10 @@ async def simular_periodo(req: SimulacionRequest):
 def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
 
+
 # ==========================================
 # MÓDULO DE SOPORTE TÁCTICO Y MAILERLITE
 # ==========================================
-class SoporteRequest(BaseModel):
-    email_usuario: str
-    plan_nivel: str
-    mensaje: str
-    estado: str = "ABIERTO"
-
 @app.post("/generar_ticket")
 async def generar_ticket(req: SoporteRequest):
     if not supabase:
@@ -272,42 +268,36 @@ async def generar_ticket(req: SoporteRequest):
         print("❌ Error en Ticket:", str(e))
         return {"status": "error", "mensaje": "Fallo en el núcleo de soporte."}
 
+
 # ==========================================
-# NUEVA RUTA: TRADUCTOR OFICIAL DE PAYPAL
+# RUTA OFICIAL DE PAYPAL
 # ==========================================
 @app.post("/webhook/paypal")
 async def paypal_webhook(request: Request):
     try:
-        # 1. Capturamos el misil de datos que envía PayPal
         payload = await request.json()
         event_type = payload.get("event_type")
         print(f"📡 SEÑAL DE PAYPAL RECIBIDA: {event_type}")
 
-        # 2. Si el evento es un pago completado
         if event_type in ["PAYMENT.CAPTURE.COMPLETED", "CHECKOUT.ORDER.APPROVED"]:
             resource = payload.get("resource", {})
-            
-            # Buscamos el email del cliente en custom_id (que deberías mandar desde el botón de PayPal)
             custom_id = resource.get("custom_id")
-            monto = resource.get("amount", {}).get("value") # Para saber cuánto pagó
+            monto = resource.get("amount", {}).get("value") 
             
             if custom_id and supabase:
-                # Lógica de seguridad: si pagó 15 es Sentinel, si pagó 45 es Executive
                 nivel = "EXECUTIVE" if float(monto) > 20 else "SENTINEL"
                 supabase.table("clientes_vip").update({"nivel_suscripcion": nivel}).eq("email", custom_id).execute()
                 print(f"✅ Base de datos verificada por Servidor para: {custom_id} -> Nivel asignado: {nivel}")
 
-        # 3. LA ORDEN MÁS IMPORTANTE: Responder a PayPal para que ponga la luz VERDE
-        return {"status": "success", "mensaje": "Transmisión de PayPal recibida y procesada"}
+        return {"status": "success", "mensaje": "Transmisión de PayPal recibida"}
         
     except Exception as e:
         print("❌ Error procesando Webhook de PayPal:", str(e))
-        # Incluso si hay error interno, le decimos a PayPal que lo recibimos para que no colapse
-        return {"status": "error", "mensaje": "Señal recibida pero con errores internos"}
+        return {"status": "error", "mensaje": "Señal con errores internos"}
 
 
 # ==========================================
-# 5. EL MOTOR DE ARRANQUE PARA RENDER
+# EL MOTOR DE ARRANQUE PARA RENDER
 # ==========================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
