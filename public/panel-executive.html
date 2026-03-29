@@ -204,7 +204,7 @@ async function sincronizarPanel() {
     if (!email) return;
 
     try {
-        const response = await fetch("https://vault-strategy-api.onrender.com/simular_periodo", {
+        const response = await fetch("https://vault-strategy-api-9lxc/simular_periodo", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -291,7 +291,7 @@ async function conectar() {
     document.getElementById('fecha-hoy').innerText = new Date().toLocaleDateString('es-ES');
 
     try {
-        const response = await fetch("https://vault-strategy-api.onrender.com/obtener_perfil", {
+        const response = await fetch("https://vault-strategy-api-9lxc/obtener_perfil", {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: email })
         });
         const res = await response.json();
