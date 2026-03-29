@@ -244,7 +244,7 @@
             resCuerpo.innerHTML = "Conectando con servidor seguro...";
 
             try {
-                const respuesta = await fetch("https://vault-strategy-api-9lxc/consultar", {
+                const respuesta = await fetch("https://vault-strategy-api-9lxc.onrender.com/consultar", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
