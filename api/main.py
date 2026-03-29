@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -47,14 +47,12 @@ class SimulacionRequest(BaseModel):
     fecha_inicio: str
     fecha_fin: str
 
-# --- NUEVA ESTRUCTURA PARA RECIBIR PAGOS ---
 class UpgradeRequest(BaseModel):
     email: str
     nivel_suscripcion: str
 
 # 4. RUTAS DEL SISTEMA
 
-# --- NUEVA RUTA: ACTUALIZACIÓN TRAS EL PAGO EN PAYPAL ---
 @app.post("/upgrade_nivel")
 async def upgrade_nivel(req: UpgradeRequest):
     if not supabase:
@@ -168,7 +166,7 @@ async def simular_periodo(req: SimulacionRequest):
 
         is_risk = val_risk < -5 or val_cap < 0
 
-        # CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS (CON VOLATILIDAD LUNAR Y SOLAR)
+        # CÁLCULO DE LA CURVA EXACTA DE 7 PUNTOS
         curva_exacta = []
         for i in range(7):
             dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
@@ -176,7 +174,7 @@ async def simular_periodo(req: SimulacionRequest):
             c_jup = math.sin(math.radians(((dia_segmento % 4332) / 4332 * 360) - jupiter_natal))
             c_sat = math.cos(math.radians(((dia_segmento % 10759) / 10759 * 360) - saturno_natal))
             c_sol = math.sin(math.radians(((dia_segmento % 365) / 365 * 360) - sol_natal))
-            c_luna = math.sin(math.radians(((dia_segmento % 28) / 28 * 360) - luna_natal)) # Volatilidad alta
+            c_luna = math.sin(math.radians(((dia_segmento % 28) / 28 * 360) - luna_natal)) 
             
             if is_risk:
                 punto = int(50 + (c_sat * 25) - (c_jup * 10) + (c_sol * 10) + (c_luna * 15)) 
@@ -213,6 +211,40 @@ async def simular_periodo(req: SimulacionRequest):
 @app.get("/api/health")
 def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
+
+# ==========================================
+# NUEVA RUTA: TRADUCTOR OFICIAL DE PAYPAL
+# ==========================================
+@app.post("/webhook/paypal")
+async def paypal_webhook(request: Request):
+    try:
+        # 1. Capturamos el misil de datos que envía PayPal
+        payload = await request.json()
+        event_type = payload.get("event_type")
+        print(f"📡 SEÑAL DE PAYPAL RECIBIDA: {event_type}")
+
+        # 2. Si el evento es un pago completado
+        if event_type in ["PAYMENT.CAPTURE.COMPLETED", "CHECKOUT.ORDER.APPROVED"]:
+            resource = payload.get("resource", {})
+            
+            # Buscamos el email del cliente en custom_id (que deberías mandar desde el botón de PayPal)
+            custom_id = resource.get("custom_id")
+            monto = resource.get("amount", {}).get("value") # Para saber cuánto pagó
+            
+            if custom_id and supabase:
+                # Lógica de seguridad: si pagó 15 es Sentinel, si pagó 45 es Executive
+                nivel = "EXECUTIVE" if float(monto) > 20 else "SENTINEL"
+                supabase.table("clientes_vip").update({"nivel_suscripcion": nivel}).eq("email", custom_id).execute()
+                print(f"✅ Base de datos verificada por Servidor para: {custom_id} -> Nivel asignado: {nivel}")
+
+        # 3. LA ORDEN MÁS IMPORTANTE: Responder a PayPal para que ponga la luz VERDE
+        return {"status": "success", "mensaje": "Transmisión de PayPal recibida y procesada"}
+        
+    except Exception as e:
+        print("❌ Error procesando Webhook de PayPal:", str(e))
+        # Incluso si hay error interno, le decimos a PayPal que lo recibimos para que no colapse
+        return {"status": "error", "mensaje": "Señal recibida pero con errores internos"}
+
 
 # ==========================================
 # 5. EL MOTOR DE ARRANQUE PARA RENDER
