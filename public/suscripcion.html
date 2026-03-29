@@ -181,7 +181,7 @@
     // Función mensajera: Le avisa a Python que actualice Supabase
     async function notificarPagoAlServidor(email, nuevoNivel) {
         try {
-            await fetch("https://vault-strategy-api.onrender.com/upgrade_nivel", {
+            await fetch("https://vault-strategy-api-9lxc/upgrade_nivel", {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ email: email, nivel_suscripcion: nuevoNivel })
