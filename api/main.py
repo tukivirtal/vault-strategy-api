@@ -210,7 +210,7 @@ def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
 
 # ==========================================
-# MÓDULO DE SOPORTE TÁCTICO Y ALERTA HOSTINGER
+# MÓDULO DE SOPORTE TÁCTICO Y ALERTA
 # ==========================================
 @app.post("/generar_ticket")
 async def generar_ticket(req: SoporteRequest):
@@ -222,7 +222,7 @@ async def generar_ticket(req: SoporteRequest):
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
-        # 2. Guardamos en la tabla 'soporte_tickets' de Supabase
+        # 2. Guardamos en la tabla
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
             "email_usuario": req.email_usuario,
@@ -232,9 +232,9 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. CONEXIÓN DIRECTA CON HOSTINGER (Envío de correo)
+        # 3. CONEXIÓN DIRECTA (Envío de correo)
         smtp_user = "support@vaultlogicsys.com"
-        smtp_pass = os.getenv("EMAIL_PASSWORD") # La llave que usted configuró en Render
+        smtp_pass = os.getenv("EMAIL_PASSWORD") 
         destinatario = "support@vaultlogicsys.com"
 
         if smtp_pass:
@@ -245,7 +245,7 @@ async def generar_ticket(req: SoporteRequest):
                 msg['Subject'] = f"🔴 NUEVO TICKET GXP: {ticket_ref}"
 
                 cuerpo = f"""
-Comandante, ha recibido una nueva transmisión de soporte táctico:
+ha recibido una nueva transmisión de soporte táctico:
 
 ID DEL TICKET: {ticket_ref}
 EMAIL DEL USUARIO: {req.email_usuario}
@@ -256,7 +256,7 @@ REPORTE DEL INCIDENTE:
 """
                 msg.attach(MIMEText(cuerpo, 'plain'))
 
-                # Coordenadas maestras de Hostinger
+                # Coordenadas maestras
                 server = smtplib.SMTP('smtp.hostinger.com', 587)
                 server.starttls()
                 server.login(smtp_user, smtp_pass)
@@ -267,7 +267,7 @@ REPORTE DEL INCIDENTE:
             except Exception as e:
                 print("❌ Error enviando email de alerta corporativa:", str(e))
         else:
-            print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD en Render. No se envió correo.")
+            print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD. No se envió correo.")
 
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
