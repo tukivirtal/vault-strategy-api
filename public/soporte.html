@@ -48,7 +48,9 @@
             box-sizing: border-box; 
             outline: none;
         }
-        input:focus { border-color: #d4af37; }
+        input:focus, select:focus, textarea:focus { 
+            border-color: #d4af37; 
+        }
         button { 
             width: 100%; 
             background: #fff; 
@@ -59,15 +61,30 @@
             cursor: pointer; 
             text-transform: uppercase; 
             transition: 0.3s;
+            margin-bottom: 10px;
         }
-        button:hover { background: #d4af37; }
+        button:hover { 
+            background: #d4af37; 
+        }
+        /* Nuevo estilo para el botón secundario de Volver */
+        button.btn-volver {
+            background: transparent;
+            border: 1px solid #333;
+            color: #777;
+        }
+        button.btn-volver:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+            background: transparent;
+        }
         #feedback { 
             display: none; 
             margin-top: 20px; 
             text-align: center; 
             font-size: 0.75rem; 
             border: 1px dashed #d4af37; 
-            padding: 10px;
+            padding: 15px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -90,7 +107,9 @@
         <textarea id="mensaje" rows="4" required placeholder="Describa el problema..."></textarea>
 
         <button type="button" onclick="enviar()">Activar Ticket</button>
+        <button type="button" class="btn-volver" onclick="window.location.href='portal.html'">Volver al Portal</button>
     </form>
+    
     <div id="feedback"></div>
 </div>
 
@@ -102,15 +121,17 @@
         const mensaje = document.getElementById('mensaje').value;
 
         if (!email || !mensaje) {
-            alert("Por favor, complete todos los campos.");
+            alert("Por favor, complete todos los campos de la transmisión.");
             return;
         }
 
+        // Mostrar estado de carga en amarillo/dorado
         feedback.style.display = "block";
+        feedback.style.color = "#d4af37";
+        feedback.style.borderColor = "#d4af37";
         feedback.innerText = "ENVIANDO DATOS AL NÚCLEO RENDER...";
 
         try {
-            // URL ACTUALIZADA AL NUEVO SERVIDOR
             const res = await fetch(`https://vault-strategy-api-9lxc.onrender.com/generar_ticket`, {
                 method: 'POST',
                 headers: {
@@ -125,14 +146,29 @@
             });
 
             if (res.ok) {
-                const data = await res.json();
-                feedback.innerText = `TICKET INDEXADO EXITOSAMENTE. PROTOCOLO ACTIVADO.`;
+                // Éxito: Se pone verde y programa la redirección
+                feedback.style.color = "#00ff8c";
+                feedback.style.borderColor = "#00ff8c";
+                feedback.innerHTML = `TICKET INDEXADO EXITOSAMENTE.<br>PROTOCOLO DE SOPORTE ACTIVADO.<br><br><span style="color:#777; font-size:10px;">Redirigiendo a la base en 3 segundos...</span>`;
+                
                 document.getElementById('form-soporte').reset();
+                
+                // Redirección automática después de 3000 milisegundos (3 segundos)
+                setTimeout(() => {
+                    window.location.href = "portal.html";
+                }, 3000);
+
             } else {
+                // Error de servidor: Se pone rojo
+                feedback.style.color = "#ff4d4d";
+                feedback.style.borderColor = "#ff4d4d";
                 feedback.innerText = "ERROR EN EL SERVIDOR RENDER. VERIFIQUE LOGS.";
             }
         } catch (err) {
+            // Error de red: Se pone rojo
             console.error(err);
+            feedback.style.color = "#ff4d4d";
+            feedback.style.borderColor = "#ff4d4d";
             feedback.innerText = "FALLO CRÍTICO: NO SE PUDO CONECTAR CON RENDER.";
         }
     }
