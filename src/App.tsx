@@ -295,10 +295,10 @@ export default function App() {
               <h5 className="font-sans font-bold text-base uppercase tracking-widest text-gold mb-6 md:mb-8">Contacto y Redes</h5>
               <ul className="space-y-4 md:space-y-6 text-white/50 font-mono text-sm">
                 <li>
-                  <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
-                  <a href="mailto:support@vaultlogicsys.com" className="hover:text-gold transition-colors whitespace-nowrap">
-                    support@vaultlogicsys.com
-                  </a>
+                 <span className="block text-[10px] text-white/30 uppercase mb-2">Soporte Ejecutivo</span>
+                <a href="soporte.html" className="hover:text-gold transition-colors whitespace-nowrap">
+                  Centro de Soporte Táctico
+                </a>
                 </li>
                 <li>
                   <span className="block text-[10px] text-white/30 uppercase mb-2">Red Táctica (X)</span>
