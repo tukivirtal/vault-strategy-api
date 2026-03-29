@@ -71,7 +71,6 @@ async def upgrade_nivel(req: UpgradeRequest):
     except Exception as e:
         return {"status": "error", "mensaje": str(e)}
 
-
 @app.post("/consultar")
 async def consultar(data: LoginData):
     if not supabase:
@@ -124,10 +123,6 @@ async def obtener_perfil(req: PerfilRequest):
     except Exception as e:
         return {"status": "error"}
 
-
-# ==========================================
-# MOTOR MATEMÁTICO: SIMULADOR DE CICLOS
-# ==========================================
 @app.post("/simular_periodo")
 async def simular_periodo(req: SimulacionRequest):
     if not supabase:
@@ -215,7 +210,6 @@ async def simular_periodo(req: SimulacionRequest):
 def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
 
-
 # ==========================================
 # MÓDULO DE SOPORTE TÁCTICO Y MAILERLITE
 # ==========================================
@@ -225,7 +219,7 @@ async def generar_ticket(req: SoporteRequest):
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     
     try:
-        # 1. Generamos el código exacto de su sistema (Ej: GX-82964)
+        # 1. Generamos el código exacto de su sistema
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
@@ -239,7 +233,7 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. CONEXIÓN DIRECTA CON MAILERLITE (Reemplaza a Make.com)
+        # 3. CONEXIÓN DIRECTA CON MAILERLITE
         ml_api_key = os.getenv("MAILERLITE_API_KEY")
         ml_group_id = os.getenv("MAILERLITE_GROUP_ID")
         
@@ -250,7 +244,6 @@ async def generar_ticket(req: SoporteRequest):
                 "Accept": "application/json",
                 "Authorization": f"Bearer {ml_api_key}"
             }
-            # Agregamos al usuario al grupo específico que dispara la automatización
             data = {
                 "email": req.email_usuario,
                 "groups": [ml_group_id]
@@ -258,7 +251,7 @@ async def generar_ticket(req: SoporteRequest):
             req_ml = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers, method='POST')
             try:
                 urllib.request.urlopen(req_ml)
-                print(f"✉️ Señal enviada a MailerLite para automatización de {req.email_usuario}")
+                print(f"✉️ Señal enviada a MailerLite para {req.email_usuario}")
             except Exception as ml_err:
                 print("❌ Error contactando a MailerLite:", ml_err)
 
@@ -267,7 +260,6 @@ async def generar_ticket(req: SoporteRequest):
     except Exception as e:
         print("❌ Error en Ticket:", str(e))
         return {"status": "error", "mensaje": "Fallo en el núcleo de soporte."}
-
 
 # ==========================================
 # RUTA OFICIAL DE PAYPAL
@@ -287,14 +279,13 @@ async def paypal_webhook(request: Request):
             if custom_id and supabase:
                 nivel = "EXECUTIVE" if float(monto) > 20 else "SENTINEL"
                 supabase.table("clientes_vip").update({"nivel_suscripcion": nivel}).eq("email", custom_id).execute()
-                print(f"✅ Base de datos verificada por Servidor para: {custom_id} -> Nivel asignado: {nivel}")
+                print(f"✅ Base de datos verificada para: {custom_id} -> Nivel: {nivel}")
 
         return {"status": "success", "mensaje": "Transmisión de PayPal recibida"}
         
     except Exception as e:
         print("❌ Error procesando Webhook de PayPal:", str(e))
         return {"status": "error", "mensaje": "Señal con errores internos"}
-
 
 # ==========================================
 # EL MOTOR DE ARRANQUE PARA RENDER
