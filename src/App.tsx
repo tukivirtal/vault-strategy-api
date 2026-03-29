@@ -164,31 +164,39 @@ export default function App() {
               </div>
               
               <h3 className="text-xl md:text-2xl font-sans font-bold mb-8 uppercase tracking-widest text-gold text-center md:text-left">Comparativa de Sistema</h3>
-              <div className="space-y-4 md:space-y-6">
+              <div className="space-y-2 md:space-y-6">
                 
-                {/* Encabezados de tabla optimizados */}
-                <div className="grid grid-cols-3 pb-4 border-b border-white/10 font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-white/40 text-center md:text-left gap-2">
-                  <span className="text-left">Métrica</span>
+                {/* Header Desktop */}
+                <div className="hidden md:grid grid-cols-3 pb-4 border-b border-white/10 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                  <span>Métrica</span>
+                  <span className="text-gold">Vault Logic</span>
+                  <span>Tradicional</span>
+                </div>
+
+                {/* Header Mobile */}
+                <div className="grid grid-cols-2 md:hidden pb-3 border-b border-white/10 font-mono text-[9px] uppercase tracking-widest text-white/40 mt-4">
                   <span className="text-gold">Vault Logic</span>
                   <span>Tradicional</span>
                 </div>
                 
-                {/* Filas optimizadas para evitar colisión */}
+                {/* Filas dinámicas: en móvil se apilan (Label arriba, valores abajo) */}
                 {[
                   { label: "Output", vault: "Directiva", trad: "Datos" },
                   { label: "Interpretación", vault: "Automática", trad: "Manual" },
                   { label: "Perfil Natal", vault: "Calibrado", trad: "Genérico" },
                   { label: "Base de Datos", vault: "NASA JPL", trad: "Feeds" },
                 ].map((item, i) => (
-                  <div key={i} className="grid grid-cols-3 py-3 md:py-4 items-center group gap-2 text-center md:text-left">
-                    <span className="font-mono text-xs md:text-lg group-hover:text-gold transition-colors text-left">{item.label}</span>
-                    <div className="flex items-center justify-center md:justify-start gap-1.5 text-gold">
-                      <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-                      <span className="font-bold text-[11px] md:text-base">{item.vault}</span>
-                    </div>
-                    <div className="flex items-center justify-center md:justify-start gap-1.5 text-white/20">
-                      <XCircle className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-                      <span className="text-[11px] md:text-base">{item.trad}</span>
+                  <div key={i} className="flex flex-col md:grid md:grid-cols-3 py-3 md:py-4 border-b border-white/5 md:border-none group gap-3 md:gap-4">
+                    <span className="font-mono text-[13px] md:text-lg text-white/70 group-hover:text-gold transition-colors">{item.label}</span>
+                    <div className="grid grid-cols-2 md:contents gap-2">
+                      <div className="flex items-center justify-start gap-1.5 text-gold">
+                        <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                        <span className="font-bold text-[12px] md:text-base">{item.vault}</span>
+                      </div>
+                      <div className="flex items-center justify-start gap-1.5 text-white/20">
+                        <XCircle className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                        <span className="text-[12px] md:text-base">{item.trad}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
