@@ -119,11 +119,12 @@
 <script>
     async function enviar() {
         const feedback = document.getElementById('feedback');
+        const nombre = document.getElementById('nombre').value; // NUEVO
         const email = document.getElementById('email').value;
         const plan = document.getElementById('plan').value;
         const mensaje = document.getElementById('mensaje').value;
 
-        if (!email || !mensaje) {
+        if (!nombre || !email || !mensaje) {
             alert("Por favor, complete todos los campos de la transmisión.");
             return;
         }
@@ -141,6 +142,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    nombre_usuario: nombre,
                     email_usuario: email,
                     plan_nivel: plan,
                     mensaje: mensaje,
