@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -214,15 +214,15 @@ def health():
 
 
 # ==========================================
-# MOTOR EN SEGUNDO PLANO (EL PUENTE DE GOOGLE)
+# MOTOR DE CORREO DIRECTO (PUENTE DE GOOGLE)
 # ==========================================
 def enviar_confirmacion_cliente(ticket_ref, nombre_usuario, email_usuario, plan_nivel):
     gmail_user = "vaultlogicsys@gmail.com"
-    gmail_pass = os.getenv("GMAIL_APP_PASSWORD") # La llave maestra sin espacios
+    gmail_pass = os.getenv("GMAIL_APP_PASSWORD") 
     correo_oficial = "support@vaultlogicsys.com"
 
     if not gmail_pass:
-        print("⚠️ ATENCIÓN: Falta la variable GMAIL_APP_PASSWORD en Render.")
+        print("⚠️ ATENCIÓN: Falta GMAIL_APP_PASSWORD en Render. Correo abortado.", flush=True)
         return
 
     try:
@@ -230,8 +230,6 @@ def enviar_confirmacion_cliente(ticket_ref, nombre_usuario, email_usuario, plan_
         msg['From'] = f"Soporte GXP <{gmail_user}>"
         msg['To'] = email_usuario
         msg['Subject'] = f"Confirmación de Ticket Recibido: {ticket_ref}"
-        
-        # Etiqueta secreta: Si responden, va a Hostinger
         msg.add_header('reply-to', correo_oficial)
 
         cuerpo = f"""Saludos, {nombre_usuario},
@@ -249,23 +247,23 @@ Soporte Técnico - Vault Logic
 """
         msg.attach(MIMEText(cuerpo, 'plain'))
 
-        # Coordenadas exactas de Google SMTP
+        # Ejecución forzada con timeout seguro
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
         server.starttls()
         server.login(gmail_user, gmail_pass)
         text = msg.as_string()
         server.sendmail(gmail_user, email_usuario, text)
         server.quit()
-        print(f"✉️ Confirmación enviada vía Google al cliente: {email_usuario}")
+        print(f"✉️ Confirmación enviada vía Google al cliente: {email_usuario}", flush=True)
     except Exception as e:
-        print("❌ Error del servidor de Google al enviar correo:", str(e))
+        print(f"❌ Error del servidor de Google al enviar correo: {str(e)}", flush=True)
 
 
 # ==========================================
-# MÓDULO DE SOPORTE TÁCTICO
+# MÓDULO DE SOPORTE TÁCTICO (ASALTO FRONTAL)
 # ==========================================
 @app.post("/generar_ticket")
-async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks):
+async def generar_ticket(req: SoporteRequest):  # <-- Eliminamos el parámetro BackgroundTasks
     if not supabase:
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     
@@ -273,6 +271,7 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
+        # 1. Guardar en Base de Datos
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
             "nombre_usuario": req.nombre_usuario,
@@ -281,15 +280,17 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
             "mensaje": req.mensaje
         }
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
-        print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
+        print(f"✅ Ticket {ticket_ref} guardado en Bóveda.", flush=True)
         
-        # LANZAMOS EL CORREO A LAS SOMBRAS
-        background_tasks.add_task(enviar_confirmacion_cliente, ticket_ref, req.nombre_usuario, req.email_usuario, req.plan_nivel)
+        # 2. ENVIAR CORREO ANTES DE TERMINAR (Obligamos a Render a esperar)
+        print("⚙️ Iniciando puente con Google...", flush=True)
+        enviar_confirmacion_cliente(ticket_ref, req.nombre_usuario, req.email_usuario, req.plan_nivel)
 
+        # 3. Luz verde a la web solo cuando el correo ya salió
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
     except Exception as e:
-        print("❌ Error en Ticket:", str(e))
+        print("❌ Error crítico en Ticket:", str(e), flush=True)
         return {"status": "error", "mensaje": "Fallo en el núcleo de soporte."}
 
 
@@ -301,7 +302,7 @@ async def paypal_webhook(request: Request):
     try:
         payload = await request.json()
         event_type = payload.get("event_type")
-        print(f"📡 SEÑAL DE PAYPAL RECIBIDA: {event_type}")
+        print(f"📡 SEÑAL DE PAYPAL RECIBIDA: {event_type}", flush=True)
 
         if event_type in ["PAYMENT.CAPTURE.COMPLETED", "CHECKOUT.ORDER.APPROVED"]:
             resource = payload.get("resource", {})
@@ -311,12 +312,12 @@ async def paypal_webhook(request: Request):
             if custom_id and supabase:
                 nivel = "EXECUTIVE" if float(monto) > 20 else "SENTINEL"
                 supabase.table("clientes_vip").update({"nivel_suscripcion": nivel}).eq("email", custom_id).execute()
-                print(f"✅ Base de datos verificada para: {custom_id} -> Nivel: {nivel}")
+                print(f"✅ Base de datos verificada para: {custom_id} -> Nivel: {nivel}", flush=True)
 
         return {"status": "success", "mensaje": "Transmisión de PayPal recibida"}
         
     except Exception as e:
-        print("❌ Error procesando Webhook de PayPal:", str(e))
+        print("❌ Error procesando Webhook de PayPal:", str(e), flush=True)
         return {"status": "error", "mensaje": "Señal con errores internos"}
 
 if __name__ == "__main__":
