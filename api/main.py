@@ -5,9 +5,6 @@ import os
 import json
 import math
 import random
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from supabase import create_client, Client
 import uvicorn
@@ -214,56 +211,10 @@ def health():
 
 
 # ==========================================
-# MOTOR DE CORREO DIRECTO (PUENTE DE GOOGLE)
-# ==========================================
-def enviar_confirmacion_cliente(ticket_ref, nombre_usuario, email_usuario, plan_nivel):
-    gmail_user = "vaultlogicsys@gmail.com"
-    gmail_pass = os.getenv("GMAIL_APP_PASSWORD") 
-    correo_oficial = "support@vaultlogicsys.com"
-
-    if not gmail_pass:
-        print("⚠️ ATENCIÓN: Falta GMAIL_APP_PASSWORD en Render. Correo abortado.", flush=True)
-        return
-
-    try:
-        msg = MIMEMultipart()
-        msg['From'] = f"Soporte GXP <{gmail_user}>"
-        msg['To'] = email_usuario
-        msg['Subject'] = f"Confirmación de Ticket Recibido: {ticket_ref}"
-        msg.add_header('reply-to', correo_oficial)
-
-        cuerpo = f"""Saludos, {nombre_usuario},
-
-Hemos recibido exitosamente su solicitud de soporte en el Centro de Comando GXP.
-
-DATOS DE SU TICKET:
-- ID de Registro: {ticket_ref}
-- Nivel de Acceso: {plan_nivel}
-
-Nuestro equipo de ingeniería ya tiene su reporte en la base de datos y lo está analizando. Nos comunicaremos con usted a la brevedad con una resolución.
-
-Atentamente,
-Soporte Técnico - Vault Logic
-"""
-        msg.attach(MIMEText(cuerpo, 'plain'))
-
-        # Ejecución forzada con timeout seguro
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
-        server.starttls()
-        server.login(gmail_user, gmail_pass)
-        text = msg.as_string()
-        server.sendmail(gmail_user, email_usuario, text)
-        server.quit()
-        print(f"✉️ Confirmación enviada vía Google al cliente: {email_usuario}", flush=True)
-    except Exception as e:
-        print(f"❌ Error del servidor de Google al enviar correo: {str(e)}", flush=True)
-
-
-# ==========================================
-# MÓDULO DE SOPORTE TÁCTICO (ASALTO FRONTAL)
+# MÓDULO DE SOPORTE TÁCTICO (NÚCLEO ESTABLE)
 # ==========================================
 @app.post("/generar_ticket")
-async def generar_ticket(req: SoporteRequest):  # <-- Eliminamos el parámetro BackgroundTasks
+async def generar_ticket(req: SoporteRequest):
     if not supabase:
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     
@@ -271,7 +222,7 @@ async def generar_ticket(req: SoporteRequest):  # <-- Eliminamos el parámetro B
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
-        # 1. Guardar en Base de Datos
+        # Guardar directamente en la Base de Datos
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
             "nombre_usuario": req.nombre_usuario,
@@ -280,13 +231,9 @@ async def generar_ticket(req: SoporteRequest):  # <-- Eliminamos el parámetro B
             "mensaje": req.mensaje
         }
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
-        print(f"✅ Ticket {ticket_ref} guardado en Bóveda.", flush=True)
-        
-        # 2. ENVIAR CORREO ANTES DE TERMINAR (Obligamos a Render a esperar)
-        print("⚙️ Iniciando puente con Google...", flush=True)
-        enviar_confirmacion_cliente(ticket_ref, req.nombre_usuario, req.email_usuario, req.plan_nivel)
+        print(f"✅ Ticket {ticket_ref} guardado exitosamente en Bóveda.", flush=True)
 
-        # 3. Luz verde a la web solo cuando el correo ya salió
+        # Luz verde inmediata a la web
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
     except Exception as e:
