@@ -14,7 +14,7 @@ import uvicorn
 
 app = FastAPI()
 
-# 1. SEGURIDAD (CORS) - Puertas abiertas para su web
+# 1. SEGURIDAD (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -214,21 +214,25 @@ def health():
 
 
 # ==========================================
-# MOTOR EN SEGUNDO PLANO (CONFIRMACIÓN AL CLIENTE)
+# MOTOR EN SEGUNDO PLANO (EL PUENTE DE GOOGLE)
 # ==========================================
 def enviar_confirmacion_cliente(ticket_ref, nombre_usuario, email_usuario, plan_nivel):
-    smtp_user = "support@vaultlogicsys.com"
-    smtp_pass = os.getenv("EMAIL_PASSWORD") # Su llave guardada en Render
+    gmail_user = "vaultlogicsys@gmail.com"
+    gmail_pass = os.getenv("GMAIL_APP_PASSWORD") # La llave maestra sin espacios
+    correo_oficial = "support@vaultlogicsys.com"
 
-    if not smtp_pass:
-        print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD en Render. Correo abortado.")
+    if not gmail_pass:
+        print("⚠️ ATENCIÓN: Falta la variable GMAIL_APP_PASSWORD en Render.")
         return
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = f"Soporte GXP <{smtp_user}>"
+        msg['From'] = f"Soporte GXP <{gmail_user}>"
         msg['To'] = email_usuario
         msg['Subject'] = f"Confirmación de Ticket Recibido: {ticket_ref}"
+        
+        # Etiqueta secreta: Si responden, va a Hostinger
+        msg.add_header('reply-to', correo_oficial)
 
         cuerpo = f"""Saludos, {nombre_usuario},
 
@@ -245,19 +249,20 @@ Soporte Técnico - Vault Logic
 """
         msg.attach(MIMEText(cuerpo, 'plain'))
 
-        # Envío por puerto 465 (SSL seguro) con límite de 10 segundos
-        server = smtplib.SMTP_SSL('smtp.hostinger.com', 465, timeout=10)
-        server.login(smtp_user, smtp_pass)
+        # Coordenadas exactas de Google SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
+        server.starttls()
+        server.login(gmail_user, gmail_pass)
         text = msg.as_string()
-        server.sendmail(smtp_user, email_usuario, text)
+        server.sendmail(gmail_user, email_usuario, text)
         server.quit()
-        print(f"✉️ Confirmación enviada con éxito al cliente: {email_usuario}")
+        print(f"✉️ Confirmación enviada vía Google al cliente: {email_usuario}")
     except Exception as e:
-        print("❌ Error interno de Hostinger al enviar correo al cliente:", str(e))
+        print("❌ Error del servidor de Google al enviar correo:", str(e))
 
 
 # ==========================================
-# MÓDULO DE SOPORTE TÁCTICO (SÚPER RÁPIDO)
+# MÓDULO DE SOPORTE TÁCTICO
 # ==========================================
 @app.post("/generar_ticket")
 async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks):
@@ -265,11 +270,9 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     
     try:
-        # 1. Generamos el código exacto
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
-        # 2. Guardamos en la tabla de Supabase (Tarda 0.1 segundos)
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
             "nombre_usuario": req.nombre_usuario,
@@ -280,10 +283,9 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. LANZAMOS EL CORREO AL CLIENTE EN LAS SOMBRAS
+        # LANZAMOS EL CORREO A LAS SOMBRAS
         background_tasks.add_task(enviar_confirmacion_cliente, ticket_ref, req.nombre_usuario, req.email_usuario, req.plan_nivel)
 
-        # 4. LE DAMOS LUZ VERDE AL USUARIO INMEDIATAMENTE
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
     except Exception as e:
