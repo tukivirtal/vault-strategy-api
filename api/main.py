@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -14,7 +14,7 @@ import uvicorn
 
 app = FastAPI()
 
-# 1. SEGURIDAD (CORS)
+# 1. SEGURIDAD (CORS) - Puertas abiertas para su web
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -61,7 +61,9 @@ class SoporteRequest(BaseModel):
     mensaje: str
     estado: str = "ABIERTO"
 
-# 4. RUTAS DEL SISTEMA
+# ==========================================
+# RUTAS DEL SISTEMA PRINCIPAL
+# ==========================================
 
 @app.post("/upgrade_nivel")
 async def upgrade_nivel(req: UpgradeRequest):
@@ -209,20 +211,62 @@ async def simular_periodo(req: SimulacionRequest):
 def health():
     return {"status": "online", "system": "VAULT LOGIC ACTIVE"}
 
+
 # ==========================================
-# MÓDULO DE SOPORTE TÁCTICO Y ALERTA
+# MOTOR EN SEGUNDO PLANO (LA MAGIA ANTIBLOQUEO PARA CORREOS)
+# ==========================================
+def enviar_alerta_correo(ticket_ref, email_usuario, plan_nivel, mensaje_usuario):
+    smtp_user = "support@vaultlogicsys.com"
+    smtp_pass = os.getenv("EMAIL_PASSWORD") # Su llave guardada en Render
+    destinatario = "support@vaultlogicsys.com"
+
+    if not smtp_pass:
+        print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD en Render. Correo abortado.")
+        return
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = smtp_user
+        msg['To'] = destinatario
+        msg['Subject'] = f"🔴 NUEVO TICKET GXP: {ticket_ref}"
+
+        cuerpo = f"""
+ha recibido una nueva transmisión de soporte táctico:
+
+ID DEL TICKET: {ticket_ref}
+EMAIL DEL USUARIO: {email_usuario}
+NIVEL DE ACCESO: {plan_nivel}
+
+REPORTE DEL INCIDENTE:
+{mensaje_usuario}
+"""
+        msg.attach(MIMEText(cuerpo, 'plain'))
+
+        # Envío por puerto 465 (SSL seguro) con límite de 10 segundos para no saturar el servidor
+        server = smtplib.SMTP_SSL('smtp.hostinger.com', 465, timeout=10)
+        server.login(smtp_user, smtp_pass)
+        text = msg.as_string()
+        server.sendmail(smtp_user, destinatario, text)
+        server.quit()
+        print(f"✉️ Alerta oficial enviada con éxito a su bandeja para el ticket {ticket_ref}")
+    except Exception as e:
+        print("❌ Error interno de Hostinger al enviar correo:", str(e))
+
+
+# ==========================================
+# MÓDULO DE SOPORTE TÁCTICO (SÚPER RÁPIDO)
 # ==========================================
 @app.post("/generar_ticket")
-async def generar_ticket(req: SoporteRequest):
+async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks):
     if not supabase:
         return {"status": "error", "mensaje": "Base de datos desconectada"}
     
     try:
-        # 1. Generamos el código exacto de su sistema
+        # 1. Generamos el código exacto
         codigo = str(random.randint(10000, 99999))
         ticket_ref = f"GX-{codigo}"
         
-        # 2. Guardamos en la tabla
+        # 2. Guardamos en la tabla de Supabase (Tarda 0.1 segundos)
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
             "email_usuario": req.email_usuario,
@@ -232,48 +276,16 @@ async def generar_ticket(req: SoporteRequest):
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. CONEXIÓN DIRECTA (Envío de correo)
-        smtp_user = "support@vaultlogicsys.com"
-        smtp_pass = os.getenv("EMAIL_PASSWORD") 
-        destinatario = "support@vaultlogicsys.com"
+        # 3. LANZAMOS EL CORREO A LAS SOMBRAS (El usuario no tiene que esperar a Hostinger)
+        background_tasks.add_task(enviar_alerta_correo, ticket_ref, req.email_usuario, req.plan_nivel, req.mensaje)
 
-        if smtp_pass:
-            try:
-                msg = MIMEMultipart()
-                msg['From'] = smtp_user
-                msg['To'] = destinatario
-                msg['Subject'] = f"🔴 NUEVO TICKET GXP: {ticket_ref}"
-
-                cuerpo = f"""
-ha recibido una nueva transmisión de soporte táctico:
-
-ID DEL TICKET: {ticket_ref}
-EMAIL DEL USUARIO: {req.email_usuario}
-NIVEL DE ACCESO: {req.plan_nivel}
-
-REPORTE DEL INCIDENTE:
-{req.mensaje}
-"""
-                msg.attach(MIMEText(cuerpo, 'plain'))
-
-                # Coordenadas maestras
-                server = smtplib.SMTP_SSL('smtp.hostinger.com', 465)
-                server.starttls()
-                server.login(smtp_user, smtp_pass)
-                text = msg.as_string()
-                server.sendmail(smtp_user, destinatario, text)
-                server.quit()
-                print(f"✉️ Alerta oficial enviada con éxito a su bandeja para el ticket {ticket_ref}")
-            except Exception as e:
-                print("❌ Error enviando email de alerta corporativa:", str(e))
-        else:
-            print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD. No se envió correo.")
-
+        # 4. LE DAMOS LUZ VERDE AL USUARIO INMEDIATAMENTE
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
         
     except Exception as e:
         print("❌ Error en Ticket:", str(e))
         return {"status": "error", "mensaje": "Fallo en el núcleo de soporte."}
+
 
 # ==========================================
 # RUTA OFICIAL DE PAYPAL
