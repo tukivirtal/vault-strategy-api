@@ -257,7 +257,7 @@ REPORTE DEL INCIDENTE:
                 msg.attach(MIMEText(cuerpo, 'plain'))
 
                 # Coordenadas maestras
-                server = smtplib.SMTP('smtp.hostinger.com', 587)
+                server = smtplib.SMTP_SSL('smtp.hostinger.com', 465)
                 server.starttls()
                 server.login(smtp_user, smtp_pass)
                 text = msg.as_string()
