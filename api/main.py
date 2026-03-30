@@ -214,12 +214,11 @@ def health():
 
 
 # ==========================================
-# MOTOR EN SEGUNDO PLANO (LA MAGIA ANTIBLOQUEO PARA CORREOS)
+# MOTOR EN SEGUNDO PLANO (CONFIRMACIÓN AL CLIENTE)
 # ==========================================
-def enviar_alerta_correo(ticket_ref, email_usuario, plan_nivel, mensaje_usuario):
+def enviar_confirmacion_cliente(ticket_ref, nombre_usuario, email_usuario, plan_nivel):
     smtp_user = "support@vaultlogicsys.com"
     smtp_pass = os.getenv("EMAIL_PASSWORD") # Su llave guardada en Render
-    destinatario = "support@vaultlogicsys.com"
 
     if not smtp_pass:
         print("⚠️ ATENCIÓN: Falta la variable EMAIL_PASSWORD en Render. Correo abortado.")
@@ -227,31 +226,34 @@ def enviar_alerta_correo(ticket_ref, email_usuario, plan_nivel, mensaje_usuario)
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = destinatario
-        msg['Subject'] = f"🔴 NUEVO TICKET GXP: {ticket_ref}"
+        msg['From'] = f"Soporte GXP <{smtp_user}>"
+        msg['To'] = email_usuario
+        msg['Subject'] = f"Confirmación de Ticket Recibido: {ticket_ref}"
 
-        cuerpo = f"""
-ha recibido una nueva transmisión de soporte táctico:
+        cuerpo = f"""Saludos, {nombre_usuario},
 
-ID DEL TICKET: {ticket_ref}
-EMAIL DEL USUARIO: {email_usuario}
-NIVEL DE ACCESO: {plan_nivel}
+Hemos recibido exitosamente su solicitud de soporte en el Centro de Comando GXP.
 
-REPORTE DEL INCIDENTE:
-{mensaje_usuario}
+DATOS DE SU TICKET:
+- ID de Registro: {ticket_ref}
+- Nivel de Acceso: {plan_nivel}
+
+Nuestro equipo de ingeniería ya tiene su reporte en la base de datos y lo está analizando. Nos comunicaremos con usted a la brevedad con una resolución.
+
+Atentamente,
+Soporte Técnico - Vault Logic
 """
         msg.attach(MIMEText(cuerpo, 'plain'))
 
-        # Envío por puerto 465 (SSL seguro) con límite de 10 segundos para no saturar el servidor
+        # Envío por puerto 465 (SSL seguro) con límite de 10 segundos
         server = smtplib.SMTP_SSL('smtp.hostinger.com', 465, timeout=10)
         server.login(smtp_user, smtp_pass)
         text = msg.as_string()
-        server.sendmail(smtp_user, destinatario, text)
+        server.sendmail(smtp_user, email_usuario, text)
         server.quit()
-        print(f"✉️ Alerta oficial enviada con éxito a su bandeja para el ticket {ticket_ref}")
+        print(f"✉️ Confirmación enviada con éxito al cliente: {email_usuario}")
     except Exception as e:
-        print("❌ Error interno de Hostinger al enviar correo:", str(e))
+        print("❌ Error interno de Hostinger al enviar correo al cliente:", str(e))
 
 
 # ==========================================
@@ -270,7 +272,7 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         # 2. Guardamos en la tabla de Supabase (Tarda 0.1 segundos)
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
-           "nombre_usuario": req.nombre_usuario,
+            "nombre_usuario": req.nombre_usuario,
             "email_usuario": req.email_usuario,
             "plan_nivel": req.plan_nivel,
             "mensaje": req.mensaje
@@ -278,8 +280,8 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         supabase.table("soporte_tickets").insert(nuevo_ticket).execute()
         print(f"✅ Ticket {ticket_ref} guardado en Bóveda.")
         
-        # 3. LANZAMOS EL CORREO A LAS SOMBRAS (El usuario no tiene que esperar a Hostinger)
-        background_tasks.add_task(enviar_alerta_correo, ticket_ref, req.email_usuario, req.plan_nivel, req.mensaje)
+        # 3. LANZAMOS EL CORREO AL CLIENTE EN LAS SOMBRAS
+        background_tasks.add_task(enviar_confirmacion_cliente, ticket_ref, req.nombre_usuario, req.email_usuario, req.plan_nivel)
 
         # 4. LE DAMOS LUZ VERDE AL USUARIO INMEDIATAMENTE
         return {"status": "success", "ticket_id": ticket_ref, "mensaje": "Ticket indexado exitosamente."}
