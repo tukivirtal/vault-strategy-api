@@ -56,6 +56,7 @@ class UpgradeRequest(BaseModel):
     nivel_suscripcion: str
 
 class SoporteRequest(BaseModel):
+    nombre_usuario: str = "Desconocido"
     email_usuario: str
     plan_nivel: str
     mensaje: str
@@ -269,6 +270,7 @@ async def generar_ticket(req: SoporteRequest, background_tasks: BackgroundTasks)
         # 2. Guardamos en la tabla de Supabase (Tarda 0.1 segundos)
         nuevo_ticket = {
             "ticket_ref": ticket_ref,
+           "nombre_usuario": req.nombre_usuario,
             "email_usuario": req.email_usuario,
             "plan_nivel": req.plan_nivel,
             "mensaje": req.mensaje
