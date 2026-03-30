@@ -163,8 +163,7 @@ async def simular_periodo(req: SimulacionRequest):
         val_neg = round((ciclo_sol * 12) - (ciclo_saturno * 8), 1)
         val_risk = round((ciclo_saturno * -20) + (ciclo_jupiter * -5), 1)
 
-        is_risk = val_risk < -5 or val_cap < 0
-
+        is_risk = False
         curva_exacta = []
         for i in range(7):
             dia_segmento = dias_desde_2000 + int((dias_totales / 6) * i)
